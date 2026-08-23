@@ -12,7 +12,10 @@ use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class CitasTable
@@ -56,8 +59,19 @@ class CitasTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
-            ])
+                Filter::make('hoy')
+                    ->label('Hoy')
+                    ->toggle()
+                    ->query(fn (Builder $query): Builder => $query->whereDate('fecha', today())),
+                Filter::make('pendientes')
+                    ->label('Pendientes')
+                    ->toggle()
+                    ->query(fn (Builder $query): Builder => $query->where('estado', 'pendiente')),
+                Filter::make('confirmadas')
+                    ->label('Confirmadas')
+                    ->toggle()
+                    ->query(fn (Builder $query): Builder => $query->where('estado', 'confirmada')),
+            ], layout: FiltersLayout::AboveContentCollapsible)
             ->recordActions([
                 ActionGroup::make(self::accionesCambiarEstado())
                     ->label('Cambiar estado')

@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (implementados los puntos 1, 2 y 3 del plan de UX: Dashboard "citas de hoy", cambio de estado con un clic, y crear paciente sin salir del formulario de Cita — ver sección 8).
+Última actualización: 23 de agosto de 2026 (implementados los puntos 1, 2, 3 y 4 del plan de UX: Dashboard "citas de hoy", cambio de estado con un clic, crear paciente sin salir del formulario de Cita, y filtros rápidos en la tabla de Citas — ver sección 8).
 
 ---
 
@@ -137,6 +137,7 @@ facturas
 - [x] ~~Dashboard con widget de "citas de hoy"~~ — resuelto (ver sección 8, punto 1). Confirmado funcionando por el usuario en el entorno real, incluyendo con una cita de prueba cargada.
 - [x] ~~Cambiar estado de una cita con un clic desde la tabla~~ — resuelto (ver sección 8, punto 2). **Pendiente probar en el entorno real** (este cambio se escribió sin acceso a PHP/Sail, igual que el punto 1).
 - [x] ~~Crear paciente nuevo sin salir del formulario de Cita~~ — resuelto (ver sección 8, punto 3). **Pendiente probar en el entorno real.**
+- [x] ~~Filtros rápidos en la lista de Citas (Hoy/Pendientes/Confirmadas)~~ — resuelto (ver sección 8, punto 4). **Pendiente probar en el entorno real.**
 - [ ] **Deuda técnica detectada de paso**: el `PacienteForm.php` original (el de `/admin/pacientes`, no el modal nuevo) tampoco valida `cedula` como única a nivel de formulario — solo la restricción de la base de datos, igual que el bug que ya se corrigió para el borrado con datos relacionados (ver sección 9). Si se crea un paciente con una cédula repetida desde `/admin/pacientes/create`, sale el error crudo de MySQL en vez de un mensaje claro. Se corrigió puntualmente en el modal nuevo de `CitaForm.php`, pero no en el formulario original — pendiente para una próxima pasada.
 
 ## 8. Plan para la próxima sesión — pulir UX del sistema interno
@@ -149,13 +150,13 @@ El sistema ya es funcional de punta a punta (CRUD + roles). Lo que sigue es hace
 
 3. [x] ~~**Crear paciente nuevo sin salir del formulario de Cita**~~ — **resuelto**. En `app/Filament/Resources/Citas/Schemas/CitaForm.php` se agregó `->createOptionForm([...])` al selector de `paciente_id`, con los mismos campos que `PacienteForm` (nombres, apellidos, cédula, fecha de nacimiento, teléfono, email, dirección, sexo). Ahora aparece un botón "+" junto al selector que abre un modal para crear el paciente sin perder los datos ya cargados en el formulario de la cita. Se agregó validación `->unique(table: 'pacientes', column: 'cedula')` al campo cédula del modal (el `PacienteForm` original no la tenía — solo la restricción de la base de datos — así que sin esto el modal habría mostrado el error crudo de MySQL en vez de un mensaje claro si se repetía una cédula). De paso se mejoró cómo se ve el selector de paciente: antes solo mostraba `nombres`, ahora muestra "Nombres Apellidos" (vía `getOptionLabelFromRecordUsing`) y se puede buscar también por apellido o cédula — útil para poder diferenciar pacientes con el mismo nombre de pila, cosa que se vuelve más común ahora que se crean pacientes rápido desde acá.
 
-4. **Filtros rápidos en la lista de Citas** ("Hoy", "Pendientes", "Confirmadas"). Implementación: usar `Tables\Filters\Filter` o `Tables\Filters\SelectFilter` en `CitasTable.php`, incluyendo un filtro rápido de fecha = hoy.
+4. [x] ~~**Filtros rápidos en la lista de Citas**~~ ("Hoy", "Pendientes", "Confirmadas") — **resuelto**. En `CitasTable.php` se agregaron 3 `Filter` con `->toggle()` (checkbox tipo switch en vez de checkbox normal): "Hoy" (`whereDate('fecha', today())`), "Pendientes" y "Confirmadas" (`where('estado', ...)`). Se combinó `layout: FiltersLayout::AboveContentCollapsible` para que aparezcan arriba de la tabla en vez de escondidos en un dropdown, y sean realmente "rápidos" de encontrar y tocar (se pueden colapsar si molestan). No se agregó filtro para "Atendida"/"Cancelada" porque el plan solo pedía esos 3 (los más usados en el día a día); si hace falta, es trivial copiar el patrón.
 
 5. **Buscador global mejorado**. Evaluar si Filament's global search (`getGloballySearchableAttributes()` en cada Resource) ya cubre esto — permite buscar "García" desde cualquier pantalla del panel sin saber en qué sección está.
 
 **Explícitamente descartado por ahora** (para no abrumar al personal antes de que domine lo básico): recordatorios automáticos por WhatsApp/SMS, portal de autoagendamiento para pacientes. Quedan para una fase futura, después de validar que recepción/médicos ya están cómodos con el sistema base.
 
-**Estado**: puntos 1 (Dashboard), 2 (cambiar estado con un clic) y 3 (crear paciente desde el formulario de Cita) resueltos; 1 y 2 confirmados funcionando por el usuario en el entorno real. Sugerencia por defecto para la próxima sesión: seguir con el punto 4 (filtros rápidos en Citas).
+**Estado**: puntos 1 (Dashboard), 2 (cambiar estado con un clic), 3 (crear paciente desde el formulario de Cita) y 4 (filtros rápidos) resueltos; 1, 2 y 3 confirmados funcionando por el usuario en el entorno real. Sigue quedando el punto 5 (buscador global) como el único pendiente del plan original de 5 mejoras.
 
 **Otros pendientes de fondo, sin definir aún**:
 - Construir la página web pública (diseño, contenido) — sigue sin arrancar.

@@ -6,6 +6,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Filtros rápidos en la tabla de Citas (punto 4 del plan de UX)
+
+- `app/Filament/Resources/Citas/Tables/CitasTable.php`: se agregaron 3 filtros tipo toggle (switch) en `->filters()`: "Hoy" (`whereDate('fecha', today())`), "Pendientes" y "Confirmadas" (`where('estado', ...)`).
+- Se usó `layout: FiltersLayout::AboveContentCollapsible` para que los filtros aparezcan como controles visibles arriba de la tabla (colapsables) en vez de escondidos detrás del ícono de filtro por defecto — así son más rápidos de encontrar y usar en el día a día.
+- No se agregaron filtros para "Atendida"/"Cancelada" — el plan solo pedía los 3 más usados; agregar más sigue el mismo patrón si hace falta después.
+- **Nota de entorno**: igual que los puntos anteriores, se escribió sin acceso a PHP/Composer/Sail. Se verificó la firma exacta de `Filter::toggle()`, `->query()` y `Table::filters(array, layout:)` contra el código fuente y la documentación oficial de Filament 5, pero falta probarlo corriendo el proyecto real.
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Crear paciente sin salir del formulario de Cita (punto 3 del plan de UX)
 
 - `app/Filament/Resources/Citas/Schemas/CitaForm.php`: se agregó `->createOptionForm([...])` al selector `paciente_id`, con los mismos campos que el formulario de Pacientes (nombres, apellidos, cédula, fecha de nacimiento, teléfono, email, dirección, sexo). Ahora hay un botón "+" junto al selector que abre un modal para dar de alta un paciente nuevo sin perder los datos ya cargados en la cita.
