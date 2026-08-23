@@ -6,6 +6,11 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Validación de cédula única — confirmado funcionando en el entorno real
+
+- Se probó en `/admin/pacientes`: crear un paciente con una cédula repetida muestra el mensaje de validación en vez del error crudo de MySQL; editar un paciente sin cambiar su propia cédula guarda sin problema (confirma que `ignoreRecord: true` funciona); editar un paciente cambiando su cédula por la de otro paciente existente también dispara la validación correctamente.
+- No hay cambios de código en esta entrada, solo la confirmación.
+
 ## [2026-08-23] Deuda técnica: validación de cédula única en el formulario de Pacientes
 
 - `app/Filament/Resources/Pacientes/Schemas/PacienteForm.php`: se agregó `->unique(table: 'pacientes', column: 'cedula', ignoreRecord: true)` al campo `cedula`. Antes solo existía la restricción `unique` a nivel de base de datos (definida en la migración), así que crear o editar un paciente con una cédula repetida desde `/admin/pacientes` mostraba el error crudo de MySQL (`Integrity constraint violation`) en vez de un mensaje de validación claro.
