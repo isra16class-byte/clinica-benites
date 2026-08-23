@@ -6,6 +6,21 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Investigación de buenas prácticas de agendamiento clínico + plan de UX
+
+Con el sistema interno ya funcional de punta a punta (CRUD + roles confirmados), se investigaron buenas prácticas de software de agendamiento clínico para identificar las mejoras de experiencia de uso con mayor impacto para recepción/médicos en el día a día.
+
+Se dejó un plan priorizado de 5 mejoras (documentado en `MEMORIA.md` sección 8):
+1. Dashboard con "citas de hoy" al entrar al panel (⭐ mayor impacto).
+2. Cambiar el estado de una cita con un clic, sin abrir el formulario completo.
+3. Crear un paciente nuevo sin salir del formulario de Cita (modal).
+4. Filtros rápidos en la lista de Citas ("Hoy", "Pendientes", "Confirmadas").
+5. Buscador global mejorado.
+
+Explícitamente descartado por ahora (fase futura): recordatorios automáticos por WhatsApp/SMS, portal de autoagendamiento para pacientes.
+
+No se tocó código en esta sesión — es planificación para la siguiente. Pendiente confirmar con el usuario cuál de los 5 puntos priorizar primero; sugerencia por defecto: puntos 1 y 2.
+
 ## [2026-08-23] Fix de fondo: botones no conectados a los permisos por rol
 
 Diagnóstico del problema reportado (botón "Crear" visible para rol sin permiso, y borrado de Paciente ejecutándose sin 403 en vez de bloquearse):

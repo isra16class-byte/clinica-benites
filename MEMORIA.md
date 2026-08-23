@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (roles y permisos **confirmados funcionando** de punta a punta tras conectar explícitamente cada botón — Crear/Editar/Eliminar/borrado masivo — a los métodos de autorización del Resource. Probado con usuario de rol `recepcion`).
+Última actualización: 23 de agosto de 2026 (sistema interno completo y funcional: CRUD + roles confirmados de punta a punta. Se investigaron buenas prácticas de software de agendamiento clínico y se dejó un plan priorizado de 5 mejoras de UX para la próxima sesión — ver sección 8).
 
 ---
 
@@ -134,7 +134,30 @@ facturas
 - [x] ~~Crear los Resources de Filament (pantallas) para cada tabla~~ — resuelto, con selectores por relación en vez de IDs.
 - [x] ~~Fix MassAssignmentException (faltaba \$fillable en los modelos)~~ — resuelto y confirmado: flujo completo Área → Médico → Paciente → Cita probado con éxito desde `/admin`.
 - [x] ~~Agregar campo `rol` a la tabla `users` y definir permisos/roles en Filament~~ — resuelto y confirmado funcionando de punta a punta, incluyendo el fix de fondo de botones no conectados a permisos (ver sección 9).
-- [ ] **Pendiente inmediato**: construir la página web pública, o mejorar el Dashboard — a decidir con el usuario. Sigue pendiente respuesta del contacto interno sobre cuántas áreas/especialidades tiene la clínica.
+
+## 8. Plan para la próxima sesión — pulir UX del sistema interno
+
+El sistema ya es funcional de punta a punta (CRUD + roles). Lo que sigue es hacerlo **más rápido de usar en el día a día** para recepción/médicos. Investigado contra buenas prácticas de software de agendamiento clínico — priorizado de más a menos impacto:
+
+1. **Dashboard con "citas de hoy" al entrar** (⭐ mayor impacto). Reemplazar las tarjetas genéricas de Filament ("Welcome", "filament") por un widget que muestre las citas del día apenas se entra a `/admin`. Implementación: crear un Widget de tabla en Filament (`make:filament-widget`) filtrando `Cita::whereDate('fecha', today())`, registrarlo en el panel provider. Considerar mostrar solo las citas del médico logueado si es rol `medico` (usar `Auth::user()->isMedico()` para filtrar por su registro de Médico — aquí también aplicaría la limitación conocida de que `users` y `medicos` no están conectados, ver sección 9).
+
+2. **Cambiar estado de una cita con un clic, sin abrir el formulario completo**. Hoy hay que entrar a Editar solo para pasar de "Pendiente" a "Atendida". Implementación: agregar una `Action` personalizada en `CitasTable.php` (botón o menú desplegable en la fila) que actualice `estado` directamente vía `$record->update(['estado' => 'atendida'])`, sin navegar a otra página. Respetar permisos: visible solo si `CitaResource::canEdit($record)`.
+
+3. **Crear paciente nuevo sin salir del formulario de Cita**. Cuando llega un paciente no registrado, hoy hay que cancelar la cita, ir a crear el paciente, y volver. Filament permite esto con `Select::make('paciente_id')->createOptionForm([...])` — agrega un botón "+" junto al selector que abre un mini-formulario modal para crear el paciente sin perder el formulario de cita. Aplicar en `CitaForm.php`.
+
+4. **Filtros rápidos en la lista de Citas** ("Hoy", "Pendientes", "Confirmadas"). Implementación: usar `Tables\Filters\Filter` o `Tables\Filters\SelectFilter` en `CitasTable.php`, incluyendo un filtro rápido de fecha = hoy.
+
+5. **Buscador global mejorado**. Evaluar si Filament's global search (`getGloballySearchableAttributes()` en cada Resource) ya cubre esto — permite buscar "García" desde cualquier pantalla del panel sin saber en qué sección está.
+
+**Explícitamente descartado por ahora** (para no abrumar al personal antes de que domine lo básico): recordatorios automáticos por WhatsApp/SMS, portal de autoagendamiento para pacientes. Quedan para una fase futura, después de validar que recepción/médicos ya están cómodos con el sistema base.
+
+**Antes de empezar la próxima sesión**: confirmar con el usuario cuál de los 5 puntos priorizar primero (la sesión anterior no llegó a decidir cuál). Sugerencia por defecto si no hay respuesta: empezar por el punto 1 (Dashboard) y el punto 2 (cambiar estado con un clic), que son los de mayor impacto con menos esfuerzo.
+
+**Otros pendientes de fondo, sin definir aún**:
+- Construir la página web pública (diseño, contenido) — sigue sin arrancar.
+- Personalizar la marca del panel (logo, colores, nombre en vez de "Laravel").
+- Sigue pendiente la respuesta del contacto interno de la clínica sobre cuántas áreas/especialidades tiene — no bloquea el desarrollo (el sistema ya soporta cualquier número de áreas dinámicamente), pero sería bueno tenerla para cargar datos reales en vez de datos de prueba.
+- No se ha hecho la entrevista formal con el dueño de la clínica.
 
 ## 9. Roles y permisos
 
@@ -170,14 +193,8 @@ Campo `rol` en la tabla `users` (string, default `recepcion`). Valores válidos:
 **Troubleshooting general para casos futuros similares**: si un botón de acción (Crear/Editar/Eliminar) se ve visible mostrando 403 al usarlo, o si una acción tipo "Eliminar"/"Ver" no respeta el rol, revisar si esa acción tiene `->visible()` conectado explícitamente al método de autorización del Resource — no basta con definir `canCreate()`/`canEdit()`/`canDelete()` en el Resource, hay que conectarlos a mano en cada botón.
 
 **Protección contra borrado con datos relacionados**: Área, Médico, Paciente y Cita ahora validan antes de borrar (en el `DeleteAction` de su página de edición) si tienen registros dependientes (ej. un paciente con citas, un médico con historias clínicas). Si los tiene, se cancela el borrado y se muestra una notificación clara en español, en vez del error crudo de MySQL (`Integrity constraint violation`). Historia Clínica y Factura no necesitan esta protección porque nada más depende de ellas.
-- [ ] Agregar campo `rol` a la tabla `users` (admin/recepción/médico).
-- [ ] Definir roles y permisos dentro de Filament (qué ve/hace cada rol) — depende del campo `rol` de arriba.
-- [ ] Construir la página web pública (diseño, contenido).
-- [ ] Definir alcance real de facturación con el cliente (¿SRI, seguros?) antes de modelar esa parte a fondo.
-- [ ] Backups automáticos antes de publicar.
-- [ ] Comprar dominio y contratar VPS cuando el sistema esté listo para lanzarse.
 
-## 8. Historial de cambios
+## 10. Historial de cambios
 
 Ver `CHANGELOG.md` — ahí se registra cronológicamente cada paso importante. Este archivo (`MEMORIA.md`) describe el estado **actual**, se sobreescribe cada vez que algo cambia. El changelog se va acumulando, nunca se borra lo viejo.
 
