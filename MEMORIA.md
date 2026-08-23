@@ -121,7 +121,7 @@ facturas
 - ✅ Tablas creadas en MySQL (`sail artisan migrate` corrido correctamente, las 6 con `DONE`).
 - ✅ Filament Resources generados para las 6 tablas (formulario + tabla + páginas). Los selectores de llaves foráneas (`area_id`, `paciente_id`, `medico_id`, `cita_id`) ya usan `Select` con relación Eloquent en vez de `TextInput` numérico, tanto en formularios como en las columnas de las tablas (muestran nombres, no IDs). Los campos `estado` (citas) y `estado_pago` (facturas) son `Select` con opciones fijas y colores (badge) en vez de texto libre.
 - ✅ Git: repo en GitHub confirmado funcionando — `git log --oneline` muestra `HEAD -> main, origin/main` en el mismo commit, o sea que local y remoto están sincronizados.
-- ⚠️ **Pendiente ejecutar**: `composer require barryvdh/laravel-dompdf` — dependencia nueva agregada por el código de exportar Facturas a PDF (ver sección 9). Sin este paso, `EditFactura` y `FacturasTable` fallarán al usar el botón "Exportar PDF" (clase `Barryvdh\DomPDF\Facade\Pdf` no existiría). No se tocó `composer.json`/`composer.lock` a mano justamente para que este comando sea el que los deje consistentes entre sí.
+- ✅ `composer require barryvdh/laravel-dompdf` corrido con `./vendor/bin/sail composer require ...` (dependencia agregada por el código de exportar Facturas a PDF, ver sección 9). `composer.json`/`composer.lock` ya están commiteados y pusheados con la entrada de `barryvdh/laravel-dompdf`.
 
 ## 6. Preguntas pendientes (por confirmar con el contacto interno / en la entrevista formal)
 
