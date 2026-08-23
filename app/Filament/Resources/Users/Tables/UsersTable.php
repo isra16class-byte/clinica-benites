@@ -9,6 +9,8 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -57,8 +59,19 @@ class UsersTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
-            ])
+                // Filtro rápido por rol (admin/recepción/médico). Se usa
+                // SelectFilter en vez de 3 Filter->toggle() como en Citas
+                // porque los roles son mutuamente excluyentes (un usuario
+                // solo tiene uno), a diferencia de "Hoy"/"Pendientes" en
+                // Citas, que sí se pueden combinar entre sí.
+                SelectFilter::make('rol')
+                    ->label('Rol')
+                    ->options([
+                        'admin' => 'Administrador',
+                        'recepcion' => 'Recepción',
+                        'medico' => 'Médico',
+                    ]),
+            ], layout: FiltersLayout::AboveContentCollapsible)
             ->recordActions([
                 EditAction::make()
                     ->visible(fn (User $record): bool => UserResource::canEdit($record)),

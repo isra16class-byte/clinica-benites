@@ -6,6 +6,13 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Filtro rápido por rol en /admin/users
+
+- `UsersTable`: nuevo `SelectFilter` "Rol" (admin/recepción/médico), colocado arriba de la tabla vía `FiltersLayout::AboveContentCollapsible` (mismo patrón visual que los filtros rápidos de Citas).
+- Se usó `SelectFilter` (una sola opción a la vez) en vez de 3 `Filter->toggle()` como en Citas, porque el rol de un usuario es mutuamente excluyente — no tiene sentido combinar "admin" y "médico" a la vez, a diferencia de "Hoy"/"Pendientes" en Citas.
+- Sintaxis validada con `php -l`. Falta probar en el entorno real.
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Confirmación en entorno real: fix de `medico_id` + filtro "mis pacientes"
 
 - Confirmado por el usuario: el fix de `medico_id` (se limpia correctamente al cambiar el rol de un usuario, tanto en el `Select` en vivo como al guardar) funciona como se esperaba.
