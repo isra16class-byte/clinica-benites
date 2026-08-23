@@ -2,12 +2,15 @@
 
 namespace App\Filament\Resources\HistoriaClinicas\Tables;
 
+use App\Filament\Resources\HistoriaClinicas\HistoriaClinicaResource;
+use App\Models\HistoriaClinica;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class HistoriaClinicasTable
 {
@@ -41,11 +44,13 @@ class HistoriaClinicasTable
             ])
             ->recordActions([
                 ViewAction::make(),
-                EditAction::make(),
+                EditAction::make()
+                    ->visible(fn (HistoriaClinica $record): bool => HistoriaClinicaResource::canEdit($record)),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => Auth::user()?->isAdmin() ?? false),
                 ]),
             ]);
     }

@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\Facturas\Tables;
 
+use App\Filament\Resources\Facturas\FacturaResource;
+use App\Models\Factura;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class FacturasTable
 {
@@ -52,11 +55,13 @@ class FacturasTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->visible(fn (Factura $record): bool => FacturaResource::canEdit($record)),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => Auth::user()?->isAdmin() ?? false),
                 ]),
             ]);
     }

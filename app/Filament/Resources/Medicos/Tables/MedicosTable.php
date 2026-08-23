@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\Medicos\Tables;
 
+use App\Filament\Resources\Medicos\MedicoResource;
+use App\Models\Medico;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class MedicosTable
 {
@@ -40,11 +43,13 @@ class MedicosTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->visible(fn (Medico $record): bool => MedicoResource::canEdit($record)),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => Auth::user()?->isAdmin() ?? false),
                 ]),
             ]);
     }

@@ -16,6 +16,7 @@ class EditPaciente extends EditRecord
     {
         return [
             DeleteAction::make()
+                ->visible(fn (Paciente $record): bool => PacienteResource::canDelete($record))
                 ->before(function (Paciente $record, DeleteAction $action) {
                     if ($record->citas()->exists() || $record->historiaClinicas()->exists() || $record->facturas()->exists()) {
                         Notification::make()

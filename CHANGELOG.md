@@ -6,6 +6,18 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Fix de fondo: botones no conectados a los permisos por rol
+
+Diagnóstico del problema reportado (botón "Crear" visible para rol sin permiso, y borrado de Paciente ejecutándose sin 403 en vez de bloquearse):
+
+**Causa raíz**: `canCreate()`/`canEdit()`/`canDelete()` en el Resource solo se aplican automáticamente al navegar por URL completa a las páginas de Crear/Editar (ahí sí bloquean con 403 correctamente). La *visibilidad* de los botones en pantalla y la ejecución del botón "Eliminar" (una acción de Livewire sin navegación de página) **no** estaban conectadas a esos métodos — Filament no lo hace automático, hay que conectarlo a mano.
+
+**Impacto real**: no era solo cosmético — el botón "Eliminar" se podía ejecutar sin chequeo de rol; en la prueba anterior solo lo salvó la restricción de integridad de MySQL (el paciente tenía citas asociadas). Un registro sin relaciones se habría borrado sin ser admin.
+
+**Fix**: se agregó `->visible()` en 18 puntos: los 6 `CreateAction` (páginas de lista), los 6 `EditAction` (tablas), los 6 `DeleteAction` (páginas de edición), y los 6 `DeleteBulkAction` (tablas) — cada uno conectado al método de autorización correspondiente del Resource.
+
+Entregado como patch (`git am`). Pendiente: repetir la prueba con el usuario de rol `recepcion` — ahora los botones de Crear/Editar en Áreas y Médicos, y el botón Eliminar en todos los recursos salvo Pacientes/Citas/Facturas (que si puede crear/editar), deberían estar completamente ocultos, no solo bloqueados al hacer clic.
+
 ## [2026-08-23] Protección contra borrado con datos relacionados + diagnóstico de botón visible sin permiso
 
 - **Reportado**: al probar el usuario de prueba con rol `recepcion`, el botón "Crear" aparecía visible en Áreas y Médicos (no debería), aunque al hacer clic sí devolvía 403 correctamente. Diagnóstico en curso — el código de `canCreate()` en el servidor está correcto, así que se sospecha de caché de Laravel o de una carga de página anterior al cambio de permisos. Se documentaron los pasos de troubleshooting en `MEMORIA.md` sección 9 (`optimize:clear` + refresh fuerte + verificar rol real en BD vía tinker). Pendiente confirmar si se resolvió.

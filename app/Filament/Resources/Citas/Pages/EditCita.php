@@ -16,6 +16,7 @@ class EditCita extends EditRecord
     {
         return [
             DeleteAction::make()
+                ->visible(fn (Cita $record): bool => CitaResource::canDelete($record))
                 ->before(function (Cita $record, DeleteAction $action) {
                     if ($record->historiaClinicas()->exists() || $record->facturas()->exists()) {
                         Notification::make()

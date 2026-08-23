@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\Pacientes\Tables;
 
+use App\Filament\Resources\Pacientes\PacienteResource;
+use App\Models\Paciente;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class PacientesTable
 {
@@ -45,11 +48,13 @@ class PacientesTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->visible(fn (Paciente $record): bool => PacienteResource::canEdit($record)),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => Auth::user()?->isAdmin() ?? false),
                 ]),
             ]);
     }

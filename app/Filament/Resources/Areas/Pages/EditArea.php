@@ -16,6 +16,7 @@ class EditArea extends EditRecord
     {
         return [
             DeleteAction::make()
+                ->visible(fn (Area $record): bool => AreaResource::canDelete($record))
                 ->before(function (Area $record, DeleteAction $action) {
                     if ($record->medicos()->exists() || $record->citas()->exists()) {
                         Notification::make()
