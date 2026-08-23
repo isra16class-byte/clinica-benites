@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (agregada investigación sobre gestión de usuarios y exportación, y pregunta pendiente sobre "cuantificos" — ver secciones 6 y 9).
+Última actualización: 23 de agosto de 2026 (construidos gestión de usuarios y exportar Facturas a PDF — ver sección 9; requiere `composer require barryvdh/laravel-dompdf` antes de probar, ver sección 5).
 
 ---
 
@@ -41,7 +41,10 @@ clinica-benites/
       Cita.php                 # Con $fillable y relaciones belongsTo(Paciente, Medico, Area)
       HistoriaClinica.php      # Con $fillable y relaciones belongsTo(Paciente, Medico, Cita)
       Factura.php              # Con $fillable y relaciones belongsTo(Paciente, Cita)
-      User.php                # Por defecto de Laravel — pendiente agregarle campo `rol`
+      User.php                # Con $fillable, campo `rol` y métodos isAdmin()/isRecepcion()/isMedico()
+    Http/
+      Controllers/
+        FacturaPdfController.php  # Genera el PDF de una factura (dompdf), reutiliza permisos de FacturaResource
     Filament/
       Resources/
         Areas/                   # Resource completo (Form, Table, Pages)
@@ -49,7 +52,8 @@ clinica-benites/
         Medicos/                 # Resource completo, selector de Área por relación
         Citas/                   # Resource completo, selectores por relación + estado con colores
         HistoriaClinicas/        # Resource completo + vista de solo lectura (Infolist)
-        Facturas/                # Resource completo, selectores por relación + estado con colores
+        Facturas/                # Resource completo, selectores por relación + estado con colores, exportar a PDF
+        Users/                   # Resource completo, solo accesible por admin (gestión de usuarios/roles)
   database/
     migrations/
       ..._create_areas_table.php            # Completa (nombre)
@@ -58,6 +62,12 @@ clinica-benites/
       ..._create_citas_table.php            # Completa (FKs paciente/medico/area, horario, estado)
       ..._create_historia_clinicas_table.php # Completa (FKs paciente/medico/cita nullable)
       ..._create_facturas_table.php         # Completa (FKs paciente/cita nullable, monto, pago)
+  resources/
+    views/
+      pdf/
+        factura.blade.php       # Plantilla del comprobante de factura (CSS simple, para dompdf)
+  routes/
+    web.php                    # Ruta GET /facturas/{factura}/pdf, protegida con middleware auth
   docker-compose.yml         # Generado por Sail
   .env                       # NO se sube a git (credenciales locales de MySQL, etc.)
   MEMORIA.md                 # Este archivo
@@ -111,6 +121,7 @@ facturas
 - ✅ Tablas creadas en MySQL (`sail artisan migrate` corrido correctamente, las 6 con `DONE`).
 - ✅ Filament Resources generados para las 6 tablas (formulario + tabla + páginas). Los selectores de llaves foráneas (`area_id`, `paciente_id`, `medico_id`, `cita_id`) ya usan `Select` con relación Eloquent en vez de `TextInput` numérico, tanto en formularios como en las columnas de las tablas (muestran nombres, no IDs). Los campos `estado` (citas) y `estado_pago` (facturas) son `Select` con opciones fijas y colores (badge) en vez de texto libre.
 - ✅ Git: repo en GitHub confirmado funcionando — `git log --oneline` muestra `HEAD -> main, origin/main` en el mismo commit, o sea que local y remoto están sincronizados.
+- ⚠️ **Pendiente ejecutar**: `composer require barryvdh/laravel-dompdf` — dependencia nueva agregada por el código de exportar Facturas a PDF (ver sección 9). Sin este paso, `EditFactura` y `FacturasTable` fallarán al usar el botón "Exportar PDF" (clase `Barryvdh\DomPDF\Facade\Pdf` no existiría). No se tocó `composer.json`/`composer.lock` a mano justamente para que este comando sea el que los deje consistentes entre sí.
 
 ## 6. Preguntas pendientes (por confirmar con el contacto interno / en la entrevista formal)
 
@@ -191,13 +202,10 @@ Sesión de investigación (23 de agosto de 2026) sobre buenas prácticas de soft
 
 **Explícitamente descartado por ahora** (ver también sección 8): recordatorios automáticos por WhatsApp/SMS, portal de autoagendamiento para pacientes — quedan para una fase futura, después de validar que recepción/médicos ya están cómodos con el sistema base. Las ideas de esta sección quedan en la misma categoría: útiles a futuro, no urgentes.
 
-**Investigado en esta sesión — candidatas concretas para la próxima pasada de código (a diferencia de la lista de arriba, estas sí resuelven huecos operativos reales de hoy, no son "ideas para más adelante"):**
+**Resuelto en esta sesión** (a diferencia de la lista de arriba, estas eran huecos operativos reales de hoy, no "ideas para más adelante"):
 
-- **Gestión de usuarios desde el panel**: hoy crear un usuario o cambiarle el rol solo se puede por consola (`tinker`/`make:filament-user`, ver sección 10). Se investigó y **no hace falta** un paquete de permisos granulares (`spatie/laravel-permission`, Filament Shield) — eso es para sistemas con roles dinámicos/combinables; con los 3 roles fijos que ya tiene Benites (admin/recepcion/medico) alcanza con un `UserResource` normal, igual que los otros 6 Resources, con un `Select` para el campo `rol` ya existente. Recomendación encontrada: que solo `admin` pueda ver/crear/editar ese Resource (mismo patrón de permisos ya usado en los demás), y evitar que un usuario pueda auto-asignarse el rol `admin` desde ahí.
-- **Exportar registros (ej. Facturas)**: dos caminos distintos según el caso:
-  - Exportar una **lista/tabla completa** (ej. todas las facturas del mes) a Excel/CSV → Filament ya trae `ExportAction`/`ExportBulkAction` nativa, no requiere paquete externo.
-  - Exportar **un registro individual con formato de comprobante** (ej. una factura o una historia clínica lista para imprimir/entregar al paciente) → la nativa de Filament no lo cubre; el patrón estándar de la comunidad es `barryvdh/laravel-dompdf` + una plantilla Blade propia del documento, con un botón de acción en el Resource.
-  - Aplicaría con más sentido a **Facturas** (comprobante para el paciente) e **Historia Clínica** (a veces el paciente lo necesita para un seguro o interconsulta); para Citas/Pacientes/Médicos, alcanza con la exportación nativa de tabla si algún día se pide.
+- **Gestión de usuarios desde el panel** — **resuelto**. Nuevo `app/Filament/Resources/Users/` (mismo patrón de carpetas que los demás Resources: `UserResource.php`, `Schemas/UserForm.php`, `Tables/UsersTable.php`, `Pages/{ListUsers,CreateUser,EditUser}.php`). No se usó ningún paquete de permisos granulares (`spatie/laravel-permission`, Filament Shield) — con los 3 roles fijos (admin/recepcion/medico) alcanza con este Resource normal + el campo `Select` de `rol` que ya existía en la tabla `users`. Solo `admin` puede ver/crear/editar/eliminar este Resource (`canViewAny()` ya bloquea el acceso completo, incluida la entrada en el menú, para recepción y médico). Protección extra agregada: un admin **no puede eliminar su propia cuenta** (`canDelete()` lo excluye explícitamente, y el `DeleteBulkAction` de la tabla valida lo mismo con un `->before()` antes de un borrado masivo) — así la clínica no puede quedarse sin ningún admin activo por accidente. El campo contraseña es opcional al editar (dejarlo en blanco no cambia la contraseña actual) y obligatorio al crear, con el patrón estándar de Filament (`dehydrateStateUsing`/`dehydrated` + `Hash::make`). **Falta probar en el entorno real** (igual que el resto de código entregado como patch, ver nota de entorno en `CHANGELOG.md`).
+- **Exportar Facturas a PDF** — **resuelto** para el caso de un comprobante individual (el caso identificado con más sentido de negocio). Se agregó `barryvdh/laravel-dompdf` como dependencia nueva (⚠️ **requiere acción manual**: correr `composer require barryvdh/laravel-dompdf` antes de o después de aplicar el patch — no se tocó `composer.json`/`composer.lock` a mano para no dejarlos inconsistentes entre sí, ver `CHANGELOG.md` para el comando exacto). Se agregó `resources/views/pdf/factura.blade.php` (plantilla con CSS simple e inline, sin frameworks externos — dompdf solo soporta un subconjunto de CSS), `app/Http/Controllers/FacturaPdfController.php` (reutiliza `FacturaResource::canViewAny()` para no duplicar la regla de permisos — médico no puede descargarlo tampoco por esta ruta) y una ruta nueva `GET /facturas/{factura}/pdf` en `routes/web.php` (fuera de `/admin` porque genera un archivo binario para descargar, no una pantalla de Filament; protegida con el middleware `auth`, mismo guard de sesión que usa Filament). Botón "Exportar PDF" agregado tanto en la tabla de Facturas (recordActions) como en la cabecera de `EditFactura`. **No se hizo** exportación de tabla completa (Excel/CSV) — Filament ya trae eso nativo (`ExportAction`) sin necesitar código nuevo, se puede agregar en cualquier momento si se pide. Tampoco se aplicó a Historia Clínica en esta pasada (quedaría con el mismo patrón, ver sección 7 para dejarlo como pendiente si se quiere).
 
 **Pendiente sin resolver (ver sección 6)**: el contacto interno mencionó que la administración de la clínica hoy se maneja mediante algo que llamó "cuantificos" — término sin aclarar todavía, no se sabe a qué proceso corresponde. No se puede evaluar si el sistema ya lo cubre o si falta construir algo para eso hasta preguntarle directamente.
 
@@ -215,6 +223,7 @@ Campo `rol` en la tabla `users` (string, default `recepcion`). Valores válidos:
 | Citas | Todo | Todo | Ver y editar (sin eliminar) |
 | Historias Clínicas | Todo | Sin acceso | Todo (eliminar solo admin, por sensibilidad legal) |
 | Facturas | Todo | Todo | Sin acceso |
+| Usuarios | Todo (excepto eliminar su propia cuenta) | Sin acceso | Sin acceso |
 
 **Limitación conocida (pendiente para después)**: un médico ve *todas* las citas/historias clínicas del sistema, no solo las de sus propios pacientes. Filtrar "solo mis pacientes" requiere conectar la tabla `users` con `medicos` (hoy son independientes) — pendiente para una siguiente fase si se necesita.
 
@@ -226,7 +235,7 @@ Campo `rol` en la tabla `users` (string, default `recepcion`). Valores válidos:
 >>> exit
 ```
 
-**Para crear usuarios de prueba con otros roles**, usar `make:filament-user` para crear el usuario y luego el mismo comando de tinker (cambiando el email/rol) para asignarle el rol correcto — o hacerlo directo desde el panel una vez que se le dé al admin acceso a gestionar usuarios (pendiente, no hay Resource de `User` todavía).
+**Para crear usuarios nuevos con cualquier rol**, ya no hace falta la consola: desde `/admin/users` un usuario `admin` puede crear/editar usuarios y asignarles rol directamente (Resource agregado, ver sección 9). El método de `tinker` de arriba sigue siendo útil solo para el primer usuario admin (antes de que exista ninguno con ese rol para entrar al Resource).
 
 **Causa raíz confirmada del botón visible con 403 (y del riesgo de borrado sin permiso)**: en Filament, `canCreate()`/`canEdit()`/`canDelete()` del Resource solo se revisan automáticamente cuando se **navega a una ruta completa** (`/areas/create`, `/areas/{id}/edit`) — ahí sí bloquean con 403. Pero ni la visibilidad de los botones en pantalla, ni el botón "Eliminar" (que actúa como una acción de Livewire dentro de la misma página, sin navegar a otra ruta) estaban conectados a esos métodos por defecto. Esto significaba dos problemas: (1) botones de Crear/Editar visibles para roles sin permiso aunque el clic diera 403, y (2) más grave — el botón **Eliminar no pasaba ninguna validación de permiso**, solo lo salvó la restricción de MySQL en el caso probado (paciente con citas relacionadas); un registro sin relaciones se habría podido borrar sin ser admin.
 

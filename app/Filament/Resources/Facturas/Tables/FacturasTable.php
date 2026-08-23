@@ -4,9 +4,11 @@ namespace App\Filament\Resources\Facturas\Tables;
 
 use App\Filament\Resources\Facturas\FacturaResource;
 use App\Models\Factura;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
@@ -55,6 +57,12 @@ class FacturasTable
                 //
             ])
             ->recordActions([
+                Action::make('exportarPdf')
+                    ->label('PDF')
+                    ->icon(Heroicon::OutlinedDocumentArrowDown)
+                    ->color('gray')
+                    ->url(fn (Factura $record): string => route('facturas.pdf', $record))
+                    ->openUrlInNewTab(),
                 EditAction::make()
                     ->visible(fn (Factura $record): bool => FacturaResource::canEdit($record)),
             ])
