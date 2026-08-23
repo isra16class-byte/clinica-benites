@@ -6,6 +6,15 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Cambiar estado de una cita con un clic (punto 2 del plan de UX)
+
+- `app/Filament/Resources/Citas/Tables/CitasTable.php`: se agregó un `ActionGroup` "Cambiar estado" en la tabla de Citas, antes del botón Editar. Contiene un botón por cada estado válido (Pendiente/Confirmada/Atendida/Cancelada); cada uno se oculta si la cita ya está en ese estado, y al hacer clic actualiza `estado` directo (`$record->update(...)`) sin abrir el formulario ni navegar de página, mostrando una notificación de éxito.
+- Se extrajo el `match` de colores de estado (antes duplicado inline en la columna) a un método `colorEstado()` compartido, usado tanto por la columna con badge como por los nuevos botones de cambio de estado — así ambos quedan visualmente consistentes.
+- El grupo completo respeta permisos: solo visible si `CitaResource::canEdit($record)`, igual que el botón Editar existente.
+- **No implementado en esta pasada**: el mismo flujo rápido en el widget "Citas de hoy" del Dashboard (que por ahora solo tiene Editar). Queda como mejora natural para una próxima sesión si se quiere.
+- **Nota de entorno**: igual que el punto 1, este cambio se escribió sin acceso a PHP/Composer/Sail. Se verificó la API exacta (`Filament\Actions\Action`, `ActionGroup`, `Notification::make()->send()`) contra el código fuente y la documentación oficial de Filament 5, pero falta probarlo corriendo el proyecto real.
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Dashboard: widget de "citas de hoy" (punto 1 del plan de UX)
 
 - Nuevo `app/Filament/Widgets/CitasDeHoyWidget.php`: widget de tabla (`Filament\Widgets\TableWidget`) que muestra las citas con `fecha` = hoy, ordenadas por `hora_inicio`, con columnas Hora/Paciente/Médico/Área/Estado (mismos colores de badge que la tabla de Citas) y acción de Editar respetando `CitaResource::canEdit()`. Se autodescubre solo porque `AdminPanelProvider` ya apuntaba `discoverWidgets()` a esa carpeta.

@@ -4,9 +4,13 @@ namespace App\Filament\Resources\Citas\Tables;
 
 use App\Filament\Resources\Citas\CitaResource;
 use App\Models\Cita;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
@@ -40,13 +44,7 @@ class CitasTable
                     ->sortable(),
                 TextColumn::make('estado')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pendiente' => 'gray',
-                        'confirmada' => 'info',
-                        'atendida' => 'success',
-                        'cancelada' => 'danger',
-                        default => 'gray',
-                    })
+                    ->color(fn (string $state): string => self::colorEstado($state))
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -61,6 +59,10 @@ class CitasTable
                 //
             ])
             ->recordActions([
+                ActionGroup::make(self::accionesCambiarEstado())
+                    ->label('Cambiar estado')
+                    ->icon(Heroicon::OutlinedArrowPath)
+                    ->visible(fn (Cita $record): bool => CitaResource::canEdit($record)),
                 EditAction::make()
                     ->visible(fn (Cita $record): bool => CitaResource::canEdit($record)),
             ])
@@ -70,5 +72,48 @@ class CitasTable
                         ->visible(fn (): bool => Auth::user()?->isAdmin() ?? false),
                 ]),
             ]);
+    }
+
+    /**
+     * Un botón por cada estado válido de una cita, para cambiarlo con un
+     * clic desde la tabla sin abrir el formulario completo de edición.
+     *
+     * @return array<Action>
+     */
+    protected static function accionesCambiarEstado(): array
+    {
+        $estados = [
+            'pendiente' => 'Marcar como pendiente',
+            'confirmada' => 'Marcar como confirmada',
+            'atendida' => 'Marcar como atendida',
+            'cancelada' => 'Marcar como cancelada',
+        ];
+
+        return collect($estados)
+            ->map(fn (string $label, string $estado): Action => Action::make("estado_{$estado}")
+                ->label($label)
+                ->color(self::colorEstado($estado))
+                ->visible(fn (Cita $record): bool => $record->estado !== $estado)
+                ->action(function (Cita $record) use ($estado): void {
+                    $record->update(['estado' => $estado]);
+
+                    Notification::make()
+                        ->title('Estado de la cita actualizado')
+                        ->success()
+                        ->send();
+                }))
+            ->values()
+            ->all();
+    }
+
+    protected static function colorEstado(string $estado): string
+    {
+        return match ($estado) {
+            'pendiente' => 'gray',
+            'confirmada' => 'info',
+            'atendida' => 'success',
+            'cancelada' => 'danger',
+            default => 'gray',
+        };
     }
 }
