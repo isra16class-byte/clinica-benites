@@ -9,7 +9,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
@@ -64,6 +63,10 @@ class UsersTable
                 // porque los roles son mutuamente excluyentes (un usuario
                 // solo tiene uno), a diferencia de "Hoy"/"Pendientes" en
                 // Citas, que sí se pueden combinar entre sí.
+                // Layout Dropdown (el default de Filament): el botón de
+                // filtro queda junto a la barra de búsqueda en vez de en su
+                // propia fila arriba de la tabla (a diferencia de Citas,
+                // que usa AboveContentCollapsible por tener 3 filtros).
                 SelectFilter::make('rol')
                     ->label('Rol')
                     ->options([
@@ -71,7 +74,7 @@ class UsersTable
                         'recepcion' => 'Recepción',
                         'medico' => 'Médico',
                     ]),
-            ], layout: FiltersLayout::AboveContentCollapsible)
+            ])
             ->recordActions([
                 EditAction::make()
                     ->visible(fn (User $record): bool => UserResource::canEdit($record)),

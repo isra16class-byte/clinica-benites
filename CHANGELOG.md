@@ -6,6 +6,13 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Ajuste de UX: filtro de rol junto a la barra de búsqueda
+
+- A pedido del usuario tras confirmar el filtro anterior: se quitó `layout: FiltersLayout::AboveContentCollapsible` del `SelectFilter` de `UsersTable`. Con el layout `Dropdown` por defecto de Filament, el botón de filtro ahora aparece junto a la barra de búsqueda (como en la mayoría de tablas de Filament), en vez de en su propia fila arriba de la tabla.
+- Se eligió no usar `AboveContentCollapsible` aquí (a diferencia de Citas) porque con un solo filtro no se justifica el espacio extra que ocupa esa fila.
+- Sintaxis validada con `php -l`. Falta probar en el entorno real.
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Confirmación en entorno real: filtro rápido por rol en /admin/users
 
 - Confirmado por el usuario: el `SelectFilter` "Rol" en `/admin/users` funciona correctamente.
