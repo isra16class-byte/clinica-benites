@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (implementados los puntos 1, 2, 3 y 4 del plan de UX: Dashboard "citas de hoy", cambio de estado con un clic, crear paciente sin salir del formulario de Cita, y filtros rápidos en la tabla de Citas — ver sección 8).
+Última actualización: 23 de agosto de 2026 (implementado el punto 5 del plan de UX: buscador global — ver sección 8. Con esto se completaron los 5 puntos del plan original de mejoras de UX).
 
 ---
 
@@ -138,6 +138,7 @@ facturas
 - [x] ~~Cambiar estado de una cita con un clic desde la tabla~~ — resuelto (ver sección 8, punto 2). **Pendiente probar en el entorno real** (este cambio se escribió sin acceso a PHP/Sail, igual que el punto 1).
 - [x] ~~Crear paciente nuevo sin salir del formulario de Cita~~ — resuelto (ver sección 8, punto 3). **Pendiente probar en el entorno real.**
 - [x] ~~Filtros rápidos en la lista de Citas (Hoy/Pendientes/Confirmadas)~~ — resuelto (ver sección 8, punto 4). **Pendiente probar en el entorno real.**
+- [x] ~~Buscador global mejorado en los 6 Resources~~ — resuelto (ver sección 8, punto 5). **Pendiente probar en el entorno real.**
 - [ ] **Deuda técnica detectada de paso**: el `PacienteForm.php` original (el de `/admin/pacientes`, no el modal nuevo) tampoco valida `cedula` como única a nivel de formulario — solo la restricción de la base de datos, igual que el bug que ya se corrigió para el borrado con datos relacionados (ver sección 9). Si se crea un paciente con una cédula repetida desde `/admin/pacientes/create`, sale el error crudo de MySQL en vez de un mensaje claro. Se corrigió puntualmente en el modal nuevo de `CitaForm.php`, pero no en el formulario original — pendiente para una próxima pasada.
 
 ## 8. Plan para la próxima sesión — pulir UX del sistema interno
@@ -152,11 +153,11 @@ El sistema ya es funcional de punta a punta (CRUD + roles). Lo que sigue es hace
 
 4. [x] ~~**Filtros rápidos en la lista de Citas**~~ ("Hoy", "Pendientes", "Confirmadas") — **resuelto**. En `CitasTable.php` se agregaron 3 `Filter` con `->toggle()` (checkbox tipo switch en vez de checkbox normal): "Hoy" (`whereDate('fecha', today())`), "Pendientes" y "Confirmadas" (`where('estado', ...)`). Se combinó `layout: FiltersLayout::AboveContentCollapsible` para que aparezcan arriba de la tabla en vez de escondidos en un dropdown, y sean realmente "rápidos" de encontrar y tocar (se pueden colapsar si molestan). No se agregó filtro para "Atendida"/"Cancelada" porque el plan solo pedía esos 3 (los más usados en el día a día); si hace falta, es trivial copiar el patrón.
 
-5. **Buscador global mejorado**. Evaluar si Filament's global search (`getGloballySearchableAttributes()` en cada Resource) ya cubre esto — permite buscar "García" desde cualquier pantalla del panel sin saber en qué sección está.
+5. [x] ~~**Buscador global mejorado**~~ — **resuelto**. `Área` ya tenía buscador global habilitado por defecto (Filament lo activa solo con `$recordTitleAttribute`), pero `Médico`/`Paciente` solo buscaban por un campo (`nombres`), y `Cita`/`HistoriaClinica`/`Factura` no tenían buscador global en absoluto (no tienen un campo de texto único, así que nunca se les puso `$recordTitleAttribute`). Se agregó `getGloballySearchableAttributes()` a los 5 Resources restantes, con "dot notation" para buscar dentro de relaciones donde hace falta (ej. `Cita` ahora se encuentra buscando por nombre/apellido/cédula del paciente o del médico, o por texto en las notas). Se agregó `getGlobalSearchResultTitle()` para mostrar un título compuesto y legible (ej. "Cita — Juan Pérez" en vez del valor crudo de `fecha`) y `getGlobalSearchResultDetails()` para mostrar contexto extra bajo el título (médico, área, fecha/hora, estado, monto, etc., según el recurso). Se agregó `getGlobalSearchEloquentQuery()` con eager loading (`->with([...])`) en los recursos que muestran datos de relaciones en el título/detalles, para no generar N+1 en cada resultado. Los permisos no requirieron cambios: Filament ya excluye del buscador global cualquier recurso donde `canViewAny()` sea `false` para el usuario actual. **Pendiente probar en el entorno real** (igual que los puntos 2–4 en su momento; se validó solo sintaxis PHP y firmas de métodos contra la documentación oficial de Filament 5.x, sin acceso al proyecto corriendo).
 
 **Explícitamente descartado por ahora** (para no abrumar al personal antes de que domine lo básico): recordatorios automáticos por WhatsApp/SMS, portal de autoagendamiento para pacientes. Quedan para una fase futura, después de validar que recepción/médicos ya están cómodos con el sistema base.
 
-**Estado**: puntos 1 (Dashboard), 2 (cambiar estado con un clic), 3 (crear paciente desde el formulario de Cita) y 4 (filtros rápidos) resueltos; 1, 2 y 3 confirmados funcionando por el usuario en el entorno real. Sigue quedando el punto 5 (buscador global) como el único pendiente del plan original de 5 mejoras.
+**Estado**: los 5 puntos del plan original de mejoras de UX están resueltos (Dashboard, cambiar estado con un clic, crear paciente desde el formulario de Cita, filtros rápidos, buscador global). Puntos 1, 2 y 3 confirmados funcionando por el usuario en el entorno real; los puntos 4 y 5 siguen pendientes de esa confirmación (ver sección 7).
 
 **Otros pendientes de fondo, sin definir aún**:
 - Construir la página web pública (diseño, contenido) — sigue sin arrancar.

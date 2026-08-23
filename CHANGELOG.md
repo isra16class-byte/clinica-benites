@@ -6,6 +6,19 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Buscador global (punto 5 del plan de UX)
+
+- **Áreas** y **Médicos/Pacientes** ya tenían el buscador global habilitado por defecto (vía `$recordTitleAttribute`), pero solo buscaban por un único campo (`nombre`/`nombres`). Se amplió en `PacienteResource.php` y `MedicoResource.php` con `getGloballySearchableAttributes()` para buscar también por apellido, cédula, email y teléfono, y `getGlobalSearchResultTitle()` para mostrar "Nombres Apellidos" en vez de solo el nombre de pila.
+- **Citas**, **Historias Clínicas** y **Facturas** no tenían buscador global activo (no tienen un único campo de texto representativo, así que nunca se les puso `$recordTitleAttribute`). Se agregó a los tres:
+  - `$recordTitleAttribute` (un campo real cualquiera, solo para cumplir el requisito de habilitación — el título mostrado se sobreescribe).
+  - `getGloballySearchableAttributes()` con "dot notation" para buscar dentro de las relaciones (ej. `paciente.nombres`, `medico.apellidos`) además de campos propios (`notas`, `motivo_consulta`, `diagnostico`, `estado_pago`, `metodo_pago`).
+  - `getGlobalSearchResultTitle()` con un título compuesto ("Cita — Juan Pérez", "Historia clínica — Juan Pérez", "Factura — Juan Pérez").
+  - `getGlobalSearchResultDetails()` con datos de contexto bajo el título (médico, área, fecha/hora y estado para Citas; médico, motivo y diagnóstico para Historias; monto, estado de pago y fecha para Facturas).
+  - `getGlobalSearchEloquentQuery()` con `->with([...])` para precargar las relaciones usadas en título/detalles y evitar N+1 en cada resultado de búsqueda.
+- Los permisos existentes se respetan sin cambios adicionales: Filament excluye automáticamente de la búsqueda global cualquier recurso cuyo `canViewAny()` devuelva `false` para el usuario actual (ej. recepción no ve Historias Clínicas ni en el menú ni en el buscador; médico no ve Facturas).
+- **Nota de entorno**: se escribió sin acceso a PHP/Composer/Sail del proyecto real, pero se validó la sintaxis de los 5 archivos modificados instalando PHP CLI en un entorno aislado (`php -l`), y las firmas de los métodos se verificaron contra la documentación oficial de Filament 5.x (`getGloballySearchableAttributes()`, `getGlobalSearchResultTitle()`, `getGlobalSearchResultDetails()`, `getGlobalSearchEloquentQuery()`). Falta probarlo corriendo el proyecto real (igual que los puntos 2, 3 y 4 del plan de UX en su momento).
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Filtros rápidos en la tabla de Citas (punto 4 del plan de UX)
 
 - `app/Filament/Resources/Citas/Tables/CitasTable.php`: se agregaron 3 filtros tipo toggle (switch) en `->filters()`: "Hoy" (`whereDate('fecha', today())`), "Pendientes" y "Confirmadas" (`where('estado', ...)`).

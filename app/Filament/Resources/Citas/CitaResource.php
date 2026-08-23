@@ -13,6 +13,9 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class CitaResource extends Resource
@@ -20,6 +23,12 @@ class CitaResource extends Resource
     protected static ?string $model = Cita::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    // Cita no tiene un único campo de texto representativo (es una relación
+    // entre paciente/médico/horario), así que se fija un atributo real solo
+    // para habilitar la búsqueda global; el título mostrado se personaliza
+    // en getGlobalSearchResultTitle().
+    protected static ?string $recordTitleAttribute = 'fecha';
 
     public static function canViewAny(): bool
     {
@@ -51,6 +60,47 @@ class CitaResource extends Resource
     public static function table(Table $table): Table
     {
         return CitasTable::configure($table);
+    }
+
+    /**
+     * Búsqueda global: por nombre/apellido/cédula del paciente, nombre del
+     * médico o el texto de las notas. "Dot notation" busca dentro de las
+     * relaciones (paciente., medico.) sin tener que cargar cada resultado.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'paciente.nombres',
+            'paciente.apellidos',
+            'paciente.cedula',
+            'medico.nombres',
+            'medico.apellidos',
+            'notas',
+        ];
+    }
+
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        $paciente = trim("{$record->paciente?->nombres} {$record->paciente?->apellidos}");
+
+        return "Cita — {$paciente}";
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Médico' => trim("{$record->medico?->nombres} {$record->medico?->apellidos}"),
+            'Área' => $record->area?->nombre,
+            'Fecha' => Carbon::parse($record->fecha)->format('d/m/Y').' '.Carbon::parse($record->hora_inicio)->format('H:i'),
+            'Estado' => ucfirst($record->estado),
+        ];
+    }
+
+    // Evita N+1: sin esto, cada resultado de la búsqueda global dispararía
+    // 3 consultas extra (paciente, médico, área) al armar título y detalles.
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['paciente', 'medico', 'area']);
     }
 
     public static function getRelations(): array

@@ -13,6 +13,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class MedicoResource extends Resource
@@ -51,6 +53,33 @@ class MedicoResource extends Resource
     public static function table(Table $table): Table
     {
         return MedicosTable::configure($table);
+    }
+
+    /**
+     * Búsqueda global: por nombre, apellido, email o teléfono, no solo por
+     * el nombre de pila (mejora sobre el $recordTitleAttribute por defecto).
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['nombres', 'apellidos', 'email', 'telefono'];
+    }
+
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        return trim("{$record->nombres} {$record->apellidos}");
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Área' => $record->area?->nombre,
+            'Teléfono' => $record->telefono,
+        ];
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with('area');
     }
 
     public static function getRelations(): array

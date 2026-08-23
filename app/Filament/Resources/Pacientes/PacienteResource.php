@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class PacienteResource extends Resource
@@ -54,6 +55,29 @@ class PacienteResource extends Resource
     public static function table(Table $table): Table
     {
         return PacientesTable::configure($table);
+    }
+
+    /**
+     * Búsqueda global: por nombre, apellido, cédula o teléfono. Antes solo
+     * buscaba por $recordTitleAttribute ('nombres'), lo que no permitía
+     * encontrar un paciente por apellido o cédula desde el buscador.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['nombres', 'apellidos', 'cedula', 'telefono'];
+    }
+
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        return trim("{$record->nombres} {$record->apellidos}");
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Cédula' => $record->cedula,
+            'Teléfono' => $record->telefono,
+        ];
     }
 
     public static function getRelations(): array
