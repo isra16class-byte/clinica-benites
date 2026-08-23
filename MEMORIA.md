@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (confirmado funcionando en el entorno real el punto 5 del plan de UX: buscador global. Con esto quedan confirmados los 5 puntos del plan original de mejoras de UX — ver sección 8).
+Última actualización: 23 de agosto de 2026 (resuelta la deuda técnica de validación de cédula única en `PacienteForm.php` original — ver sección 7. El plan de UX de 5 puntos ya estaba confirmado en el entorno real — ver sección 8).
 
 ---
 
@@ -139,7 +139,7 @@ facturas
 - [x] ~~Crear paciente nuevo sin salir del formulario de Cita~~ — resuelto (ver sección 8, punto 3). **Pendiente probar en el entorno real.**
 - [x] ~~Filtros rápidos en la lista de Citas (Hoy/Pendientes/Confirmadas)~~ — resuelto (ver sección 8, punto 4). **Pendiente probar en el entorno real.**
 - [x] ~~Buscador global mejorado en los 6 Resources~~ — resuelto (ver sección 8, punto 5). Confirmado funcionando por el usuario en el entorno real (búsqueda de "ju" mostró correctamente Citas y Pacientes con Julio Jaramillo, con título compuesto y detalles). De paso se detectó un dato de prueba mal cargado en un médico (nombre completo duplicado entre `nombres` y `apellidos`), sin relación con el buscador — corregirlo directamente en `/admin/medicos`.
-- [ ] **Deuda técnica detectada de paso**: el `PacienteForm.php` original (el de `/admin/pacientes`, no el modal nuevo) tampoco valida `cedula` como única a nivel de formulario — solo la restricción de la base de datos, igual que el bug que ya se corrigió para el borrado con datos relacionados (ver sección 9). Si se crea un paciente con una cédula repetida desde `/admin/pacientes/create`, sale el error crudo de MySQL en vez de un mensaje claro. Se corrigió puntualmente en el modal nuevo de `CitaForm.php`, pero no en el formulario original — pendiente para una próxima pasada.
+- [x] ~~**Deuda técnica**: `PacienteForm.php` original sin validar `cedula` única a nivel de formulario~~ — **resuelto**. Se agregó `->unique(table: 'pacientes', column: 'cedula', ignoreRecord: true)` al campo `cedula` en `app/Filament/Resources/Pacientes/Schemas/PacienteForm.php` (el formulario de `/admin/pacientes`, usado tanto en Crear como en Editar). Ahora, si se repite una cédula al crear o editar un paciente desde ahí, sale un mensaje de validación claro en vez del error crudo de MySQL — mismo comportamiento que ya tenía el modal de creación rápida en `CitaForm.php`. Se usó `ignoreRecord: true` (a diferencia del modal, que no lo necesita por ser solo de creación) para que editar un paciente sin cambiar su propia cédula no dispare el error por "duplicarse a sí mismo". **Pendiente probar en el entorno real.**
 
 ## 8. Plan para la próxima sesión — pulir UX del sistema interno
 

@@ -17,7 +17,8 @@ class PacienteForm
                 TextInput::make('apellidos')
                     ->required(),
                 TextInput::make('cedula')
-                    ->required(),
+                    ->required()
+                    ->unique(table: 'pacientes', column: 'cedula', ignoreRecord: true),
                 DatePicker::make('fecha_nacimiento'),
                 TextInput::make('telefono')
                     ->tel(),

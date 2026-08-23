@@ -6,6 +6,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Deuda técnica: validación de cédula única en el formulario de Pacientes
+
+- `app/Filament/Resources/Pacientes/Schemas/PacienteForm.php`: se agregó `->unique(table: 'pacientes', column: 'cedula', ignoreRecord: true)` al campo `cedula`. Antes solo existía la restricción `unique` a nivel de base de datos (definida en la migración), así que crear o editar un paciente con una cédula repetida desde `/admin/pacientes` mostraba el error crudo de MySQL (`Integrity constraint violation`) en vez de un mensaje de validación claro.
+- Se usó `ignoreRecord: true` porque este formulario se comparte entre la página de Crear y la de Editar — sin esa opción, guardar un paciente existente sin tocar su cédula fallaría la validación al "encontrarse a sí mismo" como duplicado.
+- Este mismo problema ya se había corregido puntualmente en el modal de creación rápida de paciente dentro de `CitaForm.php` (ver entrada del punto 3 del plan de UX más abajo), pero no en el formulario original — quedaba documentado como deuda técnica en `MEMORIA.md` sección 7 y ahora se cierra.
+- **Nota de entorno**: se validó sintaxis con `php -l` y la firma de `->unique(ignoreRecord: true)` contra la documentación oficial de Filament. Falta probarlo en el entorno real.
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Buscador global — confirmado funcionando en el entorno real
 
 - Se probó en `/admin` del entorno real: buscar "ju" en el buscador global devolvió correctamente las categorías "Citas" y "Pacientes", ambas mostrando a Julio Jaramillo con el título compuesto ("Cita — Julio Jaramillo Montenegro Aguirre") y los detalles de contexto (Médico, Área, Fecha, Estado / Cédula, Teléfono) tal como se diseñó en el punto 5 del plan de UX.
