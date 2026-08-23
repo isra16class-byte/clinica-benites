@@ -6,6 +6,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Confirmación en entorno real: gestión de usuarios + exportar Facturas a PDF
+
+- Se corrió `./vendor/bin/sail composer require barryvdh/laravel-dompdf` (usando el composer de Sail, no el composer nativo de Windows/WSL, que no tiene PHP en el PATH y fallaba con `php: not found`).
+- Probado en `/admin/users`: listar, crear y editar usuarios con los 3 roles, contraseña opcional al editar, y bloqueo confirmado al intentar que un admin se elimine a sí mismo.
+- Probado el botón "Exportar PDF" en la tabla de Facturas y en `EditFactura`: descarga correcta del comprobante con los datos de paciente/cita/médico/área.
+- Probado con un rol sin permiso (médico): la ruta `/facturas/{id}/pdf` responde 403, igual que el resto del Resource de Facturas.
+- Todo confirmado funcionando sin ajustes adicionales. `MEMORIA.md` actualizado (secciones 7, 9 y 10) quitando las notas de "falta probar".
+
 ## [2026-08-23] Gestión de usuarios (Resource) + Exportar Facturas a PDF
 
 - **Gestión de usuarios**: nuevo `app/Filament/Resources/Users/` (`UserResource.php`, `Schemas/UserForm.php`, `Tables/UsersTable.php`, `Pages/{ListUsers,CreateUser,EditUser}.php`), mismo patrón de carpetas que los otros 6 Resources. Solo `admin` puede ver/crear/editar/eliminar (`canViewAny()` bloquea el acceso completo para recepción/médico, incluyendo la entrada en el menú). Formulario con `name`, `email` (único, `ignoreRecord: true`), `Select` de `rol` (admin/recepcion/medico) y `password` (obligatorio solo al crear, opcional al editar — dejarlo en blanco no cambia la contraseña actual, usando el patrón estándar de Filament `dehydrateStateUsing`/`dehydrated` + `Hash::make`). Protección agregada: `canDelete()` excluye la propia cuenta del usuario logueado (no puede eliminarse a sí mismo), y el `DeleteBulkAction` de la tabla repite esa misma validación con un `->before()` porque un borrado masivo no pasa por `canDelete()` registro por registro. No se usó ningún paquete de permisos granulares (`spatie/laravel-permission`, Filament Shield) — no hace falta con solo 3 roles fijos.
