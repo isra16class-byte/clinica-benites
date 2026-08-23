@@ -15,12 +15,37 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class HistoriaClinicaResource extends Resource
 {
     protected static ?string $model = HistoriaClinica::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    public static function canViewAny(): bool
+    {
+        // Recepción no tiene acceso a historias clínicas
+        $user = Auth::user();
+
+        return $user?->isAdmin() || $user?->isMedico();
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canEdit($record): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canDelete($record): bool
+    {
+        // Eliminar un registro clínico es sensible: solo admin
+        return Auth::user()?->isAdmin() ?? false;
+    }
 
     public static function form(Schema $schema): Schema
     {

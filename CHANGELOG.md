@@ -6,6 +6,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Roles y permisos por tipo de usuario
+
+- Migración nueva: agrega columna `rol` (string, default `recepcion`) a la tabla `users`.
+- Modelo `User` actualizado: `rol` agregado al atributo `#[Fillable]` (esta versión de Laravel usa atributos PHP en vez de la propiedad `$fillable` clásica), más los métodos `isAdmin()`, `isRecepcion()`, `isMedico()`.
+- Se implementó autorización por rol en los 6 Filament Resources (`canViewAny`, `canCreate`, `canEdit`, `canDelete`), con la matriz de permisos documentada en `MEMORIA.md` sección 9: admin con acceso total; recepción sin acceso a Historias Clínicas; médico sin acceso a Facturas; solo admin puede eliminar en todos los recursos (y también editar/crear Áreas y Médicos).
+- Limitación conocida y documentada: no hay todavía relación entre `users` y `medicos`, así que un médico ve todas las citas/historias, no solo las propias — queda pendiente para una fase futura.
+- Entregado como patch (`git am`). Pasos pendientes tras aplicar: correr `sail artisan migrate`, y asignarle `rol = admin` al usuario admin existente vía `artisan tinker` (comando en `MEMORIA.md` sección 9) — si no, quedaría con el rol default `recepcion` y perdería acceso a partes del sistema.
+
 ## [2026-08-23] Fix: MassAssignmentException al crear registros desde Filament
 
 Al intentar crear un Área desde `/admin`, Laravel bloqueó el guardado con `MassAssignmentException: Add [nombre] to fillable property`. Causa: por seguridad, Laravel no permite guardar campos en un modelo a menos que estén declarados explícitamente en `$fillable` (evita que se puedan sobreescribir campos no previstos, como manipular un `id` desde un formulario adulterado). Se agregó `$fillable` a los 6 modelos con exactamente las columnas de sus respectivas migraciones (sin incluir `id`, `created_at`, `updated_at`, que Laravel maneja aparte).

@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (fix de `MassAssignmentException` confirmado funcionando: se probó crear Área → Médico → Paciente → Cita desde `/admin` con éxito, selectores por relación funcionando correctamente).
+Última actualización: 23 de agosto de 2026 (se agregó el campo `rol` a `users` y se implementó autorización por rol en los 6 Filament Resources — ver sección 9).
 
 ---
 
@@ -133,7 +133,35 @@ facturas
 - [x] ~~Correr `sail artisan migrate`~~ — resuelto, las 6 tablas creadas.
 - [x] ~~Crear los Resources de Filament (pantallas) para cada tabla~~ — resuelto, con selectores por relación en vez de IDs.
 - [x] ~~Fix MassAssignmentException (faltaba \$fillable en los modelos)~~ — resuelto y confirmado: flujo completo Área → Médico → Paciente → Cita probado con éxito desde `/admin`.
-- [ ] **Pendiente inmediato**: agregar campo `rol` a la tabla `users` y definir permisos/roles en Filament.
+- [x] ~~Agregar campo `rol` a la tabla `users` y definir permisos/roles en Filament~~ — resuelto, ver sección 9.
+- [ ] **Pendiente inmediato**: aplicar el patch con `git am`, correr `sail artisan migrate`, y asignarle `rol = admin` al usuario admin existente (ver sección 9 para el comando).
+
+## 9. Roles y permisos
+
+Campo `rol` en la tabla `users` (string, default `recepcion`). Valores válidos: `admin`, `recepcion`, `medico`. El modelo `User` tiene los métodos `isAdmin()`, `isRecepcion()`, `isMedico()` para chequear el rol.
+
+**Matriz de permisos implementada** (en cada `XResource.php`, vía `canViewAny()`/`canCreate()`/`canEdit()`/`canDelete()`):
+
+| Recurso | Admin | Recepción | Médico |
+|---|---|---|---|
+| Áreas | Todo | Solo ver | Solo ver |
+| Médicos | Todo | Solo ver | Solo ver |
+| Pacientes | Todo | Todo | Ver y editar (sin eliminar) |
+| Citas | Todo | Todo | Ver y editar (sin eliminar) |
+| Historias Clínicas | Todo | Sin acceso | Todo (eliminar solo admin, por sensibilidad legal) |
+| Facturas | Todo | Todo | Sin acceso |
+
+**Limitación conocida (pendiente para después)**: un médico ve *todas* las citas/historias clínicas del sistema, no solo las de sus propios pacientes. Filtrar "solo mis pacientes" requiere conectar la tabla `users` con `medicos` (hoy son independientes) — pendiente para una siguiente fase si se necesita.
+
+**Cómo asignar el rol al usuario admin existente** (el usuario creado con `make:filament-user` antes de esta migración quedó con el default `recepcion`):
+
+```
+./vendor/bin/sail artisan tinker
+>>> \App\Models\User::first()->update(['rol' => 'admin']);
+>>> exit
+```
+
+**Para crear usuarios de prueba con otros roles**, usar `make:filament-user` para crear el usuario y luego el mismo comando de tinker (cambiando el email/rol) para asignarle el rol correcto — o hacerlo directo desde el panel una vez que se le dé al admin acceso a gestionar usuarios (pendiente, no hay Resource de `User` todavía).
 - [ ] Agregar campo `rol` a la tabla `users` (admin/recepción/médico).
 - [ ] Definir roles y permisos dentro de Filament (qué ve/hace cada rol) — depende del campo `rol` de arriba.
 - [ ] Construir la página web pública (diseño, contenido).
