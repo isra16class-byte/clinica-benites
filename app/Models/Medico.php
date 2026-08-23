@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Medico extends Model
 {
+    protected $fillable = [
+        'nombres',
+        'apellidos',
+        'area_id',
+        'telefono',
+        'email',
+    ];
+
     public function area(): BelongsTo
     {
         return $this->belongsTo(Area::class);

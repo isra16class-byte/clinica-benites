@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (se generaron los 6 Filament Resources y se agregaron las relaciones Eloquent a los modelos; los selectores de llaves foráneas en formularios y tablas ya muestran nombres en vez de IDs).
+Última actualización: 23 de agosto de 2026 (fix de `MassAssignmentException`: se agregó `$fillable` a los 6 modelos — faltaba desde que se crearon, Filament no podía guardar registros nuevos sin eso).
 
 ---
 
@@ -35,12 +35,12 @@ Repo: `https://github.com/isra16class-byte/clinica-benites` (público)
 clinica-benites/
   app/
     Models/
-      Area.php              # Con relación hasMany(Medico)
-      Paciente.php           # Con relaciones hasMany(Cita, HistoriaClinica, Factura)
-      Medico.php              # Con relaciones belongsTo(Area), hasMany(Cita, HistoriaClinica)
-      Cita.php                 # Con relaciones belongsTo(Paciente, Medico, Area)
-      HistoriaClinica.php      # Con relaciones belongsTo(Paciente, Medico, Cita)
-      Factura.php              # Con relaciones belongsTo(Paciente, Cita)
+      Area.php              # Con $fillable y relación hasMany(Medico)
+      Paciente.php           # Con $fillable y relaciones hasMany(Cita, HistoriaClinica, Factura)
+      Medico.php              # Con $fillable y relaciones belongsTo(Area), hasMany(Cita, HistoriaClinica)
+      Cita.php                 # Con $fillable y relaciones belongsTo(Paciente, Medico, Area)
+      HistoriaClinica.php      # Con $fillable y relaciones belongsTo(Paciente, Medico, Cita)
+      Factura.php              # Con $fillable y relaciones belongsTo(Paciente, Cita)
       User.php                # Por defecto de Laravel — pendiente agregarle campo `rol`
     Filament/
       Resources/
@@ -132,7 +132,8 @@ facturas
 - [x] ~~Confirmar que el push a GitHub se completó correctamente~~ — resuelto.
 - [x] ~~Correr `sail artisan migrate`~~ — resuelto, las 6 tablas creadas.
 - [x] ~~Crear los Resources de Filament (pantallas) para cada tabla~~ — resuelto, con selectores por relación en vez de IDs.
-- [ ] **Pendiente inmediato**: aplicar el patch de esta sesión (relaciones en modelos + ajustes de Resources) con `git am`, luego probar cargando datos de prueba desde `/admin` (crear un área, un médico, un paciente, una cita) para confirmar que los selectores funcionan bien de punta a punta.
+- [x] ~~Fix MassAssignmentException (faltaba \$fillable en los modelos)~~ — resuelto.
+- [ ] **Pendiente inmediato**: aplicar el patch de esta sesión (\$fillable en los 6 modelos) con `git am`, luego probar de nuevo crear un Área desde `/admin` y seguir con médico → paciente → cita para confirmar que todo el flujo funciona de punta a punta.
 - [ ] Agregar campo `rol` a la tabla `users` (admin/recepción/médico).
 - [ ] Definir roles y permisos dentro de Filament (qué ve/hace cada rol) — depende del campo `rol` de arriba.
 - [ ] Construir la página web pública (diseño, contenido).

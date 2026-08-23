@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Area extends Model
 {
+    protected $fillable = [
+        'nombre',
+    ];
+
     public function medicos(): HasMany
     {
         return $this->hasMany(Medico::class);

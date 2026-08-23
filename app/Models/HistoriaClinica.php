@@ -7,6 +7,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class HistoriaClinica extends Model
 {
+    protected $fillable = [
+        'paciente_id',
+        'medico_id',
+        'cita_id',
+        'motivo_consulta',
+        'diagnostico',
+        'tratamiento',
+        'notas',
+    ];
+
     public function paciente(): BelongsTo
     {
         return $this->belongsTo(Paciente::class);

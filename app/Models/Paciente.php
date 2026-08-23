@@ -7,6 +7,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Paciente extends Model
 {
+    protected $fillable = [
+        'nombres',
+        'apellidos',
+        'cedula',
+        'fecha_nacimiento',
+        'telefono',
+        'email',
+        'direccion',
+        'sexo',
+    ];
+
     public function citas(): HasMany
     {
         return $this->hasMany(Cita::class);

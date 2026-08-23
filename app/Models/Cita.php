@@ -7,6 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Cita extends Model
 {
+    protected $fillable = [
+        'paciente_id',
+        'medico_id',
+        'area_id',
+        'fecha',
+        'hora_inicio',
+        'hora_fin',
+        'estado',
+        'notas',
+    ];
+
     public function paciente(): BelongsTo
     {
         return $this->belongsTo(Paciente::class);
