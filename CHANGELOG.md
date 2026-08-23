@@ -6,6 +6,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Investigación de gestión de usuarios y exportación + pregunta pendiente sobre "cuantificos"
+
+- Se investigó gestión de usuarios desde el panel (hoy solo se puede por consola, ver sección 10) y exportación de registros (ej. Facturas). Conclusiones agregadas a la sección 9 de `MEMORIA.md`:
+  - Gestión de usuarios: no hace falta un paquete de permisos granulares (`spatie/laravel-permission`, Filament Shield) dados los 3 roles fijos actuales — alcanza con un `UserResource` normal, solo visible para `admin`.
+  - Exportación: Filament ya trae exportación nativa de tablas a Excel/CSV (`ExportAction`); para un comprobante individual con formato (ej. una factura) el patrón de la comunidad es `barryvdh/laravel-dompdf` con una plantilla Blade propia.
+- Se agregó una pregunta pendiente en la sección 6: el contacto interno mencionó que la administración se maneja mediante algo que llamó "cuantificos" — término sin aclarar, queda pendiente de la entrevista formal.
+- No hay cambios de código en esta entrada, solo documentación e investigación. Entregado como patch (`git am`).
+
 ## [2026-08-23] Investigación de funciones futuras — propuesta documentada, sin priorizar
 
 - Sesión de investigación (buenas prácticas de software de gestión clínica, requisitos de la LOPDP de Ecuador para datos de salud, e ideas de otras industrias) para tener un banco de ideas listo cuando se quiera ampliar el sistema.

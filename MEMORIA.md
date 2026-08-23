@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (agregada la sección 9 con la propuesta de funciones futuras, investigada pero no priorizada — ver sección 9).
+Última actualización: 23 de agosto de 2026 (agregada investigación sobre gestión de usuarios y exportación, y pregunta pendiente sobre "cuantificos" — ver secciones 6 y 9).
 
 ---
 
@@ -125,6 +125,7 @@ facturas
 - [ ] ¿Presupuesto definido o hay que proponerlo?
 - [ ] ¿Plazo de entrega esperado?
 - [ ] ¿Planean crecer (más sucursales) pronto?
+- [ ] ¿Qué es exactamente lo que el amigo/contacto interno llamó "cuantificos" al describir cómo se maneja hoy la administración de la clínica? Término sin aclarar (posibles hipótesis sin confirmar: recibos/comprobantes en papel, un cuaderno de registro manual, cálculos de caja a mano) — no se puede saber a qué proceso actual corresponde ni si el sistema ya lo resuelve o falta cubrirlo, hasta preguntarle directamente a él o al dueño.
 
 ## 7. Roadmap / pendientes técnicos
 
@@ -189,6 +190,16 @@ Sesión de investigación (23 de agosto de 2026) sobre buenas prácticas de soft
 6. Panel ejecutivo de "salud del negocio" (ocupación de agenda, tasa de inasistencia, ingresos por médico/mes) para el dueño, más allá del widget operativo de "citas de hoy" que ya existe.
 
 **Explícitamente descartado por ahora** (ver también sección 8): recordatorios automáticos por WhatsApp/SMS, portal de autoagendamiento para pacientes — quedan para una fase futura, después de validar que recepción/médicos ya están cómodos con el sistema base. Las ideas de esta sección quedan en la misma categoría: útiles a futuro, no urgentes.
+
+**Investigado en esta sesión — candidatas concretas para la próxima pasada de código (a diferencia de la lista de arriba, estas sí resuelven huecos operativos reales de hoy, no son "ideas para más adelante"):**
+
+- **Gestión de usuarios desde el panel**: hoy crear un usuario o cambiarle el rol solo se puede por consola (`tinker`/`make:filament-user`, ver sección 10). Se investigó y **no hace falta** un paquete de permisos granulares (`spatie/laravel-permission`, Filament Shield) — eso es para sistemas con roles dinámicos/combinables; con los 3 roles fijos que ya tiene Benites (admin/recepcion/medico) alcanza con un `UserResource` normal, igual que los otros 6 Resources, con un `Select` para el campo `rol` ya existente. Recomendación encontrada: que solo `admin` pueda ver/crear/editar ese Resource (mismo patrón de permisos ya usado en los demás), y evitar que un usuario pueda auto-asignarse el rol `admin` desde ahí.
+- **Exportar registros (ej. Facturas)**: dos caminos distintos según el caso:
+  - Exportar una **lista/tabla completa** (ej. todas las facturas del mes) a Excel/CSV → Filament ya trae `ExportAction`/`ExportBulkAction` nativa, no requiere paquete externo.
+  - Exportar **un registro individual con formato de comprobante** (ej. una factura o una historia clínica lista para imprimir/entregar al paciente) → la nativa de Filament no lo cubre; el patrón estándar de la comunidad es `barryvdh/laravel-dompdf` + una plantilla Blade propia del documento, con un botón de acción en el Resource.
+  - Aplicaría con más sentido a **Facturas** (comprobante para el paciente) e **Historia Clínica** (a veces el paciente lo necesita para un seguro o interconsulta); para Citas/Pacientes/Médicos, alcanza con la exportación nativa de tabla si algún día se pide.
+
+**Pendiente sin resolver (ver sección 6)**: el contacto interno mencionó que la administración de la clínica hoy se maneja mediante algo que llamó "cuantificos" — término sin aclarar todavía, no se sabe a qué proceso corresponde. No se puede evaluar si el sistema ya lo cubre o si falta construir algo para eso hasta preguntarle directamente.
 
 ## 10. Roles y permisos
 
