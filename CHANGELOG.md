@@ -10,7 +10,7 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 Al intentar crear un Área desde `/admin`, Laravel bloqueó el guardado con `MassAssignmentException: Add [nombre] to fillable property`. Causa: por seguridad, Laravel no permite guardar campos en un modelo a menos que estén declarados explícitamente en `$fillable` (evita que se puedan sobreescribir campos no previstos, como manipular un `id` desde un formulario adulterado). Se agregó `$fillable` a los 6 modelos con exactamente las columnas de sus respectivas migraciones (sin incluir `id`, `created_at`, `updated_at`, que Laravel maneja aparte).
 
-Entregado como patch (`git am`). Pendiente: aplicar y volver a probar crear un Área desde `/admin`.
+Entregado como patch (`git am`). **Confirmado funcionando**: se probó crear un Área, un Médico (con selector de Área encontrando "Odontología" por búsqueda), un Paciente, y una Cita conectando paciente + médico + área con selectores buscables — todo el flujo de punta a punta guarda correctamente.
 
 ## [2026-08-23] Relaciones Eloquent en modelos + Filament Resources ajustados
 

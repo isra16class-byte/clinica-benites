@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (fix de `MassAssignmentException`: se agregó `$fillable` a los 6 modelos — faltaba desde que se crearon, Filament no podía guardar registros nuevos sin eso).
+Última actualización: 23 de agosto de 2026 (fix de `MassAssignmentException` confirmado funcionando: se probó crear Área → Médico → Paciente → Cita desde `/admin` con éxito, selectores por relación funcionando correctamente).
 
 ---
 
@@ -132,8 +132,8 @@ facturas
 - [x] ~~Confirmar que el push a GitHub se completó correctamente~~ — resuelto.
 - [x] ~~Correr `sail artisan migrate`~~ — resuelto, las 6 tablas creadas.
 - [x] ~~Crear los Resources de Filament (pantallas) para cada tabla~~ — resuelto, con selectores por relación en vez de IDs.
-- [x] ~~Fix MassAssignmentException (faltaba \$fillable en los modelos)~~ — resuelto.
-- [ ] **Pendiente inmediato**: aplicar el patch de esta sesión (\$fillable en los 6 modelos) con `git am`, luego probar de nuevo crear un Área desde `/admin` y seguir con médico → paciente → cita para confirmar que todo el flujo funciona de punta a punta.
+- [x] ~~Fix MassAssignmentException (faltaba \$fillable en los modelos)~~ — resuelto y confirmado: flujo completo Área → Médico → Paciente → Cita probado con éxito desde `/admin`.
+- [ ] **Pendiente inmediato**: agregar campo `rol` a la tabla `users` y definir permisos/roles en Filament.
 - [ ] Agregar campo `rol` a la tabla `users` (admin/recepción/médico).
 - [ ] Definir roles y permisos dentro de Filament (qué ve/hace cada rol) — depende del campo `rol` de arriba.
 - [ ] Construir la página web pública (diseño, contenido).
