@@ -6,6 +6,12 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Buscador global — confirmado funcionando en el entorno real
+
+- Se probó en `/admin` del entorno real: buscar "ju" en el buscador global devolvió correctamente las categorías "Citas" y "Pacientes", ambas mostrando a Julio Jaramillo con el título compuesto ("Cita — Julio Jaramillo Montenegro Aguirre") y los detalles de contexto (Médico, Área, Fecha, Estado / Cédula, Teléfono) tal como se diseñó en el punto 5 del plan de UX.
+- Se detectó de paso un dato de prueba mal cargado (no un bug del código): un médico tiene el nombre completo duplicado entre los campos `nombres` y `apellidos`, lo que hace que se vea repetido en cualquier pantalla que muestre "nombres + apellidos" (incluyendo el detalle del buscador). Se corrige editando ese registro en `/admin/medicos`, no requiere cambio de código.
+- Con esto quedan confirmados en el entorno real 4 de los 5 puntos del plan de UX (1, 2, 3 y 5); el punto 4 (filtros rápidos) sigue resuelto en código pero pendiente de esa confirmación.
+
 ## [2026-08-23] Buscador global (punto 5 del plan de UX)
 
 - **Áreas** y **Médicos/Pacientes** ya tenían el buscador global habilitado por defecto (vía `$recordTitleAttribute`), pero solo buscaban por un único campo (`nombre`/`nombres`). Se amplió en `PacienteResource.php` y `MedicoResource.php` con `getGloballySearchableAttributes()` para buscar también por apellido, cédula, email y teléfono, y `getGlobalSearchResultTitle()` para mostrar "Nombres Apellidos" en vez de solo el nombre de pila.
