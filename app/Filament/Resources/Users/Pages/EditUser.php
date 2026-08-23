@@ -21,4 +21,18 @@ class EditUser extends EditRecord
                 ->visible(fn (User $record): bool => UserResource::canDelete($record)),
         ];
     }
+
+    /**
+     * Mismo cinturón de seguridad que en CreateUser: si el rol guardado no
+     * es "medico", medico_id se limpia aquí antes de guardar, además del
+     * afterStateUpdated() en UserForm que ya lo hace al cambiar el Select.
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        if (($data['rol'] ?? null) !== 'medico') {
+            $data['medico_id'] = null;
+        }
+
+        return $data;
+    }
 }

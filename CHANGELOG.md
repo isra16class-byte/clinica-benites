@@ -6,6 +6,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Fix: `medico_id` no se limpiaba al cambiar el rol de un usuario
+
+- **Bug encontrado por el usuario al probar el filtro "mis pacientes"**: al editar un usuario `medico` (con médico vinculado) y cambiarle el rol a `recepcion`/`admin`, el campo "Médico vinculado" se ocultaba (`->visible()`) pero su valor seguía guardándose — Filament no descarta el valor de un campo solo por ocultarlo. El usuario quedaba con `rol` correcto pero `medico_id` apuntando a un médico "fantasma".
+- Fix en dos capas:
+  - `UserForm`: `->afterStateUpdated()` en el `Select` de `rol`, resetea `medico_id` a `null` en el estado del formulario en cuanto el rol deja de ser `medico`.
+  - `CreateUser::mutateFormDataBeforeCreate()` y `EditUser::mutateFormDataBeforeSave()`: cinturón de seguridad adicional, fuerza `medico_id = null` justo antes de guardar si el rol no es `medico`.
+- Sintaxis validada con `php -l`.
+- **Aclaración sobre un segundo reporte del usuario (no era un bug)**: un usuario con rol médico no veía el botón "Crear" en `/admin/citas` pero sí en `/admin/historia-clinicas`. Es la matriz de permisos ya documentada desde antes (sección 10 de `MEMORIA.md`): médico nunca tuvo permiso de crear Citas (solo ver/editar), pero sí tiene permiso completo en Historia Clínica. No se tocó código por esto.
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Filtrar "mis pacientes" para el rol médico
 
 - Nueva migración `2026_08_23_220000_add_medico_id_to_users_table.php`: agrega `medico_id` (nullable, FK a `medicos`, `nullOnDelete()`) a la tabla `users`, conectando por fin `users` con `medicos` (hasta ahora eran tablas independientes).

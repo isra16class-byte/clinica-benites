@@ -6,6 +6,7 @@ use App\Models\Medico;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
 
@@ -37,7 +38,19 @@ class UserForm
                     ])
                     ->required()
                     ->default('recepcion')
-                    ->live(),
+                    ->live()
+                    // Sin esto, al cambiar el rol de "medico" a otro, el
+                    // Select de medico_id solo se oculta (->visible()) pero
+                    // su valor seleccionado se queda "vivo" en el formulario
+                    // y se guardaría igual al hacer submit, dejando un
+                    // medico_id huérfano en un usuario que ya no es médico.
+                    // Al limpiar el estado aquí, se guarda null como se
+                    // espera en cuanto el rol deja de ser medico.
+                    ->afterStateUpdated(function (Set $set, ?string $state): void {
+                        if ($state !== 'medico') {
+                            $set('medico_id', null);
+                        }
+                    }),
                 Select::make('medico_id')
                     ->relationship('medico', 'nombres')
                     ->getOptionLabelFromRecordUsing(fn (Medico $record): string => "{$record->nombres} {$record->apellidos}")
