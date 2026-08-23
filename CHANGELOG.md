@@ -6,6 +6,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Dashboard: widget de "citas de hoy" (punto 1 del plan de UX)
+
+- Nuevo `app/Filament/Widgets/CitasDeHoyWidget.php`: widget de tabla (`Filament\Widgets\TableWidget`) que muestra las citas con `fecha` = hoy, ordenadas por `hora_inicio`, con columnas Hora/Paciente/Médico/Área/Estado (mismos colores de badge que la tabla de Citas) y acción de Editar respetando `CitaResource::canEdit()`. Se autodescubre solo porque `AdminPanelProvider` ya apuntaba `discoverWidgets()` a esa carpeta.
+- `AdminPanelProvider`: se quitaron `AccountWidget` y `FilamentInfoWidget` (las tarjetas genéricas "Welcome"/"filament") para que el widget de citas de hoy sea lo primero que se ve al entrar a `/admin`.
+- **No implementado en esta pasada**: filtrar las citas por médico logueado si el rol es `medico`. Sigue aplicando la limitación conocida de que `users` y `medicos` no están conectados (ver `MEMORIA.md` sección 9) — por ahora todos los roles ven todas las citas del día.
+- **Nota de entorno**: este cambio se escribió sin acceso a PHP/Composer/Sail (entorno de generación del patch no tiene esas herramientas), así que no se pudo correr `php artisan` ni probar visualmente. Se siguió al pie de la letra la convención de los Resources existentes (namespace, sintaxis Filament 5 con `recordActions`, colores de badge). **Falta probar en el entorno real** levantando Sail y entrando a `/admin`.
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Investigación de buenas prácticas de agendamiento clínico + plan de UX
 
 Con el sistema interno ya funcional de punta a punta (CRUD + roles confirmados), se investigaron buenas prácticas de software de agendamiento clínico para identificar las mejoras de experiencia de uso con mayor impacto para recepción/médicos en el día a día.

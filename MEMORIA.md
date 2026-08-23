@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (sistema interno completo y funcional: CRUD + roles confirmados de punta a punta. Se investigaron buenas prácticas de software de agendamiento clínico y se dejó un plan priorizado de 5 mejoras de UX para la próxima sesión — ver sección 8).
+Última actualización: 23 de agosto de 2026 (implementado el punto 1 del plan de UX: Dashboard con "citas de hoy" al entrar al panel, reemplazando las tarjetas genéricas de Filament — ver sección 8).
 
 ---
 
@@ -134,12 +134,13 @@ facturas
 - [x] ~~Crear los Resources de Filament (pantallas) para cada tabla~~ — resuelto, con selectores por relación en vez de IDs.
 - [x] ~~Fix MassAssignmentException (faltaba \$fillable en los modelos)~~ — resuelto y confirmado: flujo completo Área → Médico → Paciente → Cita probado con éxito desde `/admin`.
 - [x] ~~Agregar campo `rol` a la tabla `users` y definir permisos/roles en Filament~~ — resuelto y confirmado funcionando de punta a punta, incluyendo el fix de fondo de botones no conectados a permisos (ver sección 9).
+- [x] ~~Dashboard con widget de "citas de hoy"~~ — resuelto (ver sección 8, punto 1). **Pendiente probar en el entorno real** (`./vendor/bin/sail up` + entrar a `/admin`), ya que este cambio se escribió sin acceso a PHP/Sail en el entorno donde se generó el patch.
 
 ## 8. Plan para la próxima sesión — pulir UX del sistema interno
 
 El sistema ya es funcional de punta a punta (CRUD + roles). Lo que sigue es hacerlo **más rápido de usar en el día a día** para recepción/médicos. Investigado contra buenas prácticas de software de agendamiento clínico — priorizado de más a menos impacto:
 
-1. **Dashboard con "citas de hoy" al entrar** (⭐ mayor impacto). Reemplazar las tarjetas genéricas de Filament ("Welcome", "filament") por un widget que muestre las citas del día apenas se entra a `/admin`. Implementación: crear un Widget de tabla en Filament (`make:filament-widget`) filtrando `Cita::whereDate('fecha', today())`, registrarlo en el panel provider. Considerar mostrar solo las citas del médico logueado si es rol `medico` (usar `Auth::user()->isMedico()` para filtrar por su registro de Médico — aquí también aplicaría la limitación conocida de que `users` y `medicos` no están conectados, ver sección 9).
+1. [x] ~~**Dashboard con "citas de hoy" al entrar**~~ (⭐ mayor impacto) — **resuelto**. Se creó `app/Filament/Widgets/CitasDeHoyWidget.php` (extiende `Filament\Widgets\TableWidget`), que filtra `Cita::whereDate('fecha', today())` ordenado por `hora_inicio`, con columnas Hora/Paciente/Médico/Área/Estado (mismo badge de colores que la tabla de Citas) y una `EditAction` que respeta `CitaResource::canEdit()`. Se registra solo (`discoverWidgets` ya apuntaba a esa carpeta). Se quitaron del `AdminPanelProvider` los widgets genéricos `AccountWidget` y `FilamentInfoWidget` ("Welcome"/"filament"), así el widget de citas queda como lo primero que se ve al entrar a `/admin`. **No se filtró por médico logueado**: se mantiene la limitación conocida (`users` y `medicos` no están conectados, ver sección 9) — todos los roles ven todas las citas de hoy por ahora.
 
 2. **Cambiar estado de una cita con un clic, sin abrir el formulario completo**. Hoy hay que entrar a Editar solo para pasar de "Pendiente" a "Atendida". Implementación: agregar una `Action` personalizada en `CitasTable.php` (botón o menú desplegable en la fila) que actualice `estado` directamente vía `$record->update(['estado' => 'atendida'])`, sin navegar a otra página. Respetar permisos: visible solo si `CitaResource::canEdit($record)`.
 
@@ -151,7 +152,7 @@ El sistema ya es funcional de punta a punta (CRUD + roles). Lo que sigue es hace
 
 **Explícitamente descartado por ahora** (para no abrumar al personal antes de que domine lo básico): recordatorios automáticos por WhatsApp/SMS, portal de autoagendamiento para pacientes. Quedan para una fase futura, después de validar que recepción/médicos ya están cómodos con el sistema base.
 
-**Antes de empezar la próxima sesión**: confirmar con el usuario cuál de los 5 puntos priorizar primero (la sesión anterior no llegó a decidir cuál). Sugerencia por defecto si no hay respuesta: empezar por el punto 1 (Dashboard) y el punto 2 (cambiar estado con un clic), que son los de mayor impacto con menos esfuerzo.
+**Estado**: punto 1 (Dashboard) resuelto. Sugerencia por defecto para la próxima sesión: seguir con el punto 2 (cambiar estado con un clic), que es el siguiente de mayor impacto con menos esfuerzo.
 
 **Otros pendientes de fondo, sin definir aún**:
 - Construir la página web pública (diseño, contenido) — sigue sin arrancar.
