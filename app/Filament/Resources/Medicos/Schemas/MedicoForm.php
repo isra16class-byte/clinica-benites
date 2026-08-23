@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Medicos\Schemas;
 
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -15,9 +16,12 @@ class MedicoForm
                     ->required(),
                 TextInput::make('apellidos')
                     ->required(),
-                TextInput::make('area_id')
-                    ->required()
-                    ->numeric(),
+                Select::make('area_id')
+                    ->relationship('area', 'nombre')
+                    ->label('Área')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
                 TextInput::make('telefono')
                     ->tel(),
                 TextInput::make('email')

@@ -11,12 +11,13 @@ class HistoriaClinicaInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('paciente_id')
-                    ->numeric(),
-                TextEntry::make('medico_id')
-                    ->numeric(),
-                TextEntry::make('cita_id')
-                    ->numeric()
+                TextEntry::make('paciente.nombres')
+                    ->label('Paciente'),
+                TextEntry::make('medico.nombres')
+                    ->label('Médico'),
+                TextEntry::make('cita.fecha')
+                    ->label('Fecha de cita')
+                    ->date()
                     ->placeholder('-'),
                 TextEntry::make('motivo_consulta')
                     ->placeholder('-')

@@ -14,16 +14,25 @@ class FacturasTable
     {
         return $table
             ->columns([
-                TextColumn::make('paciente_id')
-                    ->numeric()
+                TextColumn::make('paciente.nombres')
+                    ->label('Paciente')
+                    ->searchable()
                     ->sortable(),
-                TextColumn::make('cita_id')
-                    ->numeric()
+                TextColumn::make('cita.fecha')
+                    ->label('Fecha de cita')
+                    ->date()
                     ->sortable(),
                 TextColumn::make('monto')
-                    ->numeric()
+                    ->money('USD')
                     ->sortable(),
                 TextColumn::make('estado_pago')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pendiente' => 'warning',
+                        'pagado' => 'success',
+                        'anulado' => 'danger',
+                        default => 'gray',
+                    })
                     ->searchable(),
                 TextColumn::make('metodo_pago')
                     ->searchable(),

@@ -6,6 +6,13 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Relaciones Eloquent en modelos + Filament Resources ajustados
+
+- Se agregaron las relaciones Eloquent (`belongsTo`/`hasMany`) a los 6 modelos (`Area`, `Paciente`, `Medico`, `Cita`, `HistoriaClinica`, `Factura`), que estaban vacíos desde su creación inicial.
+- Se generaron los Filament Resources (`make:filament-resource`) para las 6 tablas, usando `nombre`/`nombres` como atributo de título y generando el formulario desde las columnas existentes de la base de datos. `HistoriaClinica` incluye además una vista de solo lectura (Infolist).
+- Se ajustaron manualmente los formularios y tablas generados: los campos de llave foránea (`area_id`, `paciente_id`, `medico_id`, `cita_id`) pasaron de `TextInput` numérico a `Select` con relación Eloquent (`searchable()` + `preload()`), tanto en los formularios como en las columnas de listado (que ahora muestran nombres, ej. `area.nombre`, en vez de IDs crudos). Los campos `estado` (citas) y `estado_pago` (facturas) pasaron de texto libre a `Select` con opciones fijas, y se les agregó color (`badge`) según el valor. El campo `monto` de facturas se formatea ahora como moneda (`money('USD')`).
+- Entregado como patch (`git am`) para aplicar sobre el commit de "Genera Filament Resources para las 6 tablas principales". Pendiente: aplicar el patch y probar el flujo completo desde `/admin` (crear un área → un médico → un paciente → una cita, y confirmar que los selectores encuentran los registros).
+
 ## [2026-08-23] Columnas y relaciones agregadas a las 6 migraciones
 
 Se llenaron las 6 migraciones (`areas`, `pacientes`, `medicos`, `citas`, `historia_clinicas`, `facturas`) con las columnas y llaves foráneas acordadas (ver `MEMORIA.md`, sección 4). Se verificó que el orden de los archivos (por timestamp en el nombre) respeta las dependencias entre tablas: `areas` → `pacientes` → `medicos` → `citas` → `historia_clinicas` → `facturas` — necesario porque Laravel corre las migraciones en ese orden y una tabla con `foreignId()->constrained()` necesita que la tabla referenciada ya exista.

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Facturas\Schemas;
 
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -12,15 +13,27 @@ class FacturaForm
     {
         return $schema
             ->components([
-                TextInput::make('paciente_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('cita_id')
-                    ->numeric(),
+                Select::make('paciente_id')
+                    ->relationship('paciente', 'nombres')
+                    ->label('Paciente')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                Select::make('cita_id')
+                    ->relationship('cita', 'id')
+                    ->label('Cita relacionada')
+                    ->searchable()
+                    ->preload(),
                 TextInput::make('monto')
                     ->required()
-                    ->numeric(),
-                TextInput::make('estado_pago')
+                    ->numeric()
+                    ->prefix('$'),
+                Select::make('estado_pago')
+                    ->options([
+                        'pendiente' => 'Pendiente',
+                        'pagado' => 'Pagado',
+                        'anulado' => 'Anulado',
+                    ])
                     ->required()
                     ->default('pendiente'),
                 TextInput::make('metodo_pago'),

@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\HistoriaClinicas\Schemas;
 
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
 
@@ -12,14 +12,23 @@ class HistoriaClinicaForm
     {
         return $schema
             ->components([
-                TextInput::make('paciente_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('medico_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('cita_id')
-                    ->numeric(),
+                Select::make('paciente_id')
+                    ->relationship('paciente', 'nombres')
+                    ->label('Paciente')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                Select::make('medico_id')
+                    ->relationship('medico', 'nombres')
+                    ->label('Médico')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                Select::make('cita_id')
+                    ->relationship('cita', 'id')
+                    ->label('Cita relacionada')
+                    ->searchable()
+                    ->preload(),
                 Textarea::make('motivo_consulta')
                     ->columnSpanFull(),
                 Textarea::make('diagnostico')

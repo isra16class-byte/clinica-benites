@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Citas\Schemas;
 
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Schema;
@@ -14,22 +14,37 @@ class CitaForm
     {
         return $schema
             ->components([
-                TextInput::make('paciente_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('medico_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('area_id')
-                    ->required()
-                    ->numeric(),
+                Select::make('paciente_id')
+                    ->relationship('paciente', 'nombres')
+                    ->label('Paciente')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                Select::make('medico_id')
+                    ->relationship('medico', 'nombres')
+                    ->label('Médico')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                Select::make('area_id')
+                    ->relationship('area', 'nombre')
+                    ->label('Área')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
                 DatePicker::make('fecha')
                     ->required(),
                 TimePicker::make('hora_inicio')
                     ->required(),
                 TimePicker::make('hora_fin')
                     ->required(),
-                TextInput::make('estado')
+                Select::make('estado')
+                    ->options([
+                        'pendiente' => 'Pendiente',
+                        'confirmada' => 'Confirmada',
+                        'cancelada' => 'Cancelada',
+                        'atendida' => 'Atendida',
+                    ])
                     ->required()
                     ->default('pendiente'),
                 Textarea::make('notas')

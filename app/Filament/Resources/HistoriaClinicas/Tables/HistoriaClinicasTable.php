@@ -15,14 +15,17 @@ class HistoriaClinicasTable
     {
         return $table
             ->columns([
-                TextColumn::make('paciente_id')
-                    ->numeric()
+                TextColumn::make('paciente.nombres')
+                    ->label('Paciente')
+                    ->searchable()
                     ->sortable(),
-                TextColumn::make('medico_id')
-                    ->numeric()
+                TextColumn::make('medico.nombres')
+                    ->label('Médico')
+                    ->searchable()
                     ->sortable(),
-                TextColumn::make('cita_id')
-                    ->numeric()
+                TextColumn::make('cita.fecha')
+                    ->label('Fecha de cita')
+                    ->date()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

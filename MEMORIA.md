@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (se llenaron las 6 migraciones con sus columnas y relaciones — ver sección 4 — respetando el orden de dependencias (`areas` → `pacientes` → `medicos` → `citas` → `historia_clinicas` → `facturas`). Aún falta correr `sail artisan migrate` para crear las tablas de verdad en MySQL).
+Última actualización: 23 de agosto de 2026 (se generaron los 6 Filament Resources y se agregaron las relaciones Eloquent a los modelos; los selectores de llaves foráneas en formularios y tablas ya muestran nombres en vez de IDs).
 
 ---
 
@@ -35,13 +35,21 @@ Repo: `https://github.com/isra16class-byte/clinica-benites` (público)
 clinica-benites/
   app/
     Models/
-      Area.php              # Creado, vacío (solo boilerplate de Eloquent)
-      Paciente.php           # Creado, vacío
-      Medico.php              # Creado, vacío
-      Cita.php                 # Creado, vacío
-      HistoriaClinica.php      # Creado, vacío
-      Factura.php              # Creado, vacío
+      Area.php              # Con relación hasMany(Medico)
+      Paciente.php           # Con relaciones hasMany(Cita, HistoriaClinica, Factura)
+      Medico.php              # Con relaciones belongsTo(Area), hasMany(Cita, HistoriaClinica)
+      Cita.php                 # Con relaciones belongsTo(Paciente, Medico, Area)
+      HistoriaClinica.php      # Con relaciones belongsTo(Paciente, Medico, Cita)
+      Factura.php              # Con relaciones belongsTo(Paciente, Cita)
       User.php                # Por defecto de Laravel — pendiente agregarle campo `rol`
+    Filament/
+      Resources/
+        Areas/                   # Resource completo (Form, Table, Pages)
+        Pacientes/               # Resource completo
+        Medicos/                 # Resource completo, selector de Área por relación
+        Citas/                   # Resource completo, selectores por relación + estado con colores
+        HistoriaClinicas/        # Resource completo + vista de solo lectura (Infolist)
+        Facturas/                # Resource completo, selectores por relación + estado con colores
   database/
     migrations/
       ..._create_areas_table.php            # Completa (nombre)
@@ -100,7 +108,8 @@ facturas
 - ✅ MySQL conectado, migraciones base de Laravel corridas.
 - ✅ Filament instalado, panel accesible en `http://localhost/admin` con usuario admin creado.
 - ✅ Modelos y archivos de migración creados para las 6 tablas principales, con columnas y relaciones ya definidas.
-- ⬜ **Pendiente inmediato**: correr `sail artisan migrate` en la máquina de desarrollo para crear las tablas de verdad en MySQL (este cambio llega vía patch, hay que aplicarlo con `git am` antes de migrar).
+- ✅ Tablas creadas en MySQL (`sail artisan migrate` corrido correctamente, las 6 con `DONE`).
+- ✅ Filament Resources generados para las 6 tablas (formulario + tabla + páginas). Los selectores de llaves foráneas (`area_id`, `paciente_id`, `medico_id`, `cita_id`) ya usan `Select` con relación Eloquent en vez de `TextInput` numérico, tanto en formularios como en las columnas de las tablas (muestran nombres, no IDs). Los campos `estado` (citas) y `estado_pago` (facturas) son `Select` con opciones fijas y colores (badge) en vez de texto libre.
 - ✅ Git: repo en GitHub confirmado funcionando — `git log --oneline` muestra `HEAD -> main, origin/main` en el mismo commit, o sea que local y remoto están sincronizados.
 
 ## 6. Preguntas pendientes (por confirmar con el contacto interno / en la entrevista formal)
@@ -119,12 +128,13 @@ facturas
 
 ## 7. Roadmap / pendientes técnicos
 
-- [x] ~~Llenar las 6 migraciones con sus columnas~~ — resuelto (ver sección 4 y `CHANGELOG.md`).
-- [x] ~~Confirmar que el push a GitHub se completó correctamente~~ — resuelto, verificado con `git log --oneline`.
-- [ ] Correr `sail artisan migrate` (aplicar primero el patch con `git am`).
+- [x] ~~Llenar las 6 migraciones con sus columnas~~ — resuelto.
+- [x] ~~Confirmar que el push a GitHub se completó correctamente~~ — resuelto.
+- [x] ~~Correr `sail artisan migrate`~~ — resuelto, las 6 tablas creadas.
+- [x] ~~Crear los Resources de Filament (pantallas) para cada tabla~~ — resuelto, con selectores por relación en vez de IDs.
+- [ ] **Pendiente inmediato**: aplicar el patch de esta sesión (relaciones en modelos + ajustes de Resources) con `git am`, luego probar cargando datos de prueba desde `/admin` (crear un área, un médico, un paciente, una cita) para confirmar que los selectores funcionan bien de punta a punta.
 - [ ] Agregar campo `rol` a la tabla `users` (admin/recepción/médico).
-- [ ] Crear los Resources de Filament (pantallas) para cada tabla.
-- [ ] Definir roles y permisos dentro de Filament (qué ve/hace cada rol).
+- [ ] Definir roles y permisos dentro de Filament (qué ve/hace cada rol) — depende del campo `rol` de arriba.
 - [ ] Construir la página web pública (diseño, contenido).
 - [ ] Definir alcance real de facturación con el cliente (¿SRI, seguros?) antes de modelar esa parte a fondo.
 - [ ] Backups automáticos antes de publicar.

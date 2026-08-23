@@ -18,8 +18,9 @@ class MedicosTable
                     ->searchable(),
                 TextColumn::make('apellidos')
                     ->searchable(),
-                TextColumn::make('area_id')
-                    ->numeric()
+                TextColumn::make('area.nombre')
+                    ->label('Área')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('telefono')
                     ->searchable(),

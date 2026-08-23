@@ -14,14 +14,17 @@ class CitasTable
     {
         return $table
             ->columns([
-                TextColumn::make('paciente_id')
-                    ->numeric()
+                TextColumn::make('paciente.nombres')
+                    ->label('Paciente')
+                    ->searchable()
                     ->sortable(),
-                TextColumn::make('medico_id')
-                    ->numeric()
+                TextColumn::make('medico.nombres')
+                    ->label('Médico')
+                    ->searchable()
                     ->sortable(),
-                TextColumn::make('area_id')
-                    ->numeric()
+                TextColumn::make('area.nombre')
+                    ->label('Área')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('fecha')
                     ->date()
@@ -33,6 +36,14 @@ class CitasTable
                     ->time()
                     ->sortable(),
                 TextColumn::make('estado')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pendiente' => 'gray',
+                        'confirmada' => 'info',
+                        'atendida' => 'success',
+                        'cancelada' => 'danger',
+                        default => 'gray',
+                    })
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
