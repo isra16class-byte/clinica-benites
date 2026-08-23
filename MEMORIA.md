@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (implementados los puntos 1 y 2 del plan de UX: Dashboard con "citas de hoy" y cambio de estado de una cita con un clic desde la tabla — ver sección 8).
+Última actualización: 23 de agosto de 2026 (implementados los puntos 1, 2 y 3 del plan de UX: Dashboard "citas de hoy", cambio de estado con un clic, y crear paciente sin salir del formulario de Cita — ver sección 8).
 
 ---
 
@@ -136,6 +136,8 @@ facturas
 - [x] ~~Agregar campo `rol` a la tabla `users` y definir permisos/roles en Filament~~ — resuelto y confirmado funcionando de punta a punta, incluyendo el fix de fondo de botones no conectados a permisos (ver sección 9).
 - [x] ~~Dashboard con widget de "citas de hoy"~~ — resuelto (ver sección 8, punto 1). Confirmado funcionando por el usuario en el entorno real, incluyendo con una cita de prueba cargada.
 - [x] ~~Cambiar estado de una cita con un clic desde la tabla~~ — resuelto (ver sección 8, punto 2). **Pendiente probar en el entorno real** (este cambio se escribió sin acceso a PHP/Sail, igual que el punto 1).
+- [x] ~~Crear paciente nuevo sin salir del formulario de Cita~~ — resuelto (ver sección 8, punto 3). **Pendiente probar en el entorno real.**
+- [ ] **Deuda técnica detectada de paso**: el `PacienteForm.php` original (el de `/admin/pacientes`, no el modal nuevo) tampoco valida `cedula` como única a nivel de formulario — solo la restricción de la base de datos, igual que el bug que ya se corrigió para el borrado con datos relacionados (ver sección 9). Si se crea un paciente con una cédula repetida desde `/admin/pacientes/create`, sale el error crudo de MySQL en vez de un mensaje claro. Se corrigió puntualmente en el modal nuevo de `CitaForm.php`, pero no en el formulario original — pendiente para una próxima pasada.
 
 ## 8. Plan para la próxima sesión — pulir UX del sistema interno
 
@@ -145,7 +147,7 @@ El sistema ya es funcional de punta a punta (CRUD + roles). Lo que sigue es hace
 
 2. [x] ~~**Cambiar estado de una cita con un clic, sin abrir el formulario completo**~~ — **resuelto**. En `app/Filament/Resources/Citas/Tables/CitasTable.php` se agregó un `ActionGroup` "Cambiar estado" (icono de refresh) antes del botón Editar, con un botón por cada estado válido (pendiente/confirmada/atendida/cancelada). Cada botón se oculta si la cita ya está en ese estado, actualiza directo con `$record->update(['estado' => $estado])` (sin navegar a otra página) y muestra una notificación de éxito. Los colores de cada botón coinciden con los del badge de la columna Estado (se extrajo a un helper `colorEstado()` compartido para no duplicar el `match`). Todo el grupo respeta `CitaResource::canEdit($record)`, igual que el botón Editar. **No se aplicó todavía al widget de "Citas de hoy" del Dashboard** (punto 1) — ese widget por ahora solo tiene el botón Editar; sería una mejora natural para una próxima pasada si se quiere el mismo flujo rápido desde el Dashboard.
 
-3. **Crear paciente nuevo sin salir del formulario de Cita**. Cuando llega un paciente no registrado, hoy hay que cancelar la cita, ir a crear el paciente, y volver. Filament permite esto con `Select::make('paciente_id')->createOptionForm([...])` — agrega un botón "+" junto al selector que abre un mini-formulario modal para crear el paciente sin perder el formulario de cita. Aplicar en `CitaForm.php`.
+3. [x] ~~**Crear paciente nuevo sin salir del formulario de Cita**~~ — **resuelto**. En `app/Filament/Resources/Citas/Schemas/CitaForm.php` se agregó `->createOptionForm([...])` al selector de `paciente_id`, con los mismos campos que `PacienteForm` (nombres, apellidos, cédula, fecha de nacimiento, teléfono, email, dirección, sexo). Ahora aparece un botón "+" junto al selector que abre un modal para crear el paciente sin perder los datos ya cargados en el formulario de la cita. Se agregó validación `->unique(table: 'pacientes', column: 'cedula')` al campo cédula del modal (el `PacienteForm` original no la tenía — solo la restricción de la base de datos — así que sin esto el modal habría mostrado el error crudo de MySQL en vez de un mensaje claro si se repetía una cédula). De paso se mejoró cómo se ve el selector de paciente: antes solo mostraba `nombres`, ahora muestra "Nombres Apellidos" (vía `getOptionLabelFromRecordUsing`) y se puede buscar también por apellido o cédula — útil para poder diferenciar pacientes con el mismo nombre de pila, cosa que se vuelve más común ahora que se crean pacientes rápido desde acá.
 
 4. **Filtros rápidos en la lista de Citas** ("Hoy", "Pendientes", "Confirmadas"). Implementación: usar `Tables\Filters\Filter` o `Tables\Filters\SelectFilter` en `CitasTable.php`, incluyendo un filtro rápido de fecha = hoy.
 
@@ -153,7 +155,7 @@ El sistema ya es funcional de punta a punta (CRUD + roles). Lo que sigue es hace
 
 **Explícitamente descartado por ahora** (para no abrumar al personal antes de que domine lo básico): recordatorios automáticos por WhatsApp/SMS, portal de autoagendamiento para pacientes. Quedan para una fase futura, después de validar que recepción/médicos ya están cómodos con el sistema base.
 
-**Estado**: puntos 1 (Dashboard) y 2 (cambiar estado con un clic) resueltos, ambos confirmados funcionando por el usuario en el entorno real. Sugerencia por defecto para la próxima sesión: seguir con el punto 3 (crear paciente sin salir del formulario de Cita) o el punto 4 (filtros rápidos en Citas).
+**Estado**: puntos 1 (Dashboard), 2 (cambiar estado con un clic) y 3 (crear paciente desde el formulario de Cita) resueltos; 1 y 2 confirmados funcionando por el usuario en el entorno real. Sugerencia por defecto para la próxima sesión: seguir con el punto 4 (filtros rápidos en Citas).
 
 **Otros pendientes de fondo, sin definir aún**:
 - Construir la página web pública (diseño, contenido) — sigue sin arrancar.

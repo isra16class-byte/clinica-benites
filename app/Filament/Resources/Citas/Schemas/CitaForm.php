@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Citas\Schemas;
 
+use App\Models\Paciente;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Schema;
 
@@ -16,10 +18,28 @@ class CitaForm
             ->components([
                 Select::make('paciente_id')
                     ->relationship('paciente', 'nombres')
+                    ->getOptionLabelFromRecordUsing(fn (Paciente $record): string => "{$record->nombres} {$record->apellidos}")
                     ->label('Paciente')
-                    ->searchable()
+                    ->searchable(['nombres', 'apellidos', 'cedula'])
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->createOptionForm([
+                        TextInput::make('nombres')
+                            ->required(),
+                        TextInput::make('apellidos')
+                            ->required(),
+                        TextInput::make('cedula')
+                            ->required()
+                            ->unique(table: 'pacientes', column: 'cedula'),
+                        DatePicker::make('fecha_nacimiento'),
+                        TextInput::make('telefono')
+                            ->tel(),
+                        TextInput::make('email')
+                            ->email(),
+                        TextInput::make('direccion'),
+                        TextInput::make('sexo'),
+                    ])
+                    ->createOptionModalHeading('Crear paciente nuevo'),
                 Select::make('medico_id')
                     ->relationship('medico', 'nombres')
                     ->label('Médico')

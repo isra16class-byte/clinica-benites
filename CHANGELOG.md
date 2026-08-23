@@ -6,6 +6,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Crear paciente sin salir del formulario de Cita (punto 3 del plan de UX)
+
+- `app/Filament/Resources/Citas/Schemas/CitaForm.php`: se agregó `->createOptionForm([...])` al selector `paciente_id`, con los mismos campos que el formulario de Pacientes (nombres, apellidos, cédula, fecha de nacimiento, teléfono, email, dirección, sexo). Ahora hay un botón "+" junto al selector que abre un modal para dar de alta un paciente nuevo sin perder los datos ya cargados en la cita.
+- Se agregó validación `->unique(table: 'pacientes', column: 'cedula')` al campo cédula de ese modal — el formulario original de Pacientes no la tenía (solo la restricción de la base de datos), así que sin esto el modal habría mostrado el error crudo de MySQL en vez de un mensaje de validación claro si se repetía una cédula. **Nota**: esta validación se agregó solo en el modal nuevo, no en `PacienteForm.php` original — queda documentado como deuda técnica pendiente en `MEMORIA.md` sección 7.
+- Se mejoró el selector de paciente en el mismo formulario: antes solo mostraba `nombres`, ahora muestra "Nombres Apellidos" (`getOptionLabelFromRecordUsing`) y permite buscar por nombre, apellido o cédula — para poder distinguir pacientes con el mismo nombre de pila.
+- **Nota de entorno**: igual que los puntos 1 y 2, se escribió sin acceso a PHP/Composer/Sail. Se verificó la API exacta de `createOptionForm()`, `getOptionLabelFromRecordUsing()` y la firma de `unique()` contra el código fuente y la documentación oficial de Filament 5, pero falta probarlo corriendo el proyecto real.
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Cambiar estado de una cita con un clic (punto 2 del plan de UX)
 
 - `app/Filament/Resources/Citas/Tables/CitasTable.php`: se agregó un `ActionGroup` "Cambiar estado" en la tabla de Citas, antes del botón Editar. Contiene un botón por cada estado válido (Pendiente/Confirmada/Atendida/Cancelada); cada uno se oculta si la cita ya está en ese estado, y al hacer clic actualiza `estado` directo (`$record->update(...)`) sin abrir el formulario ni navegar de página, mostrando una notificación de éxito.
