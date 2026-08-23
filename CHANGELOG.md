@@ -1,0 +1,45 @@
+# 📜 CHANGELOG — Clínica Benites
+
+Registro cronológico de cambios del proyecto. Formato: más nuevo arriba, nunca se borran entradas viejas.
+
+Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este archivo es solo la bitácora de "qué cambió cuándo".
+
+---
+
+## [2026-08-23] Modelos y migraciones creadas para las 6 tablas principales
+
+Se generaron con `artisan make:model ... -m` los modelos y archivos de migración (aún vacíos, sin columnas) para: `Area`, `Paciente`, `Medico`, `Cita`, `HistoriaClinica`, `Factura`. La tabla `users` no se recreó — ya existe por defecto en Laravel, se le agregará el campo `rol` más adelante.
+
+Se acordó el diseño completo de columnas y relaciones (ver `MEMORIA.md`, sección 4) — pendiente escribirlas dentro de cada archivo de migración y correr `sail artisan migrate`.
+
+## [2026-08-23] Repositorio creado en GitHub y conectado al proyecto local
+
+- Repo creado como **público** en `https://github.com/isra16class-byte/clinica-benites` — decisión consciente: el código no va a contener datos reales de pacientes (esos viven en la base de datos local, no en el repo).
+- `git init`, `git add .`, `git remote add origin ...` corridos.
+- Primer intento de `git push` falló con `src refspec main does not match any` — causa: se había hecho `git branch -M main` y el push antes de tener ningún commit real.
+- Segundo intento de commit falló con `Author identity unknown` — faltaba configurar `user.name`/`user.email` de Git en esta máquina (nunca se había usado Git ahí antes).
+- Configurado `git config --global user.email` y `user.name`. Pendiente confirmar que el commit + push posteriores se completaron sin errores.
+
+## [2026-08-23] Instalación del entorno de desarrollo completa
+
+Windows + WSL2 + Docker Desktop + Laravel Sail + Filament, todo funcionando:
+
+- WSL2 instalado con Ubuntu (`wsl --install -d Ubuntu`) — el primer intento con `wsl --install` a secas no dejó ninguna distro instalada, hubo que especificar `-d Ubuntu` explícitamente.
+- Docker Desktop instalado con integración WSL2 activada (Settings → Resources → WSL Integration → switch de Ubuntu).
+- Git + VS Code + extensión WSL instalados. Confirmado que VS Code puede conectarse a la ventana WSL (indicador "WSL: Ubuntu" abajo a la izquierda).
+- Proyecto Laravel creado con `curl -s "https://laravel.build/clinica-benites" | bash` (instala Laravel + Sail, corre todo en Docker sin PHP/MySQL directo en la máquina).
+- `sail up` levantado — la primera carga tardó varios minutos descargando imágenes de Docker; los logs periódicos de "Meilisearch" con `status_code=200` generaron confusión (se aclaró que es un health-check normal, no que algo esté cargando).
+- Error inicial al entrar a `localhost`: `SQLSTATE[42S02]: Base table or view not found... sessions` — resuelto corriendo `sail artisan migrate` (faltaban las migraciones base de Laravel).
+- Filament instalado (`composer require filament/filament` + `artisan filament:install --panels`), usuario admin creado con `artisan make:filament-user`, panel accesible y funcional en `http://localhost/admin`.
+
+## [2026-08-22] Definición de alcance y stack técnico
+
+- Se identificó la clínica objetivo: **Clínica Benites**, Av. Francisco de Orellana, Guayaquil (vía Google Maps — 3.1★, 16 opiniones, sin web ni redes sociales encontradas).
+- Confirmado por el contacto interno: **el paciente no va a agendar cita desde la web** — las citas las sigue creando el personal manualmente, pero quedan registradas en el sistema (por lo tanto, base de datos sí es necesaria de todas formas).
+- Arquitectura decidida: web pública y sistema privado en el **mismo proyecto**, separados por rutas y autenticación, no por dominios distintos.
+- Stack decidido: **Laravel + Filament + MySQL**, entorno de desarrollo con **Docker vía WSL2** (Windows), hosting futuro en **VPS** (Hetzner/DigitalOcean) en vez de hosting compartido.
+- Confirmado que todo el desarrollo es gratuito hasta el momento de publicar (dominio ~$10-15/año + VPS ~$5-15/mes ≈ $70-100/año total).
+
+## [2026-08-22] Guía de entrevista con el cliente
+
+Se armó un documento con las preguntas clave a cubrir en la entrevista formal con el dueño/cliente de la clínica (aún pendiente de realizarse): contexto general, usuarios/roles, agenda, historias clínicas, facturación, página web, datos/privacidad (LOPDP Ecuador), infraestructura/presupuesto, soporte y crecimiento futuro.
