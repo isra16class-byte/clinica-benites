@@ -55,6 +55,24 @@ class HistoriaClinicaResource extends Resource
         return Auth::user()?->isAdmin() ?? false;
     }
 
+    /**
+     * Mismo filtro que en CitaResource: un médico vinculado (users.medico_id)
+     * solo ve las historias clínicas de sus propios pacientes. Ver
+     * MEMORIA.md sección 10.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        $user = Auth::user();
+
+        if ($user?->isMedico() && $user->medico_id) {
+            $query->where('medico_id', $user->medico_id);
+        }
+
+        return $query;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return HistoriaClinicaForm::configure($schema);

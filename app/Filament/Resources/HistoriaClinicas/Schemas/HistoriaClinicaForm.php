@@ -5,6 +5,7 @@ namespace App\Filament\Resources\HistoriaClinicas\Schemas;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Auth;
 
 class HistoriaClinicaForm
 {
@@ -23,7 +24,11 @@ class HistoriaClinicaForm
                     ->label('Médico')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    // Mismo criterio que en CitaForm: preseleccionar al
+                    // médico logueado si está vinculado, evita el error de
+                    // registrar una historia clínica a nombre de otro médico.
+                    ->default(fn (): ?int => Auth::user()?->medico_id),
                 Select::make('cita_id')
                     ->relationship('cita', 'id')
                     ->label('Cita relacionada')

@@ -9,6 +9,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Auth;
 
 class CitaForm
 {
@@ -45,7 +46,13 @@ class CitaForm
                     ->label('Médico')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    // Si quien crea la cita es un médico vinculado a su
+                    // propio registro (users.medico_id), se preselecciona a
+                    // sí mismo para evitar el error de agendarle una cita a
+                    // otro médico por descuido. Sigue siendo editable, y no
+                    // afecta a admin/recepción (no tienen medico_id).
+                    ->default(fn (): ?int => Auth::user()?->medico_id),
                 Select::make('area_id')
                     ->relationship('area', 'nombre')
                     ->label('Área')

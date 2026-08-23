@@ -6,6 +6,20 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Filtrar "mis pacientes" para el rol médico
+
+- Nueva migración `2026_08_23_220000_add_medico_id_to_users_table.php`: agrega `medico_id` (nullable, FK a `medicos`, `nullOnDelete()`) a la tabla `users`, conectando por fin `users` con `medicos` (hasta ahora eran tablas independientes).
+- `User::medico()` (relación `belongsTo`) y `medico_id` agregado al atributo `#[Fillable]` del modelo.
+- `UserForm` (`/admin/users`): nuevo campo `Select` "Médico vinculado", visible solo cuando el rol seleccionado es `medico` (el `Select` de `rol` ahora usa `->live()` para poder reaccionar a ese cambio sin recargar la página).
+- `UsersTable`: nueva columna "Médico vinculado" (toggleable), muestra "—" cuando no aplica.
+- `CitaResource::getEloquentQuery()` y `HistoriaClinicaResource::getEloquentQuery()`: si el usuario logueado tiene rol `medico` y `medico_id` asignado, la consulta base se filtra por `medico_id` — afecta tabla, edición y búsqueda global (que reutiliza `getEloquentQuery()` en Filament).
+- `CitasDeHoyWidget`: mismo filtro aplicado a la query del widget de dashboard.
+- `CitaForm` y `HistoriaClinicaForm`: el campo `medico_id` trae `->default()` que preselecciona al médico logueado si está vinculado (sigue siendo editable).
+- Diseño defensivo: un usuario con rol `medico` sin `medico_id` asignado sigue viendo todo (sin filtro), igual que el comportamiento anterior — evita bloquear a alguien por un dato sin migrar.
+- **Pendiente**: correr la migración en el entorno real (`sail artisan migrate`) y asignar `medico_id` a los usuarios médico existentes desde `/admin/users` para que el filtro empiece a aplicar. Falta probar de punta a punta en el entorno real.
+- Sintaxis validada con `php -l` (PHP 8.3 CLI en un entorno aislado) en los 9 archivos nuevos/modificados.
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Confirmación en entorno real: gestión de usuarios + exportar Facturas a PDF
 
 - Se corrió `./vendor/bin/sail composer require barryvdh/laravel-dompdf` (usando el composer de Sail, no el composer nativo de Windows/WSL, que no tiene PHP en el PATH y fallaba con `php: not found`).

@@ -8,6 +8,8 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class CitasDeHoyWidget extends BaseWidget
 {
@@ -20,11 +22,22 @@ class CitasDeHoyWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                Cita::query()
+            ->query(function (): Builder {
+                $query = Cita::query()
                     ->whereDate('fecha', today())
-                    ->orderBy('hora_inicio')
-            )
+                    ->orderBy('hora_inicio');
+
+                // Mismo filtro "mis pacientes" que CitaResource: un médico
+                // vinculado (users.medico_id) solo ve sus propias citas de
+                // hoy en el widget del dashboard (ver MEMORIA.md sección 10).
+                $user = Auth::user();
+
+                if ($user?->isMedico() && $user->medico_id) {
+                    $query->where('medico_id', $user->medico_id);
+                }
+
+                return $query;
+            })
             ->columns([
                 TextColumn::make('hora_inicio')
                     ->label('Hora')

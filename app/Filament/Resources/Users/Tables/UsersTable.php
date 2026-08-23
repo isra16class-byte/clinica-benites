@@ -43,6 +43,13 @@ class UsersTable
                         default => ucfirst($state),
                     })
                     ->searchable(),
+                TextColumn::make('medico.nombres')
+                    ->label('Médico vinculado')
+                    ->formatStateUsing(fn ($state, User $record): ?string => $record->medico
+                        ? trim("{$record->medico->nombres} {$record->medico->apellidos}")
+                        : null)
+                    ->placeholder('—')
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->label('Creado')
                     ->dateTime()

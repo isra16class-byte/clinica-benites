@@ -52,6 +52,26 @@ class CitaResource extends Resource
         return Auth::user()?->isAdmin() ?? false;
     }
 
+    /**
+     * Si el usuario logueado tiene rol medico y está vinculado a un
+     * registro de Medico (campo users.medico_id, ver MEMORIA.md sección
+     * 10), solo ve sus propias citas. Admin y recepción, y un médico sin
+     * vincular todavía, siguen viendo todas (comportamiento anterior) para
+     * no bloquear a nadie por una migración de datos incompleta.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        $user = Auth::user();
+
+        if ($user?->isMedico() && $user->medico_id) {
+            $query->where('medico_id', $user->medico_id);
+        }
+
+        return $query;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return CitaForm::configure($schema);

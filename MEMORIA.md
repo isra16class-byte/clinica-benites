@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (gestión de usuarios y exportar Facturas a PDF — construidos, `composer require barryvdh/laravel-dompdf` corrido, y **confirmados funcionando en el entorno real**: ver secciones 7, 9 y 10).
+Última actualización: 23 de agosto de 2026 (agregado el filtro "mis pacientes" para el rol médico — conecta `users` con `medicos` — ver sección 10; falta probar en el entorno real).
 
 ---
 
@@ -154,6 +154,7 @@ facturas
 - [x] ~~**Deuda técnica**: `PacienteForm.php` original sin validar `cedula` única a nivel de formulario~~ — **resuelto y confirmado funcionando por el usuario en el entorno real**. Se agregó `->unique(table: 'pacientes', column: 'cedula', ignoreRecord: true)` al campo `cedula` en `app/Filament/Resources/Pacientes/Schemas/PacienteForm.php` (el formulario de `/admin/pacientes`, usado tanto en Crear como en Editar). Ahora, si se repite una cédula al crear o editar un paciente desde ahí, sale un mensaje de validación claro en vez del error crudo de MySQL — mismo comportamiento que ya tenía el modal de creación rápida en `CitaForm.php`. Se usó `ignoreRecord: true` (a diferencia del modal, que no lo necesita por ser solo de creación) para que editar un paciente sin cambiar su propia cédula no dispare el error por "duplicarse a sí mismo".
 - [x] ~~**Gestión de usuarios desde el panel** (`/admin/users`)~~ — resuelto y confirmado funcionando por el usuario en el entorno real (ver sección 9 y 10 para el detalle). Incluye la protección contra que un admin se elimine a sí mismo, también confirmada.
 - [x] ~~**Exportar Facturas a PDF** (botón "Exportar PDF")~~ — resuelto y confirmado funcionando por el usuario en el entorno real, incluyendo que un rol sin permiso (médico) recibe 403 al intentar la ruta directa (ver sección 9 para el detalle).
+- [x] ~~**Filtrar "mis pacientes" para el rol médico**~~ — resuelto (ver sección 10 para el detalle). **Pendiente probar en el entorno real** (correr la migración con `sail artisan migrate` y confirmar el filtro con un usuario médico de prueba vinculado desde `/admin/users`).
 
 ## 8. Plan para la próxima sesión — pulir UX del sistema interno
 
@@ -192,7 +193,7 @@ Sesión de investigación (23 de agosto de 2026) sobre buenas prácticas de soft
 - Recordatorios de cita por WhatsApp/SMS (reducen inasistencias 35-50% según varias fuentes de la industria) — ya estaba descartado explícitamente para esta fase (ver arriba), se mantiene la decisión.
 - Exportar historia clínica o factura a PDF.
 - Reportes/KPIs básicos (citas por estado, ingresos por método de pago) vía widgets de estadísticas de Filament.
-- Filtrar "mis pacientes" para el rol médico (ya documentado como limitación conocida en sección 7 y sección 10).
+- ~~Filtrar "mis pacientes" para el rol médico~~ — resuelto, ver sección 10.
 
 **Ideas cruzadas de otras industrias (más "renovadoras", no vistas típicamente en clínicas pequeñas de la región):**
 1. **Lista de espera automática** (patrón de restaurantes/hoteles — OpenTable, Waitwhile): cuando se cancela una cita, el sistema ofrece automáticamente ese cupo al primer paciente en una lista de espera (por WhatsApp/link), en vez de que el hueco quede vacío hasta que recepción se acuerde de llamar a alguien. Usaría datos que el sistema ya tiene (`citas`, `estado`), sin necesitar APIs de pago de entrada. Identificada como la propuesta de mayor impacto/novedad.
@@ -227,7 +228,16 @@ Campo `rol` en la tabla `users` (string, default `recepcion`). Valores válidos:
 | Facturas | Todo | Todo | Sin acceso |
 | Usuarios | Todo (excepto eliminar su propia cuenta) | Sin acceso | Sin acceso |
 
-**Limitación conocida (pendiente para después)**: un médico ve *todas* las citas/historias clínicas del sistema, no solo las de sus propios pacientes. Filtrar "solo mis pacientes" requiere conectar la tabla `users` con `medicos` (hoy son independientes) — pendiente para una siguiente fase si se necesita.
+**Filtro "mis pacientes" para el rol médico — resuelto** (ya no es una limitación conocida). Se conectó la tabla `users` con `medicos`:
+
+- Migración `2026_08_23_220000_add_medico_id_to_users_table.php`: agrega `medico_id` (nullable, FK a `medicos`, `nullOnDelete()`) a `users`.
+- `User::medico()` (`belongsTo`) y `medico_id` agregado al `#[Fillable]` del modelo.
+- `UserForm`: nuevo `Select` "Médico vinculado" (`medico_id`), visible solo cuando el `Select` de `rol` (ahora `->live()`) está en `medico`. Se asigna desde `/admin/users`, junto con el resto de datos del usuario.
+- `CitaResource::getEloquentQuery()` y `HistoriaClinicaResource::getEloquentQuery()`: si el usuario logueado `isMedico()` y tiene `medico_id` asignado, se agrega `->where('medico_id', $user->medico_id)` a la consulta base — afecta la tabla, el buscador global (usa `getGlobalSearchEloquentQuery()`, que ya extiende de `getEloquentQuery()` en Filament) y cualquier vista que dependa de esos Resources.
+- `CitasDeHoyWidget`: mismo filtro aplicado a la query del widget del Dashboard, para que un médico solo vea sus propias citas de hoy, no las de todos.
+- `CitaForm` y `HistoriaClinicaForm`: el campo `medico_id` ahora trae `->default(fn (): ?int => Auth::user()?->medico_id)` — si quien crea el registro es un médico vinculado, aparece preseleccionado a sí mismo (sigue siendo editable), para evitar el error de agendar/registrar algo a nombre de un colega por descuido.
+- **Diseño defensivo**: si un usuario con rol `medico` no tiene `medico_id` asignado todavía (dato sin migrar, o admin que olvidó vincularlo), el filtro no se aplica y ese usuario sigue viendo todo — igual que el comportamiento actual — en vez de no ver nada. Es preferible "ver de más" temporalmente a que un médico real quede bloqueado por un dato sin cargar.
+- **Pendiente**: asignar `medico_id` a los usuarios con rol médico que ya existen en el sistema (créalos/edítalos desde `/admin/users` y selecciona su médico vinculado). Sin ese paso, el filtro simplemente no aplica para ellos (ver diseño defensivo arriba) — no rompe nada, pero tampoco se benefician del filtro hasta hacerlo. **Falta probar en el entorno real** (corriendo la migración con `sail artisan migrate` y confirmando el filtro con un usuario médico de prueba).
 
 **Cómo asignar el rol al usuario admin existente** (el usuario creado con `make:filament-user` antes de esta migración quedó con el default `recepcion`):
 

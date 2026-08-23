@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Models\Medico;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
 
@@ -34,7 +36,20 @@ class UserForm
                         'medico' => 'Médico',
                     ])
                     ->required()
-                    ->default('recepcion'),
+                    ->default('recepcion')
+                    ->live(),
+                Select::make('medico_id')
+                    ->relationship('medico', 'nombres')
+                    ->getOptionLabelFromRecordUsing(fn (Medico $record): string => "{$record->nombres} {$record->apellidos}")
+                    ->label('Médico vinculado')
+                    ->searchable(['nombres', 'apellidos'])
+                    ->preload()
+                    // Solo tiene sentido (y solo se muestra) cuando el rol es
+                    // medico: conecta este usuario con su registro en la
+                    // tabla `medicos`, para poder filtrar "mis pacientes" en
+                    // Citas e Historias Clínicas (ver MEMORIA.md sección 10).
+                    ->visible(fn (Get $get): bool => $get('rol') === 'medico')
+                    ->helperText('Necesario para que este usuario solo vea sus propias citas e historias clínicas al iniciar sesión.'),
                 TextInput::make('password')
                     ->label('Contraseña')
                     ->password()
