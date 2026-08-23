@@ -6,6 +6,12 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Protección contra borrado con datos relacionados + diagnóstico de botón visible sin permiso
+
+- **Reportado**: al probar el usuario de prueba con rol `recepcion`, el botón "Crear" aparecía visible en Áreas y Médicos (no debería), aunque al hacer clic sí devolvía 403 correctamente. Diagnóstico en curso — el código de `canCreate()` en el servidor está correcto, así que se sospecha de caché de Laravel o de una carga de página anterior al cambio de permisos. Se documentaron los pasos de troubleshooting en `MEMORIA.md` sección 9 (`optimize:clear` + refresh fuerte + verificar rol real en BD vía tinker). Pendiente confirmar si se resolvió.
+- **Reportado y resuelto**: al intentar eliminar un Paciente con citas asociadas, salía el error crudo de MySQL `SQLSTATE[23000]: Integrity constraint violation... Cannot delete or update a parent row`. Se agregó una validación `->before()` en el `DeleteAction` de las páginas de edición de **Área**, **Médico**, **Paciente** y **Cita**: si el registro tiene datos dependientes, se cancela el borrado y se muestra una notificación clara en español en vez del error técnico. Se agregaron las relaciones `Area::citas()`, `Cita::historiaClinicas()` y `Cita::facturas()` a los modelos (faltaban, necesarias para poder chequear).
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Roles y permisos por tipo de usuario
 
 - Migración nueva: agrega columna `rol` (string, default `recepcion`) a la tabla `users`.

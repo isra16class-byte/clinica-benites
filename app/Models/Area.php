@@ -15,4 +15,9 @@ class Area extends Model
     {
         return $this->hasMany(Medico::class);
     }
+
+    public function citas(): HasMany
+    {
+        return $this->hasMany(Cita::class);
+    }
 }

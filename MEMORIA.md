@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (se agregó el campo `rol` a `users` y se implementó autorización por rol en los 6 Filament Resources — ver sección 9).
+Última actualización: 23 de agosto de 2026 (se agregó validación antes de borrar en Área/Médico/Paciente/Cita para evitar el error crudo de MySQL cuando hay registros relacionados — ahora muestra una notificación clara en español y cancela el borrado. También se está diagnosticando un caso donde el botón "Crear" aparecía visible para un rol sin permiso, aunque el bloqueo de seguridad sí funcionaba al hacer clic — ver sección 9).
 
 ---
 
@@ -162,6 +162,10 @@ Campo `rol` en la tabla `users` (string, default `recepcion`). Valores válidos:
 ```
 
 **Para crear usuarios de prueba con otros roles**, usar `make:filament-user` para crear el usuario y luego el mismo comando de tinker (cambiando el email/rol) para asignarle el rol correcto — o hacerlo directo desde el panel una vez que se le dé al admin acceso a gestionar usuarios (pendiente, no hay Resource de `User` todavía).
+
+**Troubleshooting — botón visible que no debería**: se observó un caso donde el botón "Crear" aparecía en Áreas/Médicos para un usuario con rol `recepcion` (no debería, `canCreate()` bloquea eso), y al hacer clic sí daba 403 correctamente — o sea, la seguridad de fondo funcionaba, pero el botón no se ocultaba en pantalla. Causas más probables: caché de Laravel desactualizada (correr `sail artisan optimize:clear`) o la página del navegador cargada antes de que el permiso cambiara (hacer refresh fuerte, `Ctrl+Shift+R`). Si vuelve a pasar, revisar primero con `artisan tinker` que el usuario de prueba tenga el `rol` esperado en la base de datos.
+
+**Protección contra borrado con datos relacionados**: Área, Médico, Paciente y Cita ahora validan antes de borrar (en el `DeleteAction` de su página de edición) si tienen registros dependientes (ej. un paciente con citas, un médico con historias clínicas). Si los tiene, se cancela el borrado y se muestra una notificación clara en español, en vez del error crudo de MySQL (`Integrity constraint violation`). Historia Clínica y Factura no necesitan esta protección porque nada más depende de ellas.
 - [ ] Agregar campo `rol` a la tabla `users` (admin/recepción/médico).
 - [ ] Definir roles y permisos dentro de Filament (qué ve/hace cada rol) — depende del campo `rol` de arriba.
 - [ ] Construir la página web pública (diseño, contenido).
