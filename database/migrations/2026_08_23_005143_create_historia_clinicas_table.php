@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('historia_clinicas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('paciente_id')->constrained('pacientes');
+            $table->foreignId('medico_id')->constrained('medicos');
+            $table->foreignId('cita_id')->nullable()->constrained('citas');
+            $table->text('motivo_consulta')->nullable();
+            $table->text('diagnostico')->nullable();
+            $table->text('tratamiento')->nullable();
+            $table->text('notas')->nullable();
             $table->timestamps();
         });
     }

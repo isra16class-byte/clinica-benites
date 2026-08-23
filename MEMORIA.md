@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (se crearon los modelos y archivos de migración vacíos de las 6 tablas principales — `Area`, `Paciente`, `Medico`, `Cita`, `HistoriaClinica`, `Factura` — todavía sin las columnas definidas dentro. Repo inicializado y conectado a GitHub, primer commit en proceso).
+Última actualización: 23 de agosto de 2026 (se llenaron las 6 migraciones con sus columnas y relaciones — ver sección 4 — respetando el orden de dependencias (`areas` → `pacientes` → `medicos` → `citas` → `historia_clinicas` → `facturas`). Aún falta correr `sail artisan migrate` para crear las tablas de verdad en MySQL).
 
 ---
 
@@ -44,19 +44,19 @@ clinica-benites/
       User.php                # Por defecto de Laravel — pendiente agregarle campo `rol`
   database/
     migrations/
-      ..._create_areas_table.php            # Creada, columnas AÚN NO agregadas
-      ..._create_pacientes_table.php        # Creada, columnas AÚN NO agregadas
-      ..._create_medicos_table.php          # Creada, columnas AÚN NO agregadas
-      ..._create_citas_table.php            # Creada, columnas AÚN NO agregadas
-      ..._create_historia_clinicas_table.php # Creada, columnas AÚN NO agregadas
-      ..._create_facturas_table.php         # Creada, columnas AÚN NO agregadas
+      ..._create_areas_table.php            # Completa (nombre)
+      ..._create_pacientes_table.php        # Completa (datos personales + cedula unique)
+      ..._create_medicos_table.php          # Completa (FK area_id)
+      ..._create_citas_table.php            # Completa (FKs paciente/medico/area, horario, estado)
+      ..._create_historia_clinicas_table.php # Completa (FKs paciente/medico/cita nullable)
+      ..._create_facturas_table.php         # Completa (FKs paciente/cita nullable, monto, pago)
   docker-compose.yml         # Generado por Sail
   .env                       # NO se sube a git (credenciales locales de MySQL, etc.)
   MEMORIA.md                 # Este archivo
   CHANGELOG.md                # Bitácora cronológica
 ```
 
-## 4. Modelo de datos (diseño acordado, columnas pendientes de escribir en las migraciones)
+## 4. Modelo de datos (ya escrito en las migraciones)
 
 ```
 areas
@@ -99,9 +99,9 @@ facturas
 - ✅ Proyecto Laravel (`clinica-benites`) corriendo con Sail (`./vendor/bin/sail up`).
 - ✅ MySQL conectado, migraciones base de Laravel corridas.
 - ✅ Filament instalado, panel accesible en `http://localhost/admin` con usuario admin creado.
-- ✅ Modelos y archivos de migración creados para las 6 tablas principales (vacíos por dentro).
-- ⬜ **Pendiente inmediato**: llenar cada migración con sus columnas (ver sección 4) y correr `sail artisan migrate`.
-- 🔄 Git: repo creado en GitHub (público), `git init` + `git add .` + commit en curso — push aún sin confirmar como exitoso.
+- ✅ Modelos y archivos de migración creados para las 6 tablas principales, con columnas y relaciones ya definidas.
+- ⬜ **Pendiente inmediato**: correr `sail artisan migrate` en la máquina de desarrollo para crear las tablas de verdad en MySQL (este cambio llega vía patch, hay que aplicarlo con `git am` antes de migrar).
+- ✅ Git: repo en GitHub confirmado funcionando — `git log --oneline` muestra `HEAD -> main, origin/main` en el mismo commit, o sea que local y remoto están sincronizados.
 
 ## 6. Preguntas pendientes (por confirmar con el contacto interno / en la entrevista formal)
 
@@ -119,9 +119,9 @@ facturas
 
 ## 7. Roadmap / pendientes técnicos
 
-- [ ] Llenar las 6 migraciones con sus columnas (ver sección 4).
-- [ ] Correr `sail artisan migrate`.
-- [ ] Confirmar que el push a GitHub se completó correctamente.
+- [x] ~~Llenar las 6 migraciones con sus columnas~~ — resuelto (ver sección 4 y `CHANGELOG.md`).
+- [x] ~~Confirmar que el push a GitHub se completó correctamente~~ — resuelto, verificado con `git log --oneline`.
+- [ ] Correr `sail artisan migrate` (aplicar primero el patch con `git am`).
 - [ ] Agregar campo `rol` a la tabla `users` (admin/recepción/médico).
 - [ ] Crear los Resources de Filament (pantallas) para cada tabla.
 - [ ] Definir roles y permisos dentro de Filament (qué ve/hace cada rol).

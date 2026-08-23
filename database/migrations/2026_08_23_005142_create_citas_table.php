@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('citas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('paciente_id')->constrained('pacientes');
+            $table->foreignId('medico_id')->constrained('medicos');
+            $table->foreignId('area_id')->constrained('areas');
+            $table->date('fecha');
+            $table->time('hora_inicio');
+            $table->time('hora_fin');
+            $table->string('estado')->default('pendiente');
+            $table->text('notas')->nullable();
             $table->timestamps();
         });
     }
