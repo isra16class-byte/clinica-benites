@@ -6,6 +6,12 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Confirmación en entorno real: fix de `medico_id` + filtro "mis pacientes"
+
+- Confirmado por el usuario: el fix de `medico_id` (se limpia correctamente al cambiar el rol de un usuario, tanto en el `Select` en vivo como al guardar) funciona como se esperaba.
+- Con esto, el filtro "mis pacientes" para el rol médico (Citas, Historias Clínicas, Dashboard, autoselect al crear) queda confirmado de punta a punta en el entorno real.
+- `MEMORIA.md` actualizado quitando las notas de "pendiente probar".
+
 ## [2026-08-23] Fix: `medico_id` no se limpiaba al cambiar el rol de un usuario
 
 - **Bug encontrado por el usuario al probar el filtro "mis pacientes"**: al editar un usuario `medico` (con médico vinculado) y cambiarle el rol a `recepcion`/`admin`, el campo "Médico vinculado" se ocultaba (`->visible()`) pero su valor seguía guardándose — Filament no descarta el valor de un campo solo por ocultarlo. El usuario quedaba con `rol` correcto pero `medico_id` apuntando a un médico "fantasma".
