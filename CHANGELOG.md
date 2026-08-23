@@ -6,6 +6,11 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Confirmación en entorno real: filtro rápido por rol en /admin/users
+
+- Confirmado por el usuario: el `SelectFilter` "Rol" en `/admin/users` funciona correctamente.
+- `MEMORIA.md` actualizado quitando la nota de "falta probar".
+
 ## [2026-08-23] Filtro rápido por rol en /admin/users
 
 - `UsersTable`: nuevo `SelectFilter` "Rol" (admin/recepción/médico), colocado arriba de la tabla vía `FiltersLayout::AboveContentCollapsible` (mismo patrón visual que los filtros rápidos de Citas).
