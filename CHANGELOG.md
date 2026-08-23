@@ -6,6 +6,13 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Investigación de funciones futuras — propuesta documentada, sin priorizar
+
+- Sesión de investigación (buenas prácticas de software de gestión clínica, requisitos de la LOPDP de Ecuador para datos de salud, e ideas de otras industrias) para tener un banco de ideas listo cuando se quiera ampliar el sistema.
+- Se agregó la sección 9 en `MEMORIA.md` ("Propuesta de funciones futuras") con: requisitos de cumplimiento pendientes (consentimiento del paciente, registro de auditoría vía `spatie/laravel-activitylog`), funciones típicas de EHR/practice management que aún faltan (exportar a PDF, reportes/KPIs, filtro "mis pacientes" por médico), y funciones "cruzadas" de otras industrias: lista de espera automática para cancelaciones (patrón de restaurantes/hoteles), recall/control preventivo (patrón de CRM de retail y clínicas dentales), encuesta de satisfacción post-visita, marcado de paciente frecuente, turno virtual para walk-ins, y panel ejecutivo de KPIs del negocio.
+- **Decisión del usuario**: por ahora no se prioriza ni se construye nada de esto — queda solo como propuesta documentada para una futura sesión.
+- No hay cambios de código en esta entrada, solo documentación. Entregado como patch (`git am`), igual que el resto de cambios a `MEMORIA.md`/`CHANGELOG.md`.
+
 ## [2026-08-23] Validación de cédula única — confirmado funcionando en el entorno real
 
 - Se probó en `/admin/pacientes`: crear un paciente con una cédula repetida muestra el mensaje de validación en vez del error crudo de MySQL; editar un paciente sin cambiar su propia cédula guarda sin problema (confirma que `ignoreRecord: true` funciona); editar un paciente cambiando su cédula por la de otro paciente existente también dispara la validación correctamente.
