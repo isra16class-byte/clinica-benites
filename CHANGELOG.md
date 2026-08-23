@@ -16,7 +16,7 @@ Diagnóstico del problema reportado (botón "Crear" visible para rol sin permiso
 
 **Fix**: se agregó `->visible()` en 18 puntos: los 6 `CreateAction` (páginas de lista), los 6 `EditAction` (tablas), los 6 `DeleteAction` (páginas de edición), y los 6 `DeleteBulkAction` (tablas) — cada uno conectado al método de autorización correspondiente del Resource.
 
-Entregado como patch (`git am`). Pendiente: repetir la prueba con el usuario de rol `recepcion` — ahora los botones de Crear/Editar en Áreas y Médicos, y el botón Eliminar en todos los recursos salvo Pacientes/Citas/Facturas (que si puede crear/editar), deberían estar completamente ocultos, no solo bloqueados al hacer clic.
+Entregado como patch (`git am`). **Confirmado funcionando**: probado con el usuario de rol `recepcion` — Áreas/Médicos sin botones de Crear/Editar/Eliminar, Pacientes/Citas/Facturas con Crear/Editar pero sin Eliminar, Historia Clínicas sigue sin aparecer en el menú. Sistema de roles y permisos completo y verificado de punta a punta.
 
 ## [2026-08-23] Protección contra borrado con datos relacionados + diagnóstico de botón visible sin permiso
 

@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (fix de fondo: los botones Crear/Editar/Eliminar en Filament no se conectaban automáticamente a `canCreate()`/`canEdit()`/`canDelete()` del Resource — solo la navegación por URL los usaba, no la visibilidad del botón en pantalla ni la ejecución del botón "Eliminar" dentro de la misma página. Se conectó explícitamente cada botón con `->visible()` en las 18 ubicaciones relevantes — ver sección 9).
+Última actualización: 23 de agosto de 2026 (roles y permisos **confirmados funcionando** de punta a punta tras conectar explícitamente cada botón — Crear/Editar/Eliminar/borrado masivo — a los métodos de autorización del Resource. Probado con usuario de rol `recepcion`).
 
 ---
 
@@ -133,8 +133,8 @@ facturas
 - [x] ~~Correr `sail artisan migrate`~~ — resuelto, las 6 tablas creadas.
 - [x] ~~Crear los Resources de Filament (pantallas) para cada tabla~~ — resuelto, con selectores por relación en vez de IDs.
 - [x] ~~Fix MassAssignmentException (faltaba \$fillable en los modelos)~~ — resuelto y confirmado: flujo completo Área → Médico → Paciente → Cita probado con éxito desde `/admin`.
-- [x] ~~Agregar campo `rol` a la tabla `users` y definir permisos/roles en Filament~~ — resuelto, ver sección 9.
-- [ ] **Pendiente inmediato**: aplicar el patch con `git am`, correr `sail artisan migrate`, y asignarle `rol = admin` al usuario admin existente (ver sección 9 para el comando).
+- [x] ~~Agregar campo `rol` a la tabla `users` y definir permisos/roles en Filament~~ — resuelto y confirmado funcionando de punta a punta, incluyendo el fix de fondo de botones no conectados a permisos (ver sección 9).
+- [ ] **Pendiente inmediato**: construir la página web pública, o mejorar el Dashboard — a decidir con el usuario. Sigue pendiente respuesta del contacto interno sobre cuántas áreas/especialidades tiene la clínica.
 
 ## 9. Roles y permisos
 
