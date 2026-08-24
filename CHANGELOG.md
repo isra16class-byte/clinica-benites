@@ -8,6 +8,18 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Documentación: validación externa de 6.2/6.3 + marco legal ecuatoriano (sección 6.4 nueva)
+
+- El usuario pidió investigar en internet si las propuestas de planificación de las secciones 6.2 (infraestructura: camas/UCI, quirófanos, procedimientos, emergencias, ambulancia) y 6.3 (medicamentos e insumos) están bien encaminadas, comparándolas con cómo lo resuelven otras clínicas/hospitales y estándares del sector, para dejar el sistema cubriendo esas buenas prácticas de antemano.
+- Investigación realizada sobre: sistemas ADT (Admission-Discharge-Transfer) y el estándar HL7 FHIR (recursos `Location`/`Encounter` para camas/ubicaciones), programación de quirófanos con equipo multidisciplinario, gestión de inventario farmacéutico hospitalario (lotes, vencimiento, FEFO), el estándar `MedicationRequest` de FHIR para prescripciones, sistemas hospitalarios open source comparables en tamaño (OpenMRS, OpenHospital, Bahmni), sistemas de triage de emergencias (ESI — Emergency Severity Index), y normativa ecuatoriana (Ley Orgánica de Protección de Datos Personales 2021/2023 y normativa del MSP sobre historia clínica electrónica con estándar HL7).
+- **Conclusión general**: ambas propuestas (6.2 y 6.3) están bien fundamentadas y coinciden con el patrón estándar de la industria — no se rediseñaron. Se les agregaron 3 ajustes concretos y una sección nueva de contexto legal:
+  - **6.2 — quirófanos**: el estado `libre/ocupado` se amplía a algo más granular (ej. preparación → en cirugía → limpieza → libre), porque el tiempo de limpieza entre cirugías es un dato real que afecta disponibilidad.
+  - **6.2 — emergencias**: un simple campo `origen` (programada/emergencia) se queda corto; se agrega la posibilidad de un campo de **prioridad/triage** (patrón ESI, 5 niveles), y se refina la pregunta pendiente para la clínica: si ya aplican algún criterio de prioridad hoy, aunque sea informal.
+  - **6.3 — inventario**: la trazabilidad por **lote y fecha de vencimiento** deja de ser "pregunta abierta" y pasa a tratarse como prácticamente obligatoria (patrón FEFO — First-Expired-First-Out), con una posible tabla de lotes separada del catálogo. Además, se documenta que el estándar del sector separa el ciclo de un medicamento en 3 eventos distintos (prescrito / dispensado / administrado), relevante para cuando se conecte con el futuro módulo de prescripciones de 2027.
+  - **Sección 6.4 (nueva)**: marco legal ecuatoriano — Ley Orgánica de Protección de Datos Personales (datos de salud como "dato sensible") y normativa del MSP que exige el estándar HL7 para historia clínica electrónica en instituciones públicas y privadas. No implica cambios de código, es contexto para futuras decisiones de diseño y para la eventual entrevista formal con el dueño de la clínica.
+- **No se tocó ningún modelo, migración, Resource ni seeder** — es una actualización puramente de documentación en `MEMORIA.md` (refinamiento de 6.2/6.3 + sección 6.4 nueva), igual que las dos entradas anteriores de este changelog. El sistema actual no se ve afectado.
+- Entregado como patch (`git am`).
+
 ## [2026-08-24] Documentación: propuesta de planificación para medicamentos e insumos
 
 - El usuario pidió una propuesta de modelado (solo documentación, sin código) para el módulo de **medicamentos e insumos** que el contacto interno mencionó en la sección 6.1 de `MEMORIA.md` ("debe vivir en farmacia, quirófano, admisión y facturación").
