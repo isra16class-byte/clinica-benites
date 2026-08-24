@@ -6,6 +6,13 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Fix: texto invisible en el ítem activo del menú lateral
+
+- El usuario probó el rediseño del sidebar oscuro (ver entrada de abajo) en el entorno real y mandó una captura de `/admin/facturas`: el ítem "Facturas" (activo, seleccionado) se veía con fondo blanco/claro y texto blanco encima — prácticamente ilegible.
+- **Causa**: el fondo y el color de texto del ítem activo se aplicaban con selectores CSS distintos — el del fondo (`.fi-sidebar-item.fi-active .fi-sidebar-item-button`) dependía de una clase interna del botón que no calzó contra la versión real de Filament instalada; el del texto (`.fi-sidebar-item.fi-active .fi-sidebar-item-label`) sí calzó y forzó el texto a blanco. Resultado: texto blanco forzado sobre un fondo que nunca cambió de blanco.
+- **Fix**: en `AdminPanelProvider.php`, el fondo y el color activo ahora se aplican juntos al `<li class="fi-sidebar-item fi-active">` (clase confirmada) y a todos sus descendientes (selector universal `*`), en vez de nombrar clases internas del botón/label que pueden variar entre versiones — así nunca vuelve a pasar que uno de los dos cambie sin el otro. Mismo criterio aplicado al estado `:hover`.
+- Sintaxis PHP validada con `php -l`. Entregado como patch (`git am`). **Pendiente confirmar en el entorno real que el ítem activo ya se ve bien.**
+
 ## [2026-08-23] Rediseño del color extra con criterio (60/30/10, sidebar oscuro)
 
 - El usuario pidió una segunda vuelta más pensada sobre el ajuste de color anterior ("¿cómo lo arreglarías vos? buscá en internet la mejor combinación"). Se investigaron guías de diseño (UAB Medicine, CMS.gov, regla 60/30/10) antes de tocar el código de nuevo.

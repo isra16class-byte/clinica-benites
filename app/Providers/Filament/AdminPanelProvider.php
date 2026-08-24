@@ -60,15 +60,30 @@ class AdminPanelProvider extends PanelProvider
                         .fi-sidebar .fi-icon {
                             color: color-mix(in srgb, white 70%, var(--primary-900));
                         }
-                        .fi-sidebar .fi-sidebar-item-button:hover .fi-sidebar-item-label,
-                        .fi-sidebar .fi-sidebar-item-button:hover .fi-icon {
-                            color: #ffffff;
+                        .fi-sidebar .fi-sidebar-item:hover,
+                        .fi-sidebar .fi-sidebar-item:hover * {
+                            color: #ffffff !important;
                         }
-                        .fi-sidebar .fi-sidebar-item.fi-active .fi-sidebar-item-button {
+
+                        /* Fondo y color del ítem activo: se aplican juntos,
+                           al <li> (fi-sidebar-item, con la clase fi-active
+                           ya confirmada por Filament) y a TODOS sus
+                           descendientes (selector universal) — en vez de
+                           encadenar una clase interna del botón (ej.
+                           fi-sidebar-item-button) que no se pudo confirmar
+                           contra el entorno real. Esa clase interna no
+                           calzó: el texto sí se forzaba a blanco (por el
+                           selector de fi-sidebar-item-label) pero el fondo
+                           se quedaba blanco por defecto (el selector del
+                           fondo no encontraba su clase) — texto blanco
+                           sobre fondo blanco, invisible. Apuntar al <li>
+                           mismo evita depender de esas clases internas. */
+                        .fi-sidebar .fi-sidebar-item.fi-active {
                             background-color: var(--primary-700) !important;
+                            border-radius: 0.5rem;
                         }
-                        .fi-sidebar .fi-sidebar-item.fi-active .fi-sidebar-item-label,
-                        .fi-sidebar .fi-sidebar-item.fi-active .fi-icon {
+                        .fi-sidebar .fi-sidebar-item.fi-active,
+                        .fi-sidebar .fi-sidebar-item.fi-active * {
                             color: #ffffff !important;
                         }
 
