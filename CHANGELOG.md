@@ -8,6 +8,12 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Confirmado en el entorno real: módulo de Medicamentos e Insumos
+
+- El usuario probó en vivo el módulo construido en la entrada anterior (catálogo, lotes, movimientos) y confirmó que **todo funciona perfectamente**: creación de ítem del catálogo, creación de lote con vencimiento, movimiento de entrada (stock del lote y del ítem sube correctamente, calculado en vivo), movimiento de salida (stock baja correctamente), protección contra borrado de ítems/lotes con dependencias, y permisos por rol (recepción solo ve catálogo pero gestiona movimientos, médico sin acceso al módulo).
+- Sin cambios de código en esta entrada — solo actualización de `MEMORIA.md` (sección 6.3) marcando el módulo como confirmado, mismo criterio que se usó con los demás módulos del sistema.
+- Entregado como patch (`git am`).
+
 ## [2026-08-24] Primer módulo construido: Medicamentos e Insumos (catálogo, lotes, movimientos)
 
 - A pedido del usuario, se empezó a **construir** (por primera vez con código, no solo documentación) la propuesta de la sección 6.3 de `MEMORIA.md` — el módulo de medicamentos/insumos que el contacto interno pidió, en vez de la infraestructura de la 6.2. El usuario también pidió avanzar con **supuestos razonables** sobre las decisiones que seguían sin confirmar con la clínica, documentándolos para poder ajustarlos después en vez de bloquear el desarrollo esperando esa confirmación.
