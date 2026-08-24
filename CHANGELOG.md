@@ -16,7 +16,7 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 - No se tocó ningún modelo, migración, ni Resource de Filament — el modelo de datos actual (`areas` como tabla con solo `nombre`) ya soportaba esto sin cambios de código (confirmado en la sesión anterior, sección 6.1 de `MEMORIA.md`).
 - Nota: no se cargaron los "servicios/infraestructura adicional" del PDF (Hospitalización, UCI, Central de Quirófanos, etc.) como filas de `areas` — esos no son especialidades médicas en el sentido del modelo actual (un área con médicos asignados), son infraestructura de la clínica; se dejaron documentados en `MEMORIA.md` como contexto, no como datos a cargar.
 - Sintaxis no se pudo validar con `php -l` en este entorno (sin PHP instalado); se revisó manualmente el archivo.
-- Entregado como patch (`git am`). **Pendiente confirmar en el entorno real** — correr el seeder y verificar que las 27 áreas aparezcan en `/admin/areas`.
+- Entregado como patch (`git am`). **Confirmado funcionando por el usuario en el entorno real.**
 
 ## [2026-08-24] Documentación: respuesta del contacto interno sobre áreas/especialidades y alcance por fases
 
