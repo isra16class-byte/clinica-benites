@@ -16,7 +16,7 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 - Se aplicó `use HasBackFormAction;` en las 7 páginas de Editar existentes: `EditArea`, `EditMedico`, `EditPaciente`, `EditCita`, `EditHistoriaClinica`, `EditFactura`, `EditUser`. Ninguna tenía ya un `getFormActions()` propio.
 - No se tocó ninguna página de Crear — conservan `Crear` + `Cancelar` por defecto de Filament.
 - Sintaxis no se pudo validar con `php -l` en este entorno (sin PHP instalado); se revisó manualmente cada archivo tocado. Cambio de configuración de botones vía un trait compartido, sin lógica de negocio nueva.
-- Entregado como patch (`git am`). **Pendiente confirmar en el entorno real.**
+- Entregado como patch (`git am`). **Confirmado funcionando por el usuario en el entorno real.**
 
 ## [2026-08-24] Filtros de Citas: de "arriba de la tabla colapsable" a dropdown junto al buscador
 
