@@ -6,6 +6,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Nuevo logo vectorial (inspirado en el cartel real) + color primario Teal
+
+- El usuario generó con IA (Gemini) una imagen aproximada del cartel físico de la clínica (emblema triangular, hoja/llama bicolor azul-turquesa, texto curvo "CLÍNICA BENITES") y pidió usarla como referencia para el logo del panel.
+- Esa imagen es una foto/render (fondo gris de mármol, reflejos 3D), no un vector — se le presentó al usuario el trade-off (se vería con recuadro gris en el header, y perdería detalle a tamaño de favicon) y se le preguntó cómo prefería usarla. Eligió: rehacer una versión vectorial propia inspirada en la imagen, con fondo transparente.
+- Se reemplazaron `public/images/icon.svg` (triángulo con contorno navy `#12395c` y hoja partida en dos mitades, azul `#1f6fa8` / turquesa `#1fae8e`) y `public/images/logo.svg` (mismo ícono + "CLÍNICA BENITES" en dos líneas), sustituyendo el monograma "CB" provisional anterior.
+- `public/favicon.ico` regenerado desde el `icon.svg` nuevo usando `cairosvg` (`pip install cairosvg --break-system-packages`, no estaba instalado en este entorno) — más preciso que el enfoque anterior con Pillow dibujando a mano; ahora el favicon se puede regenerar fielmente desde el SVG cada vez que cambie. Verificado visualmente con capturas a 32px y 200px antes de dar por bueno el diseño.
+- Color primario del panel cambiado de vuelta (había quedado en el ámbar por defecto tras la reversión anterior) a `Color::Teal`, porque los colores del logo nuevo calzan casi exacto con ese Tailwind color predefinido. A diferencia del intento anterior con Cyan, **no se agregó CSS a medida** — solo la línea `->colors(['primary' => Color::Teal])`, sin tocar sidebar/topbar/tablas, para no repetir el problema de clases internas de Filament que no calzaron la vez pasada.
+- Sintaxis PHP no se pudo validar con `php -l` en este entorno (sin PHP instalado); cambio simple de assets + una línea de configuración, sin lógica nueva.
+- Entregado como patch (`git am`). **Pendiente confirmar en el entorno real**: cómo se ve el logo en el header/login, y si el Teal contrasta bien con el resto de la interfaz.
+
 ## [2026-08-23] Revertir colores del panel a los defaults de Filament
 
 - El usuario probó en el entorno real el branding con color turquesa/sidebar celeste (compartió captura de `/admin/citas` con datos reales cargados) y decidió que el color no convence.
