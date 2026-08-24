@@ -6,6 +6,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Título y buscador en la misma fila en todas las tablas del panel (primer theme propio)
+
+- Pedido original: en el widget "Citas de hoy" del Dashboard, el título quedaba en una fila y la barra de búsqueda en la fila de abajo — se pidió juntarlos en una sola fila.
+- Primer intento (moviendo el `heading` de nivel widget a `->heading()` en `table()`) no cambió nada visualmente — se confirmó leyendo el código fuente de `filament/widgets` que ambos caminos son equivalentes internamente. La causa real es que **todas** las tablas de Filament separan el título (`.fi-ta-header`) y la barra de búsqueda/filtros (`.fi-ta-header-toolbar`) en dos bloques apilados, por diseño de fábrica — no es un bug de este widget.
+- Se evaluaron 3 opciones con el usuario: dejarlo como está, forkear la plantilla Blade completa de la tabla (2604 líneas del paquete `filament/tables`, descartado por el riesgo de congelar esa copia y perder actualizaciones/parches de seguridad futuros de Filament en todas las tablas), o lograr el mismo resultado con CSS scoped sin tocar archivos de Filament. Se eligió la tercera.
+- El proyecto no tenía un theme propio de Filament configurado — se creó por primera vez: `resources/css/filament/admin/theme.css` (importa el theme base de Filament + el ajuste de CSS que junta ambos bloques en una fila, dentro de un `@media (min-width: 640px)` para no apretar en mobile), registrado con `->viteTheme(...)` en `AdminPanelProvider.php` y agregado al `input` de `vite.config.js`.
+- Efecto: aplica a **todas** las tablas del panel (Áreas, Citas, Facturas, Historia Clínicas, Médicos, Pacientes, Usuarios, y el widget "Citas de hoy"), consistente en todo el sistema, no un parche aislado del widget.
+- Sintaxis no se pudo validar con `npm`/`php` en este entorno (sin Node/PHP instalados); cambio de CSS + configuración de Vite/Filament, sin lógica de negocio.
+- Entregado como patch (`git am`). **Pendiente correr `npm run build`** (o `npm run dev`) para que Vite compile el `theme.css` nuevo — sin eso el cambio no se ve aunque el código ya esté aplicado. Pendiente confirmar visualmente en el entorno real, incluida una vista en mobile/pantalla angosta.
+
 ## [2026-08-23] Nuevo logo vectorial (inspirado en el cartel real) + color primario Teal
 
 - El usuario generó con IA (Gemini) una imagen aproximada del cartel físico de la clínica (emblema triangular, hoja/llama bicolor azul-turquesa, texto curvo "CLÍNICA BENITES") y pidió usarla como referencia para el logo del panel.

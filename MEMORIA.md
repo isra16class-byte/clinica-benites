@@ -2,7 +2,9 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (nuevo logo — el usuario generó con IA una aproximación del cartel físico real de la clínica (triángulo con hoja/llama bicolor azul-turquesa y texto curvo) y se pidió rehacer esa referencia como vector limpio para el panel. Se reemplazó el monograma "CB" provisional por un ícono vectorial propio inspirado en esa imagen — triángulo con contorno navy y una hoja partida en azul/turquesa — y se aplicó el color primario Teal de Filament, ya coherente con los colores del logo nuevo. Antes de esto, con datos reales cargados, el usuario probó el branding con color turquesa/sidebar celeste y decidió que no convencía — se había revertido a los colores por defecto de Filament (ámbar/gris); ver sección 8.1 para el detalle completo de ambas vueltas. Se encontró y corrigió también un bug de fondo: la app nunca se configuró con idioma español ni con la zona horaria de Guayaquil — se quedó en los defaults de Laravel (inglés/UTC) desde el inicio del proyecto. Esto causaba fechas en inglés en las tablas y, más grave, que el widget "Citas de hoy" del Dashboard dejara de mostrar las citas del día a partir de las 19:00 hora local — ver sección 5 y 8.1 para el detalle).
+Última actualización: 24 de agosto de 2026 (se creó el primer theme propio de Filament para el panel — antes no existía ninguno, se usaban los estilos por defecto — con un único ajuste de CSS: en todas las tablas del panel, incluido el widget "Citas de hoy" del Dashboard, el título y la barra de búsqueda/filtros ahora quedan en la misma fila en vez de dos filas apiladas, que es el comportamiento de fábrica de Filament. Ver sección 8.2 para el detalle completo, incluyendo por qué se descartó tanto dejarlo como estaba como forkear la plantilla Blade completa de la tabla).
+
+Última actualización anterior: 23 de agosto de 2026 (nuevo logo — el usuario generó con IA una aproximación del cartel físico real de la clínica (triángulo con hoja/llama bicolor azul-turquesa y texto curvo) y se pidió rehacer esa referencia como vector limpio para el panel. Se reemplazó el monograma "CB" provisional por un ícono vectorial propio inspirado en esa imagen — triángulo con contorno navy y una hoja partida en azul/turquesa — y se aplicó el color primario Teal de Filament, ya coherente con los colores del logo nuevo. Antes de esto, con datos reales cargados, el usuario probó el branding con color turquesa/sidebar celeste y decidió que no convencía — se había revertido a los colores por defecto de Filament (ámbar/gris); ver sección 8.1 para el detalle completo de ambas vueltas. Se encontró y corrigió también un bug de fondo: la app nunca se configuró con idioma español ni con la zona horaria de Guayaquil — se quedó en los defaults de Laravel (inglés/UTC) desde el inicio del proyecto. Esto causaba fechas en inglés en las tablas y, más grave, que el widget "Citas de hoy" del Dashboard dejara de mostrar las citas del día a partir de las 19:00 hora local — ver sección 5 y 8.1 para el detalle).
 
 ---
 
@@ -215,6 +217,27 @@ A pedido del usuario, se personalizó el panel de Filament (antes con los defaul
 - Sigue pendiente la respuesta del contacto interno de la clínica sobre cuántas áreas/especialidades tiene — no bloquea el desarrollo (el sistema ya soporta cualquier número de áreas dinámicamente), pero sería bueno tenerla para cargar datos reales en vez de datos de prueba.
 - No se ha hecho la entrevista formal con el dueño de la clínica.
 - Si se consigue el logo real de la clínica (archivo original), reemplazar el diseño provisorio de branding (ver sección 8.1).
+
+## 8.2 Theme propio del panel — encabezado de tablas (título + buscador en una sola fila)
+
+**Pedido original**: en el widget "Citas de hoy" del Dashboard, el título ("Citas de hoy") aparecía en una fila y la barra de búsqueda en la fila de abajo — se pidió juntarlos en una sola fila.
+
+**Primer intento (no funcionó)**: mover el título de `protected static ?string $heading` (nivel widget) a `->heading()` dentro de `table()`. Se investigó el código fuente de `filament/widgets` y se confirmó que ambos caminos terminan siendo exactamente lo mismo internamente (`TableWidget::makeTable()` ya envuelve el `$heading` estático en `->heading()` de la tabla) — por eso no cambió nada visualmente. Este cambio quedó igual en el código (es inofensivo, más explícito), pero la causa real era otra.
+
+**Causa real**: no es un bug de este widget — es el comportamiento de fábrica de **todas** las tablas de Filament (confirmado leyendo el código fuente real del paquete `filament/tables` en la versión exacta instalada, `v5.7.3`, clonado temporalmente para inspeccionarlo). El encabezado de una tabla (`.fi-ta-header-ctn`) contiene dos bloques hijos separados: `.fi-ta-header` (título/descripción/acciones) y `.fi-ta-header-toolbar` (buscador/filtros/selector de columnas) — cada uno con su propio `border-bottom`, apilados uno debajo del otro por diseño. No hay una opción de configuración que los junte.
+
+**Opciones evaluadas con el usuario**:
+1. Dejarlo como está (consistente con el resto del panel, cero riesgo).
+2. Forkear/copiar la plantilla Blade completa de la tabla (`vendor/filament/tables/resources/views/index.blade.php`, **2604 líneas** — orden, selección masiva, agrupamiento, columnas, todo el motor de la tabla) a `resources/views/vendor/filament-tables/`, y editar ahí los dos `<div>`. **Descartado**: congela esa plantilla completa en la versión actual del paquete — cualquier actualización futura de Filament (incluidos parches de seguridad) dejaría de aplicarse silenciosamente a esa copia, en todas las tablas del sistema.
+3. **Elegida**: lograr el mismo resultado visual con **CSS scoped**, dirigido específicamente a esas dos clases (`.fi-ta-header`, `.fi-ta-header-toolbar`, dentro de `.fi-ta-header-ctn`), sin tocar ningún archivo de Filament. Mismo resultado, sin el riesgo de la opción 2.
+
+**Qué se hizo**:
+- El proyecto **no tenía un theme propio de Filament configurado todavía** (usaba los estilos por defecto del paquete) — se creó por primera vez.
+- Archivo nuevo `resources/css/filament/admin/theme.css`: importa el theme base de Filament (`@import '/vendor/filament/filament/resources/css/theme.css';`) y agrega el ajuste de CSS descrito arriba, dentro de un `@media (min-width: 640px)` (mismo breakpoint `sm` que usa Filament en sus propios patrones responsivos) — en pantallas angostas se mantiene el apilado normal, para no apretar el título contra el buscador en mobile.
+- `vite.config.js`: se agregó `resources/css/filament/admin/theme.css` al arreglo `input` de la configuración de Laravel/Vite.
+- `AdminPanelProvider.php`: se agregó `->viteTheme('resources/css/filament/admin/theme.css')`.
+- **Efecto**: aplica a **todas** las tablas del panel (Áreas, Citas, Facturas, Historia Clínicas, Médicos, Pacientes, Usuarios, y el widget "Citas de hoy"), no solo al widget del Dashboard — es la misma decisión que se había tomado al elegir esta opción, para que el panel se vea consistente.
+- **Pendiente de verificar en el entorno real**: falta correr `npm run build` (o `npm run dev` mientras se prueba) para que Vite compile el nuevo `theme.css` — sin ese paso, Filament seguiría usando el CSS por defecto aunque el código ya esté commiteado. Confirmar visualmente que título + buscador quedan en una sola fila en al menos una tabla de Resource además del widget, y que en mobile (pantalla angosta) se mantiene el apilado legible.
 
 ## 9. Propuesta de funciones futuras (investigadas, no priorizadas aún)
 
