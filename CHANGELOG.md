@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Documentación: propuesta de planificación para medicamentos e insumos
+
+- El usuario pidió una propuesta de modelado (solo documentación, sin código) para el módulo de **medicamentos e insumos** que el contacto interno mencionó en la sección 6.1 de `MEMORIA.md` ("debe vivir en farmacia, quirófano, admisión y facturación").
+- Se agregó la sección **6.3** en `MEMORIA.md`, con el mismo criterio que la 6.2 (propuesta de arquitectura para discutir, no diseño final). A diferencia de la infraestructura física de la 6.2, este módulo parte de cero — no hay ninguna tabla, campo ni seeder relacionado hoy en el sistema.
+- Propuesta: separar **catálogo** (`items_inventario`: medicamentos e insumos en una sola tabla, con `tipo` para distinguirlos, y stock) de **movimientos** (`movimientos_inventario`: entradas/salidas/traslados/ajustes, con área origen/destino y referencia opcional a paciente/cita si es consumo clínico real) — el stock se derivaría de los movimientos en vez de editarse a mano, mismo criterio que se propuso para las camas en la sección 6.2.
+- Se propuso una posible tabla intermedia `factura_items` para conectar el consumo de insumos con `Factura`, sin mezclar "qué se usó clínicamente" con "qué se cobró".
+- Se listaron las **decisiones pendientes de confirmar con la clínica**: si "farmacia" es un área física propia o solo un paso lógico, si el stock necesita ser en tiempo real, si todo insumo se cobra al paciente o hay costos que la clínica absorbe, si hace falta registrar proveedores/compras externas, si se necesita trazabilidad por lote/vencimiento (relevante por norma sanitaria en medicamentos), y si este módulo depende de que exista primero `quirofanos`/`cirugias` (sección 6.2) o puede avanzar independiente.
+- **No se tocó ningún modelo, migración, Resource ni seeder** — documentación de planificación, igual que la sección 6.2. El sistema actual no se ve afectado.
+- Entregado como patch (`git am`).
+
 ## [2026-08-24] Documentación: propuesta de planificación para la infraestructura (UCI, quirófanos, laboratorio, etc.)
 
 - El usuario pidió continuar con la infraestructura del PDF (`Servicios_CB_2026.pdf`, ver entrada anterior en este changelog y sección 6.1 de `MEMORIA.md`), aclarando explícitamente que es para **planificar el módulo futuro (fase 2/3), no para construir código todavía**.

@@ -2,7 +2,9 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 24 de agosto de 2026 — quinta entrada del día (a pedido del usuario, se agregó la sección **6.2**: una propuesta de planificación — sin tocar código — de cómo modelar a futuro la infraestructura del PDF de la sección 6.1 (UCI, quirófanos, hospitalización, laboratorio, etc.), agrupada en 5 conceptos posibles (camas/internamiento, quirófanos/cirugías, procedimientos/estudios, emergencias, ambulancia), más las decisiones que faltan confirmar con la clínica antes de construir cualquiera de ellos. Explícitamente **solo documentación**, el usuario aclaró que es para planificar la fase 2/3, no para construir ahora.)
+Última actualización: 24 de agosto de 2026 — sexta entrada del día (a pedido del usuario, se agregó la sección **6.3**: una propuesta de planificación — sin tocar código, mismo estilo que la 6.2 — de cómo modelar a futuro el módulo de **medicamentos e insumos** mencionado por el contacto interno en la sección 6.1, que debe vivir en farmacia, quirófano, admisión y facturación. A diferencia de la infraestructura física de la 6.2, este módulo no tenía ninguna propuesta previa — es dominio completamente nuevo, sin nada construido hoy. Explícitamente **solo documentación**, para planificar fase 2/3.)
+
+Última actualización anterior: 24 de agosto de 2026 — quinta entrada del día (a pedido del usuario, se agregó la sección **6.2**: una propuesta de planificación — sin tocar código — de cómo modelar a futuro la infraestructura del PDF de la sección 6.1 (UCI, quirófanos, hospitalización, laboratorio, etc.), agrupada en 5 conceptos posibles (camas/internamiento, quirófanos/cirugías, procedimientos/estudios, emergencias, ambulancia), más las decisiones que faltan confirmar con la clínica antes de construir cualquiera de ellos. Explícitamente **solo documentación**, el usuario aclaró que es para planificar la fase 2/3, no para construir ahora.)
 
 Última actualización anterior: 24 de agosto de 2026 — cuarta entrada del día (se creó `database/seeders/AreaSeeder.php` con las 27 especialidades reales de la clínica, la respuesta del contacto interno documentada en la entrada anterior — usa `firstOrCreate` para no duplicar si ya había áreas de prueba cargadas. Registrado en `DatabaseSeeder.php` para correr con `db:seed`, o solo con `--class=AreaSeeder`. No se cargaron los "servicios/infraestructura" del PDF (UCI, quirófanos, etc.) como áreas — no son especialidades médicas en el sentido del modelo actual, quedan solo como contexto documentado. **Confirmado funcionando por el usuario en el entorno real.** Ver sección 6.1 y 9 para el detalle.)
 
@@ -216,6 +218,36 @@ facturas
 - ¿Va a haber más de un quirófano/UCI si la clínica crece a otra sede (pregunta ya abierta en la sección 6, sobre sucursales)?
 
 **Qué NO se hizo**: ningún modelo, migración, Resource ni seeder — esto es puramente una propuesta de arquitectura para discutir, análoga a como quedó documentada la sección 6.1. El sistema actual (Áreas/Médicos/Pacientes/Citas/HistoriaClinicas/Facturas) sigue siendo la única parte construida y no se ve afectado por esta propuesta.
+
+### 6.3 Propuesta de modelado futuro para medicamentos e insumos (planificación — sin código)
+
+**Encargo explícito del usuario (24 ago 2026, misma sesión)**: pidió avanzar con una propuesta de modelado para el módulo de medicamentos/insumos que el contacto interno mencionó en la sección 6.1 ("debe vivir en farmacia, quirófano, admisión y facturación"). Igual que la sección 6.2, es **solo para planificar** — no se tocó ningún modelo, migración, Resource ni seeder.
+
+**Punto de partida — a diferencia de la infraestructura de la sección 6.2, acá no hay nada construido ni cargado todavía**: ni una tabla, ni un campo, ni un seeder. `Factura` solo modela `monto`/`estado_pago`, no ítems ni insumos. Es dominio nuevo desde cero.
+
+**Por qué no entra en ningún modelo actual**: lo que describe el contacto interno mezcla dos cosas distintas que conviene separar desde el diseño:
+1. Un **catálogo** de qué medicamentos/insumos existen y cuánto stock hay (inventario).
+2. Un **movimiento** de esos ítems entre las 4 áreas que mencionó (farmacia, quirófano, admisión, facturación) — entradas, salidas, traslados y consumo real en la atención de un paciente.
+
+**Propuesta de estructura (agrupación propia, a confirmar con la clínica)**:
+
+1. **Catálogo — `items_inventario`** (nombre, tipo: medicamento/insumo, unidad_medida, stock_actual, stock_minimo opcional para alertas, precio_unitario si se va a facturar). Un solo catálogo para ambos tipos (medicamento e insumo) en vez de dos tablas separadas, ya que comparten los mismos campos y solo cambia el `tipo` — simplifica reportes y movimientos.
+
+2. **Movimientos — `movimientos_inventario`** (item_id FK, tipo_movimiento: entrada/salida/traslado/ajuste, cantidad, area_origen, area_destino nullable — solo aplica en traslados, fecha_hora, usuario_id de quién lo registró, referencia opcional: paciente_id y/o cita_id/cirugia_id si el movimiento es consumo real en la atención de alguien, no solo reabastecimiento de bodega). El `stock_actual` de cada ítem se recalcularía a partir de la suma de sus movimientos, en vez de editarse a mano, para no desincronizarse — mismo criterio de diseño que se propuso para el estado de las camas en 6.2.
+
+3. **Relación con Facturación**: si un insumo/medicamento consumido en la atención de un paciente se cobra, `movimientos_inventario` con `paciente_id` sería el puente hacia `Factura` — probablemente una tabla intermedia tipo `factura_items` (factura_id, item_id, cantidad, precio_unitario) en vez de forzarlo dentro de `movimientos_inventario`, para no mezclar "qué se usó clínicamente" con "qué se cobró" (no siempre es lo mismo — ej. insumos cubiertos por un paquete/seguro).
+
+4. **Relación con las 4 áreas mencionadas**: farmacia y quirófano tendrían más sentido como `area_origen`/`area_destino` de un traslado (ej. farmacia despacha a quirófano antes de una cirugía) que como tablas propias — no está claro todavía si "farmacia" necesita ser una entidad con su propio Resource (con su propio responsable, horario, etc.) o alcanza con que sea un valor más de un campo `area` en los movimientos. Admisión y facturación ya existen como conceptos en el sistema actual (el flujo de `Cita`/`Factura`), así que el enganche ahí sería más directo.
+
+**Decisiones que faltan confirmar con la clínica antes de construir esto** (más numerosas que en 6.2, porque acá no hay ningún punto de partida ya construido):
+- ¿"Farmacia" es un área física/organizativa propia dentro de la clínica (con personal, horario, responsable), o es solo un paso lógico dentro del flujo de atención?
+- ¿El control de stock necesita ser en tiempo real (para saber si hay suficiente antes de una cirugía, por ejemplo), o alcanza con un registro histórico de movimientos para auditoría/costos?
+- ¿Todo insumo/medicamento consumido se cobra al paciente, o hay insumos que la clínica absorbe como costo operativo sin pasar por `Factura`?
+- ¿Hay proveedores que registrar (compras a farmacias/distribuidoras externas), o el alcance es solo el consumo interno una vez que el stock ya está en la clínica?
+- ¿Se necesita trazabilidad por lote/vencimiento (común en medicamentos, por norma sanitaria), o alcanza con cantidad total por ítem?
+- ¿Este módulo se construye junto con la infraestructura de la sección 6.2 (quirófano en particular los comparte como dependencia), o puede avanzar de forma independiente antes de que exista `cirugias`/`quirofanos`?
+
+**Qué NO se hizo**: ningún modelo, migración, Resource ni seeder — mismo criterio que la sección 6.2, es una propuesta de arquitectura para discutir. El sistema actual no se ve afectado.
 
 ## 7. Roadmap / pendientes técnicos
 
