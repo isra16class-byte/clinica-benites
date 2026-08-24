@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Medicos\Pages;
 
+use App\Filament\Concerns\HasBackFormAction;
 use App\Filament\Resources\Medicos\MedicoResource;
 use App\Models\Medico;
 use Filament\Actions\DeleteAction;
@@ -10,6 +11,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditMedico extends EditRecord
 {
+    use HasBackFormAction;
+
     protected static string $resource = MedicoResource::class;
 
     protected function getHeaderActions(): array

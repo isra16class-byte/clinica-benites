@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Botón "Cancelar" → "Atrás" en las pantallas de Editar
+
+- Pedido original: en la pantalla de Editar (probado en Pacientes), el botón "Cancelar" junto a "Guardar cambios" resultaba redundante — el registro ya está guardado, no hay nada que "cancelar" ahí, solo tiene sentido volver al listado. Se aclaró explícitamente que el "Cancelar" de las pantallas de **Crear** sí es útil (descarta un formulario sin guardar) y no debía tocarse.
+- Se confirmó con el usuario aplicar el cambio a **todas** las pantallas de Editar del panel (no solo Pacientes), y que el botón navegue al listado del recurso (ej. `/admin/pacientes`), no a la página anterior del historial del navegador.
+- Se creó `app/Filament/Concerns/HasBackFormAction.php` — un trait que sobreescribe `getFormActions()` (el método de Filament que arma los botones del formulario de Editar) para devolver `[Guardar, Atrás]` en vez de `[Guardar, Cancelar]`. El botón "Atrás" usa `Heroicon::OutlinedArrowLeft`, color gris (igual que tenía "Cancelar"), y navega con `$this->getResourceUrl()` sin argumentos, que en Filament resuelve siempre al listado (`index`) del Resource actual.
+- Se aplicó `use HasBackFormAction;` en las 7 páginas de Editar existentes: `EditArea`, `EditMedico`, `EditPaciente`, `EditCita`, `EditHistoriaClinica`, `EditFactura`, `EditUser`. Ninguna tenía ya un `getFormActions()` propio.
+- No se tocó ninguna página de Crear — conservan `Crear` + `Cancelar` por defecto de Filament.
+- Sintaxis no se pudo validar con `php -l` en este entorno (sin PHP instalado); se revisó manualmente cada archivo tocado. Cambio de configuración de botones vía un trait compartido, sin lógica de negocio nueva.
+- Entregado como patch (`git am`). **Pendiente confirmar en el entorno real.**
+
 ## [2026-08-24] Filtros de Citas: de "arriba de la tabla colapsable" a dropdown junto al buscador
 
 - Al confirmar en el entorno real el cambio anterior (título+buscador en una sola fila en todas las tablas), la tabla `/admin/citas` quedó viéndose distinta a las demás: un hueco vacío grande entre el buscador y el ícono de filtro.

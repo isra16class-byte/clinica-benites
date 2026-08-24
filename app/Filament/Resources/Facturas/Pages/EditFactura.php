@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Facturas\Pages;
 
+use App\Filament\Concerns\HasBackFormAction;
 use App\Filament\Resources\Facturas\FacturaResource;
 use App\Models\Factura;
 use Filament\Actions\Action;
@@ -11,6 +12,8 @@ use Filament\Support\Icons\Heroicon;
 
 class EditFactura extends EditRecord
 {
+    use HasBackFormAction;
+
     protected static string $resource = FacturaResource::class;
 
     protected function getHeaderActions(): array

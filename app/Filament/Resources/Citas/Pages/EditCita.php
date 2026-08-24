@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Citas\Pages;
 
+use App\Filament\Concerns\HasBackFormAction;
 use App\Filament\Resources\Citas\CitaResource;
 use App\Models\Cita;
 use Filament\Actions\DeleteAction;
@@ -10,6 +11,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditCita extends EditRecord
 {
+    use HasBackFormAction;
+
     protected static string $resource = CitaResource::class;
 
     protected function getHeaderActions(): array
