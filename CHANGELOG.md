@@ -6,6 +6,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Revertir colores del panel a los defaults de Filament
+
+- El usuario probó en el entorno real el branding con color turquesa/sidebar celeste (compartió captura de `/admin/citas` con datos reales cargados) y decidió que el color no convence.
+- En `AdminPanelProvider.php` se quitó por completo el bloque `->colors(['primary' => Color::Cyan, 'gray' => Color::Slate])` y todo el `renderHook` de CSS a medida (tinte celeste del sidebar, línea de acento en topbar y encabezado de tabla, color de los botones de acción) — ese CSS dependía de las variables `--primary-*`/`--gray-*`, así que no tenía sentido dejarlo apuntando a un color que ya no se usa.
+- El panel queda con los colores **por defecto de Filament** (ámbar primario, gris neutro estándar de Filament), sin ningún CSS de acento agregado.
+- **No se tocó** `brandName('Clínica Benites')`, `brandLogo()` ni `favicon()` — el pedido fue solo sobre los colores, el logo/nombre se mantienen.
+- Se limpiaron los `use` de `Filament\Support\Colors\Color` y `Filament\View\PanelsRenderHook` en `AdminPanelProvider.php`, ya sin uso tras quitar ese bloque.
+- Sintaxis PHP no se pudo validar con `php -l` en este entorno (sin PHP instalado); cambio simple de eliminar bloques de configuración, sin lógica nueva.
+- Entregado como patch (`git am`). **Pendiente confirmar en el entorno real** cómo se ve el ámbar por defecto contra el logo/nombre actuales.
+
 ## [2026-08-23] Fix: locale español y timezone Guayaquil (fechas en inglés + Dashboard sin citas de hoy)
 
 - El usuario reportó dos problemas a la vez: las fechas en las tablas no se veían "completas" (ej. "Apr 12, 2024") y el Dashboard no mostraba las citas de hoy.

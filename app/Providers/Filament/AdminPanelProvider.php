@@ -9,8 +9,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
-use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -31,59 +29,6 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(asset('images/logo.svg'))
             ->brandLogoHeight('2.5rem')
             ->favicon(asset('images/icon.svg'))
-            ->colors([
-                'primary' => Color::Cyan,
-                'gray' => Color::Slate,
-            ])
-            ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                fn (): string => <<<'HTML'
-                    <style>
-                        /* Regla 60/30/10 (neutro/estructural/acento) y separar
-                           el color de marca del color semántico de estado
-                           (los badges de "confirmada"/"cancelada"/"pendiente"
-                           ya usan color con significado propio — no hay que
-                           competir con eso pintando todo turquesa). Turquesa
-                           reservado a lo accionable (botones, enlaces, línea
-                           de acento) y a un tinte suave de fondo — nunca se
-                           fuerza el color del texto: se deja el gris que
-                           Filament ya trae por defecto, que al ser sobre
-                           fondos claros siempre contrasta bien sin tener que
-                           adivinar ni encadenar clases internas del paquete
-                           (eso fue lo que causó el problema anterior: texto
-                           forzado a blanco sobre un fondo que a veces se
-                           quedaba blanco también, quedando invisible). */
-
-                        /* Sidebar: tinte celeste suave en vez de blanco liso,
-                           sin tocar el color del texto — el gris default de
-                           Filament ya se lee bien contra un fondo claro. */
-                        .fi-sidebar {
-                            background-color: color-mix(in srgb, var(--primary-500) 8%, white);
-                        }
-
-                        /* Barra superior: línea de acento fina, nada más. */
-                        .fi-topbar > nav {
-                            border-bottom-width: 2px;
-                            border-bottom-color: var(--primary-400);
-                        }
-
-                        /* Tablas: encabezado neutro (blanco/gris) con una
-                           línea de acento debajo — se descartó teñir todo el
-                           encabezado de color (versión anterior) porque
-                           competía visualmente con los badges de estado. */
-                        .fi-ta-table thead tr {
-                            border-bottom: 2px solid var(--primary-400);
-                        }
-
-                        /* Botones de acción en tabla (ej. "Editar") en color
-                           primario, reservado a lo accionable. */
-                        .fi-ta-actions .fi-btn,
-                        .fi-ta-actions .fi-link {
-                            color: var(--primary-600) !important;
-                        }
-                    </style>
-                    HTML,
-            )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
