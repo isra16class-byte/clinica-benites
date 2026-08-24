@@ -17,11 +17,10 @@ class CitasDeHoyWidget extends BaseWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    protected static ?string $heading = 'Citas de hoy';
-
     public function table(Table $table): Table
     {
         return $table
+            ->heading('Citas de hoy')
             ->query(function (): Builder {
                 $query = Cita::query()
                     ->whereDate('fecha', today())
