@@ -8,6 +8,15 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Documentación: respuesta del contacto interno sobre áreas/especialidades y alcance por fases
+
+- El usuario le preguntó al contacto interno (amigo que trabaja en la clínica) cuántas áreas/especialidades tiene la clínica — pregunta pendiente desde el inicio del proyecto (sección 6 de `MEMORIA.md`).
+- Respuesta recibida junto con material de marketing real de la clínica (`Servicios_CB_2026.pdf`): **27 especialidades** (Auditoría Médica, Anestesiología, Cardiología, Cirugía General y Digestiva, Cirugía Plástica, Neurología, Traumatología, Urología, etc. — lista completa en `MEMORIA.md` sección 6.1) y una lista de servicios/infraestructura (UCI, Central de Quirófanos, Hospitalización, Ambulancia, Laboratorio, Rayos X, Ecografía, UCIN, Emergencias, entre otros) que confirma que la clínica opera con lógica de hospital, no solo consultorios.
+- El contacto también aclaró el alcance real del sistema por fases, en texto: (1) el registro de pacientes que ya existe en el sistema corresponde solo a **admisión**; (2) un futuro módulo de **medicamentos e insumos** debe vivir en farmacia, quirófano, admisión y facturación — no construido, dominio nuevo; (3) para 2027 planean innovar consultorios y agregar un sistema de **registro de prescripciones** (recetas médicas) — tampoco existe hoy; (4) el propósito general es digitalizar la mayor parte del historial clínico del paciente.
+- **No se tocó código en este cambio** — es puramente actualización de contexto/documentación en `MEMORIA.md` (nueva sección 6.1) y este changelog, para que quede registrado de cara a planificar los próximos módulos.
+- Pendiente como siguiente paso mecánico (no hecho todavía): cargar las 27 especialidades reales en la tabla `areas` (vía seeder o a mano desde `/admin/areas`) — el modelo de datos actual ya las soporta sin cambios de código.
+- Entregado como patch (`git am`), junto con el PDF de referencia (no versionado en el repo, solo usado como fuente de la información).
+
 ## [2026-08-24] Botón "Cancelar" → "Atrás" en las pantallas de Editar
 
 - Pedido original: en la pantalla de Editar (probado en Pacientes), el botón "Cancelar" junto a "Guardar cambios" resultaba redundante — el registro ya está guardado, no hay nada que "cancelar" ahí, solo tiene sentido volver al listado. Se aclaró explícitamente que el "Cancelar" de las pantallas de **Crear** sí es útil (descarta un formulario sin guardar) y no debía tocarse.
