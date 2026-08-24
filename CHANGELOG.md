@@ -8,6 +8,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Documentación: pregunta pendiente sobre si faltan roles (farmacia)
+
+- Se le explicó al usuario, en un documento Word aparte, qué es cada módulo del sistema (con sus campos/opciones) y cómo se relacionan entre sí, incluyendo qué módulos no tienen relación directa.
+- De ahí surgió la pregunta de si los 3 roles actuales (admin/recepción/médico) alcanzan. Al revisar la matriz de permisos real del código se confirmó un hueco: el rol **médico no tiene acceso a Ítems/Lotes/Movimientos de Inventario** (ni para ver), aunque es quien aplica el medicamento/insumo en la consulta — hoy ese registro depende de que recepción lo cargue aparte.
+- Se agregó como pregunta pendiente nueva en la sección 6 de `MEMORIA.md`: si conviene darle al médico acceso a registrar sus propios movimientos de inventario, y si más adelante (cuando farmacia opere como puesto dedicado) conviene un 4º rol de farmacéutico/bodega. Es una decisión de negocio, no una corrección — con el volumen actual, 3 roles sigue pareciendo suficiente.
+- **No se tocó ningún modelo, migración, Resource ni permiso** — es documentación de una pregunta abierta, el sistema actual no se ve afectado.
+- Entregado como patch (`git am`).
+
 ## [2026-08-24] Confirmado en el entorno real: módulo de Medicamentos e Insumos
 
 - El usuario probó en vivo el módulo construido en la entrada anterior (catálogo, lotes, movimientos) y confirmó que **todo funciona perfectamente**: creación de ítem del catálogo, creación de lote con vencimiento, movimiento de entrada (stock del lote y del ítem sube correctamente, calculado en vivo), movimiento de salida (stock baja correctamente), protección contra borrado de ítems/lotes con dependencias, y permisos por rol (recepción solo ve catálogo pero gestiona movimientos, médico sin acceso al módulo).
