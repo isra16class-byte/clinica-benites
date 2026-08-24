@@ -6,6 +6,15 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Simplificar el sidebar: se descarta el fondo oscuro, tinte celeste claro sin forzar el texto
+
+- El intento de sidebar oscuro (entrada de abajo) siguió sin verse bien en la prueba real incluso después del primer fix (texto invisible en el ítem activo, ver entrada de abajo): el usuario probó de nuevo en `/admin/areas` y seguía mal. Se investigó el código fuente real de Filament v5.7.6 (`item.blade.php`, descargado directo desde GitHub para la versión exacta instalada según `composer.lock`) y se confirmó que el `<li>` sí lleva las clases `fi-sidebar-item fi-active` como se esperaba — así que el CSS en teoría debía funcionar. Sin acceso a inspeccionar el DOM en vivo (herramientas de desarrollador del navegador del usuario) no se pudo determinar con certeza si el problema real era cache del navegador/Livewire (`wire:navigate` no siempre recarga el `<head>`) o algo de especificidad CSS.
+- Ante la complicación, el usuario pidió simplificar: descartar el sidebar oscuro por completo y volver a un tinte celeste claro de fondo, sin forzar el color del texto en ningún estado (normal/hover/activo) — se deja el gris que Filament trae por defecto, que sobre un fondo claro ya contrasta bien.
+- En `AdminPanelProvider.php`: se eliminaron todas las reglas de `.fi-sidebar-item-label`, `.fi-icon`, `.fi-sidebar-group-label`, `:hover` y `.fi-active` (siete reglas en total). Queda solo `.fi-sidebar { background-color: color-mix(in srgb, var(--primary-500) 8%, white); }` — mismo mecanismo de tinte suave que ya se usaba antes de probar el sidebar oscuro. El resto del `<style>` (línea de acento en topbar/tabla, color de botones de acción) no se tocó, esas clases (`.fi-topbar`, `.fi-ta-table`, `.fi-ta-actions`) son de nivel más alto y ya estaban confirmadas.
+- Menor superficie de riesgo: de siete reglas dependientes de clases internas de Filament, queda solo una que apunta a `.fi-sidebar` (clase raíz del componente, ya confirmada desde la primera vuelta de branding).
+- Sintaxis PHP no se pudo validar con `php -l` en este entorno (sin PHP instalado), pero el cambio es solo texto dentro del heredoc CSS — no se tocó estructura PHP.
+- Entregado como patch (`git am`). **Pendiente confirmar en el entorno real.**
+
 ## [2026-08-23] Fix: texto invisible en el ítem activo del menú lateral
 
 - El usuario probó el rediseño del sidebar oscuro (ver entrada de abajo) en el entorno real y mandó una captura de `/admin/facturas`: el ítem "Facturas" (activo, seleccionado) se veía con fondo blanco/claro y texto blanco encima — prácticamente ilegible.

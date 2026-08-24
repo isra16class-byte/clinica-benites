@@ -43,48 +43,22 @@ class AdminPanelProvider extends PanelProvider
                            el color de marca del color semántico de estado
                            (los badges de "confirmada"/"cancelada"/"pendiente"
                            ya usan color con significado propio — no hay que
-                           competir con eso pintando todo turquesa). Patrón:
-                           sidebar oscuro con identidad propia (común en
-                           paneles SaaS), contenido y tablas en blanco/gris
-                           para que los datos y los badges se lean bien, y
-                           turquesa reservado a lo accionable (botones,
-                           enlaces, ítem de menú activo). */
+                           competir con eso pintando todo turquesa). Turquesa
+                           reservado a lo accionable (botones, enlaces, línea
+                           de acento) y a un tinte suave de fondo — nunca se
+                           fuerza el color del texto: se deja el gris que
+                           Filament ya trae por defecto, que al ser sobre
+                           fondos claros siempre contrasta bien sin tener que
+                           adivinar ni encadenar clases internas del paquete
+                           (eso fue lo que causó el problema anterior: texto
+                           forzado a blanco sobre un fondo que a veces se
+                           quedaba blanco también, quedando invisible). */
 
-                        /* Sidebar: fondo turquesa oscuro sólido en vez de un
-                           tinte casi imperceptible sobre blanco. */
+                        /* Sidebar: tinte celeste suave en vez de blanco liso,
+                           sin tocar el color del texto — el gris default de
+                           Filament ya se lee bien contra un fondo claro. */
                         .fi-sidebar {
-                            background-color: var(--primary-900);
-                        }
-                        .fi-sidebar .fi-sidebar-item-label,
-                        .fi-sidebar .fi-sidebar-group-label,
-                        .fi-sidebar .fi-icon {
-                            color: color-mix(in srgb, white 70%, var(--primary-900));
-                        }
-                        .fi-sidebar .fi-sidebar-item:hover,
-                        .fi-sidebar .fi-sidebar-item:hover * {
-                            color: #ffffff !important;
-                        }
-
-                        /* Fondo y color del ítem activo: se aplican juntos,
-                           al <li> (fi-sidebar-item, con la clase fi-active
-                           ya confirmada por Filament) y a TODOS sus
-                           descendientes (selector universal) — en vez de
-                           encadenar una clase interna del botón (ej.
-                           fi-sidebar-item-button) que no se pudo confirmar
-                           contra el entorno real. Esa clase interna no
-                           calzó: el texto sí se forzaba a blanco (por el
-                           selector de fi-sidebar-item-label) pero el fondo
-                           se quedaba blanco por defecto (el selector del
-                           fondo no encontraba su clase) — texto blanco
-                           sobre fondo blanco, invisible. Apuntar al <li>
-                           mismo evita depender de esas clases internas. */
-                        .fi-sidebar .fi-sidebar-item.fi-active {
-                            background-color: var(--primary-700) !important;
-                            border-radius: 0.5rem;
-                        }
-                        .fi-sidebar .fi-sidebar-item.fi-active,
-                        .fi-sidebar .fi-sidebar-item.fi-active * {
-                            color: #ffffff !important;
+                            background-color: color-mix(in srgb, var(--primary-500) 8%, white);
                         }
 
                         /* Barra superior: línea de acento fina, nada más. */
