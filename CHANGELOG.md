@@ -8,6 +8,15 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Documentación: propuesta de planificación para la infraestructura (UCI, quirófanos, laboratorio, etc.)
+
+- El usuario pidió continuar con la infraestructura del PDF (`Servicios_CB_2026.pdf`, ver entrada anterior en este changelog y sección 6.1 de `MEMORIA.md`), aclarando explícitamente que es para **planificar el módulo futuro (fase 2/3), no para construir código todavía**.
+- Se agregó la sección **6.2** en `MEMORIA.md`: una propuesta de cómo se podrían modelar los 15 ítems de infraestructura del PDF, agrupados en 5 conceptos posibles — (1) camas/internamiento (Hospitalización, UCI, UCIN), (2) quirófanos/cirugías (Central de Quirófanos), (3) procedimientos/estudios (Laboratorio, Rayos X, Ecografía, Centro de Imagen, Endoscopía, Centro de Gastroenterología, Procedimientos Ambulatorios), (4) emergencias (posiblemente solo un campo `origen`, no una tabla nueva), y (5) ambulancia (menor prioridad). Se aclaró que Consulta Externa ya está cubierta por `Cita` (no es un hueco) y que Cafetería se descarta por no ser infraestructura clínica.
+- Para cada grupo se detalla una posible estructura de tablas/columnas (ej. `camas` + `internamientos`, `quirofanos` + `cirugias` con posible tabla intermedia `cirugia_medico` porque una cirugía puede tener más de un médico a diferencia de `Cita`, `ordenes_estudio` unificando los distintos tipos de estudio en vez de una tabla por tipo).
+- Se listaron explícitamente las **decisiones pendientes de confirmar con la clínica** antes de poder pasar de propuesta a diseño final: si se necesita disponibilidad en tiempo real de camas/quirófanos o alcanza con histórico, si una cirugía siempre nace de una `Cita` previa, si los resultados de estudios necesitan archivos adjuntos desde el inicio, si "emergencias" implica triage/prioridad, y si habrá más de una sede.
+- **No se tocó ningún modelo, migración, Resource ni seeder** — es documentación de planificación, igual que la sección 6.1. El sistema actual (Áreas/Médicos/Pacientes/Citas/HistoriaClinicas/Facturas) no se ve afectado.
+- Entregado como patch (`git am`).
+
 ## [2026-08-24] Seeder con las 27 especialidades reales de la clínica
 
 - Siguiente paso mecánico tras la respuesta del contacto interno sobre áreas/especialidades (ver entrada anterior en este changelog y sección 6.1 de `MEMORIA.md`).

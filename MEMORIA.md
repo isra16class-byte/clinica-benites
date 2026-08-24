@@ -2,7 +2,9 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 24 de agosto de 2026 — cuarta entrada del día (se creó `database/seeders/AreaSeeder.php` con las 27 especialidades reales de la clínica, la respuesta del contacto interno documentada en la entrada anterior — usa `firstOrCreate` para no duplicar si ya había áreas de prueba cargadas. Registrado en `DatabaseSeeder.php` para correr con `db:seed`, o solo con `--class=AreaSeeder`. No se cargaron los "servicios/infraestructura" del PDF (UCI, quirófanos, etc.) como áreas — no son especialidades médicas en el sentido del modelo actual, quedan solo como contexto documentado. **Confirmado funcionando por el usuario en el entorno real.** Ver sección 6.1 y 9 para el detalle.)
+Última actualización: 24 de agosto de 2026 — quinta entrada del día (a pedido del usuario, se agregó la sección **6.2**: una propuesta de planificación — sin tocar código — de cómo modelar a futuro la infraestructura del PDF de la sección 6.1 (UCI, quirófanos, hospitalización, laboratorio, etc.), agrupada en 5 conceptos posibles (camas/internamiento, quirófanos/cirugías, procedimientos/estudios, emergencias, ambulancia), más las decisiones que faltan confirmar con la clínica antes de construir cualquiera de ellos. Explícitamente **solo documentación**, el usuario aclaró que es para planificar la fase 2/3, no para construir ahora.)
+
+Última actualización anterior: 24 de agosto de 2026 — cuarta entrada del día (se creó `database/seeders/AreaSeeder.php` con las 27 especialidades reales de la clínica, la respuesta del contacto interno documentada en la entrada anterior — usa `firstOrCreate` para no duplicar si ya había áreas de prueba cargadas. Registrado en `DatabaseSeeder.php` para correr con `db:seed`, o solo con `--class=AreaSeeder`. No se cargaron los "servicios/infraestructura" del PDF (UCI, quirófanos, etc.) como áreas — no son especialidades médicas en el sentido del modelo actual, quedan solo como contexto documentado. **Confirmado funcionando por el usuario en el entorno real.** Ver sección 6.1 y 9 para el detalle.)
 
 Última actualización anterior: 24 de agosto de 2026 — tercera entrada del día (el contacto interno de la clínica respondió sobre las áreas/especialidades, con material de marketing real (`Servicios_CB_2026.pdf`): son 27 especialidades, y la clínica funciona con lógica de hospital — quirófanos, UCI, hospitalización — no solo consultorios. También aclaró el alcance por fases: el registro de pacientes/citas de hoy corresponde solo a **admisión**; un futuro módulo de medicamentos/insumos iría en farmacia, quirófano, admisión y facturación (no construido aún); y para 2027 planean innovar consultorios + agregar registro de prescripciones médicas. Propósito general declarado: digitalizar la mayor parte del historial clínico del paciente. **Solo documentación por ahora — no se tocó código**, ver sección 6.1 para el detalle completo. No confundir con la entrada anterior, sobre el botón "Cancelar"/"Atrás", que sigue siendo válida y no se modificó.)
 
@@ -175,6 +177,45 @@ facturas
 **Qué NO cambia por ahora**: nada de esto son pedidos de construir algo ya — es información de contexto/alcance para planificar. El sistema actual (Áreas/Médicos/Pacientes/Citas/HistoriaClinicas/Facturas, todo en admisión) sigue siendo válido como base y como "fase 1". Los módulos nuevos (farmacia/insumos, prescripciones estructuradas, lo que sea "innovar consultorios") son trabajo futuro, no reemplazo de lo ya hecho.
 
 **Aún sin responder**: aunque ahora se sabe la lista de especialidades, sigue sin confirmarse si la clínica planea usar el sistema para *todas* esas 27 especialidades desde ya, o si el registro de citas/pacientes por especialidad se ampliará gradualmente. Tampoco se aclaró qué son exactamente "consultorios" en el contexto de "innovar los consultorios" (¿construcción física, digitalización de citas por consultorio, otra cosa?).
+
+### 6.2 Propuesta de modelado futuro para la infraestructura (planificación — sin código)
+
+**Encargo explícito del usuario (24 ago 2026)**: pidió avanzar con la infraestructura del PDF (`Servicios_CB_2026.pdf`, ver 6.1), pero aclaró que es **solo para planificar el módulo futuro (fase 2/3)** — no para construir nada todavía. Esta subsección es una propuesta de cómo se podría modelar cuando la clínica confirme que es momento de construirlo; no se tocó ningún modelo, migración ni Resource.
+
+**Por qué no entra en el modelo actual de `areas`**: un `Area` hoy representa una especialidad médica (algo a lo que un `Medico` pertenece). Hospitalización, UCI, quirófanos, etc. no son especialidades — son **capacidad física/operativa** (camas, salas, equipos) que se ocupa y se libera con el tiempo. Necesitan su propio concepto de "ocupado/libre" y de "quién está usando qué, desde cuándo hasta cuándo", que `Area` no tiene ni debería tener.
+
+**Los 15 ítems del PDF agrupados por el tipo de dato que implican** (agrupación propia, no viene del PDF ni del contacto interno — a confirmar):
+
+1. **Camas / internamiento** — Hospitalización, UCI, UCIN. Las tres son variantes de lo mismo: un paciente ocupa una cama durante un rango de fechas. Posible modelo:
+   - `camas` (identificador/número, `tipo`: hospitalización/UCI/UCIN, estado: libre/ocupada/mantenimiento)
+   - `internamientos` (paciente_id, cama_id, medico_id responsable, fecha_ingreso, fecha_alta nullable — nulo mientras sigue internado, motivo, y opcionalmente cita_id si el ingreso viene de una cita ya agendada)
+   - El estado de la cama se podría derivar de si tiene un internamiento activo (sin `fecha_alta`), en vez de mantenerlo como campo separado que se pueda desincronizar — a decidir cuando se construya.
+
+2. **Quirófanos / cirugías** — Central de Quirófanos. Modelo tipo agenda, similar a `Cita` pero para cirugías:
+   - `quirofanos` (número/nombre, estado)
+   - `cirugias` (paciente_id, quirofano_id, fecha, hora_inicio, hora_fin, tipo_cirugia, estado, notas). Punto abierto: una cirugía suele involucrar más de un médico (cirujano principal, anestesiólogo, ayudantes) — probablemente necesite una tabla intermedia `cirugia_medico` en vez de un solo `medico_id`, a diferencia de `Cita` que asume un médico único.
+   - Relacionado con las especialidades quirúrgicas ya cargadas (Cirugía General, Cirugía Vascular, Cirugía Plástica, Cirugía Oncológica, Cirugía Pediátrica, Cirugía Holep de Próstata, Cirugía Torácica, Cateterismo Cardiaco, Laparoscopía — son varias de las 27 áreas ya en el sistema).
+
+3. **Procedimientos / estudios** — Laboratorio, Rayos X, Ecografía, Centro de Imagen, Unidad de Endoscopía (alta y baja), Centro de Gastroenterología, Procedimientos Ambulatorios. Todos comparten el mismo patrón: un médico solicita un estudio, el paciente lo hace, y en algún momento hay un resultado (posiblemente un archivo adjunto — PDF, imagen). Posible modelo unificado en vez de una tabla por tipo de estudio:
+   - `ordenes_estudio` (paciente_id, medico_solicitante_id, tipo — con esos mismos 7 valores u otra taxonomía a confirmar, fecha_solicitud, fecha_realizacion nullable, estado: solicitado/en_proceso/completado, resultado como texto y/o archivo adjunto).
+   - Punto abierto: si el resultado necesita adjuntar archivos (ej. una radiografía escaneada), hace falta definir dónde se guardan (disco local vía Sail, o storage externo tipo S3) — no evaluado todavía.
+
+4. **Emergencias** — a diferencia de los tres grupos anteriores, no parece necesitar una tabla propia: es más bien una **forma de llegar** a un internamiento o una cita (paciente que llega sin cita previa, por urgencia) más que un recurso físico. Posible tratamiento: un campo `origen` (programada/emergencia) en `Cita` o en `internamientos`, en vez de un modelo nuevo — a confirmar si la clínica maneja triage o algo más elaborado.
+
+5. **Ambulancia** — servicio de transporte, no de permanencia. Si se llega a modelar, sería algo simple tipo `servicios_ambulancia` (paciente_id nullable, origen, destino, fecha_hora, motivo) — menor prioridad, conexión más débil con el resto del dominio (Paciente/Cita/HistoriaClinica).
+
+6. **Consulta Externa** — esto **ya está cubierto** por el sistema actual: es exactamente lo que hoy modela `Cita` (consulta en consultorio, no internamiento). No necesita nada nuevo, solo se menciona para que quede explícito que no es un hueco.
+
+7. **Cafetería** — no es infraestructura clínica, se descarta explícitamente de cualquier modelado (no hay paciente, médico ni historia clínica involucrados).
+
+**Decisiones que faltan confirmar con la clínica antes de construir cualquiera de estos** (no se puede avanzar de "propuesta" a "diseño final" sin esto):
+- ¿Se necesita saber en tiempo real cuántas camas/quirófanos están libres (para tomar decisiones operativas), o alcanza con un registro histórico de quién ocupó qué y cuándo?
+- ¿Una cirugía siempre nace de una `Cita` ya agendada, o puede agendarse directo como cirugía sin pasar por Citas?
+- ¿Los resultados de laboratorio/imagenología se van a poder adjuntar como archivo desde el día uno, o alcanza con texto libre al principio?
+- ¿"Emergencias" implica un flujo de triage/prioridad, o es solo una etiqueta de cómo llegó el paciente?
+- ¿Va a haber más de un quirófano/UCI si la clínica crece a otra sede (pregunta ya abierta en la sección 6, sobre sucursales)?
+
+**Qué NO se hizo**: ningún modelo, migración, Resource ni seeder — esto es puramente una propuesta de arquitectura para discutir, análoga a como quedó documentada la sección 6.1. El sistema actual (Áreas/Médicos/Pacientes/Citas/HistoriaClinicas/Facturas) sigue siendo la única parte construida y no se ve afectado por esta propuesta.
 
 ## 7. Roadmap / pendientes técnicos
 
