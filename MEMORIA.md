@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (filtro rápido por rol en `/admin/users` — **confirmado funcionando por el usuario en el entorno real** — ver sección 9).
+Última actualización: 23 de agosto de 2026 (branding del panel: nombre "Clínica Benites", colores turquesa, logo y favicon — ver sección 8.1. Falta probar en el entorno real).
 
 ---
 
@@ -66,6 +66,11 @@ clinica-benites/
     views/
       pdf/
         factura.blade.php       # Plantilla del comprobante de factura (CSS simple, para dompdf)
+  public/
+    images/
+      icon.svg                 # Monograma "CB" (favicon del panel /admin)
+      logo.svg                  # Ícono + "Clínica Benites" (logo del header del panel)
+    favicon.ico                 # Favicon del sitio en general (regenerado, antes vacío)
   routes/
     web.php                    # Ruta GET /facturas/{factura}/pdf, protegida con middleware auth
   docker-compose.yml         # Generado por Sail
@@ -154,6 +159,7 @@ facturas
 - [x] ~~**Deuda técnica**: `PacienteForm.php` original sin validar `cedula` única a nivel de formulario~~ — **resuelto y confirmado funcionando por el usuario en el entorno real**. Se agregó `->unique(table: 'pacientes', column: 'cedula', ignoreRecord: true)` al campo `cedula` en `app/Filament/Resources/Pacientes/Schemas/PacienteForm.php` (el formulario de `/admin/pacientes`, usado tanto en Crear como en Editar). Ahora, si se repite una cédula al crear o editar un paciente desde ahí, sale un mensaje de validación claro en vez del error crudo de MySQL — mismo comportamiento que ya tenía el modal de creación rápida en `CitaForm.php`. Se usó `ignoreRecord: true` (a diferencia del modal, que no lo necesita por ser solo de creación) para que editar un paciente sin cambiar su propia cédula no dispare el error por "duplicarse a sí mismo".
 - [x] ~~**Gestión de usuarios desde el panel** (`/admin/users`)~~ — resuelto y confirmado funcionando por el usuario en el entorno real (ver sección 9 y 10 para el detalle). Incluye la protección contra que un admin se elimine a sí mismo y el filtro rápido por rol en la tabla, ambos confirmados.
 - [x] ~~**Exportar Facturas a PDF** (botón "Exportar PDF")~~ — resuelto y confirmado funcionando por el usuario en el entorno real, incluyendo que un rol sin permiso (médico) recibe 403 al intentar la ruta directa (ver sección 9 para el detalle).
+- [x] ~~**Branding del panel** (nombre, colores, logo, favicon)~~ — resuelto (ver sección 8.1). **Pendiente probar en el entorno real.**
 - [x] ~~**Filtrar "mis pacientes" para el rol médico**~~ — **resuelto y confirmado funcionando por el usuario en el entorno real** (ver sección 10 para el detalle), incluyendo el fix del bug de `medico_id` al cambiar el rol de un usuario.
 
 ## 8. Plan para la próxima sesión — pulir UX del sistema interno
@@ -174,11 +180,23 @@ El sistema ya es funcional de punta a punta (CRUD + roles). Lo que sigue es hace
 
 **Estado**: los 5 puntos del plan original de mejoras de UX están resueltos (Dashboard, cambiar estado con un clic, crear paciente desde el formulario de Cita, filtros rápidos, buscador global). Puntos 1, 2, 3 y 5 confirmados funcionando por el usuario en el entorno real; el punto 4 (filtros rápidos) sigue pendiente de esa confirmación (ver sección 7).
 
+### 8.1 Branding del panel — resuelto (falta confirmar en entorno real)
+
+A pedido del usuario, se personalizó el panel de Filament (antes con los defaults genéricos de Filament: nombre "Laravel", logo de texto, color ámbar):
+
+- **Nombre**: `->brandName('Clínica Benites')` en `AdminPanelProvider`. Además, `APP_NAME` en `.env.example` se cambió de `Laravel` a `"Clínica Benites"` (afecta el título de la pestaña del navegador y el remitente de los correos vía `config('app.name')`). **El `.env` real de cada entorno no se actualiza solo** — hay que cambiarlo a mano ahí también, ya que no está versionado.
+- **Colores**: primario cambiado de `Color::Amber` (default) a `Color::Cyan` (turquesa) — elegido por el usuario para que combine con los colores reales del cartel/fachada de la clínica (confirmado con fotos de Google Street View que el usuario compartió: el logo físico de la clínica usa un triángulo turquesa con un ícono adentro, y también existe una variante con monograma cuadrado azul, usada en distintos carteles del local).
+- **Logo e ícono**: no se tiene el archivo vectorial original del logo físico de la clínica (solo fotos), así que se diseñó un logo simple original (no una reproducción exacta del cartel) inspirado en esos mismos colores: un monograma "CB" en un cuadrado redondeado turquesa (`#0e7490`). Dos archivos en `public/images/`: `icon.svg` (el cuadrado solo, usado como favicon del panel vía `->favicon()`) y `logo.svg` (ícono + texto "CLÍNICA BENITES" en dos líneas, usado como `->brandLogo()` en el header).
+- **Favicon general del sitio**: `public/favicon.ico` estaba vacío (0 bytes, nunca se había cargado uno real) — se generó uno de verdad con Pillow (Python) a partir del mismo diseño del monograma, en los tamaños estándar 16/32/48/64px, ya que no había herramienta de conversión SVG→ICO disponible en el entorno (ImageMagick sin el delegate `rsvg-convert`).
+- **Si más adelante se consigue el logo real** (archivo vectorial/de alta resolución de la clínica, o el dueño define una identidad de marca distinta): reemplazar directamente `public/images/logo.svg` e `icon.svg` (y regenerar `favicon.ico` con el mismo enfoque) — el resto de la configuración (`brandLogo()`, `favicon()`) no necesita cambiar, solo los archivos.
+- **Pendiente probar en el entorno real**: cómo se ve el logo en el tamaño del header y en la pantalla de login, si el color turquesa se ve bien contra el resto de la interfaz de Filament, y si el favicon se ve correctamente en la pestaña del navegador.
+- **No se tocó** la página web pública (`resources/views/welcome.blade.php`) — sigue siendo la de bienvenida por defecto de Laravel (solo cambia el `<title>` por el efecto indirecto de `APP_NAME`). La construcción real del sitio público sigue como pendiente de fondo (ver abajo).
+
 **Otros pendientes de fondo, sin definir aún**:
 - Construir la página web pública (diseño, contenido) — sigue sin arrancar.
-- Personalizar la marca del panel (logo, colores, nombre en vez de "Laravel").
 - Sigue pendiente la respuesta del contacto interno de la clínica sobre cuántas áreas/especialidades tiene — no bloquea el desarrollo (el sistema ya soporta cualquier número de áreas dinámicamente), pero sería bueno tenerla para cargar datos reales en vez de datos de prueba.
 - No se ha hecho la entrevista formal con el dueño de la clínica.
+- Si se consigue el logo real de la clínica (archivo original), reemplazar el diseño provisorio de branding (ver sección 8.1).
 
 ## 9. Propuesta de funciones futuras (investigadas, no priorizadas aún)
 

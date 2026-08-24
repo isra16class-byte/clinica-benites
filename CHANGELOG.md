@@ -6,6 +6,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Branding del panel: nombre, colores, logo y favicon
+
+- `AdminPanelProvider`: `->brandName('Clínica Benites')` (antes mostraba "Laravel" por defecto), `->brandLogo(asset('images/logo.svg'))`, `->brandLogoHeight('2.5rem')`, `->favicon(asset('images/icon.svg'))` y color primario cambiado de `Color::Amber` (default de Filament) a `Color::Cyan` — turquesa, a pedido del usuario y acorde a los colores reales de la fachada/cartel de la clínica (fotos de Google Street View compartidas por el usuario).
+- Nuevos assets en `public/images/`: `icon.svg` (monograma "CB" en cuadrado redondeado turquesa, usado como favicon) y `logo.svg` (versión horizontal ícono + "Clínica Benites", usada como logo del header del panel). Son un diseño original simple (no una reproducción exacta del cartel físico, del que no se tiene el archivo vectorial) pensado para verse bien a tamaño chico en el panel.
+- `public/favicon.ico` regenerado con Pillow (antes era un archivo vacío de 0 bytes, sin favicon real) a partir del mismo diseño del monograma "CB", en los tamaños estándar 16/32/48/64px — este es el favicon que se sirve para el sitio en general (fuera del panel de Filament, que usa `icon.svg` vía `->favicon()`).
+- `.env.example`: `APP_NAME=Laravel` → `APP_NAME="Clínica Benites"`. **Importante**: el `.env` real (no versionado) de cada entorno hay que actualizarlo a mano con el mismo valor — este archivo solo cambia la plantilla, no el `.env` que ya existe localmente. Afecta el título de la pestaña del navegador y el remitente de los correos (`MAIL_FROM_NAME`), entre otros usos de `config('app.name')` en Laravel.
+- **No se tocó** la página pública (`resources/views/welcome.blade.php`) más allá del efecto indirecto del cambio de `APP_NAME` en el `<title>` — sigue siendo la página de bienvenida por defecto de Laravel, la construcción del sitio público sigue pendiente (ver `MEMORIA.md`, sección 8).
+- Sintaxis PHP validada con `php -l`. Falta probar visualmente en el entorno real (colores, tamaño del logo en el header/login, favicon en la pestaña del navegador).
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Confirmación en entorno real: filtro de rol junto a la barra de búsqueda
 
 - Confirmado por el usuario: el botón de filtro de rol aparece correctamente junto a la barra de búsqueda en `/admin/users`.

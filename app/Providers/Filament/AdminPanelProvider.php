@@ -26,8 +26,12 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('Clínica Benites')
+            ->brandLogo(asset('images/logo.svg'))
+            ->brandLogoHeight('2.5rem')
+            ->favicon(asset('images/icon.svg'))
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Cyan,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
