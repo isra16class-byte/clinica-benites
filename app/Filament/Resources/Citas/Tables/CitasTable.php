@@ -12,7 +12,6 @@ use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -71,7 +70,7 @@ class CitasTable
                     ->label('Confirmadas')
                     ->toggle()
                     ->query(fn (Builder $query): Builder => $query->where('estado', 'confirmada')),
-            ], layout: FiltersLayout::AboveContentCollapsible)
+            ])
             ->recordActions([
                 ActionGroup::make(self::accionesCambiarEstado())
                     ->label('Cambiar estado')

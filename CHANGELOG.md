@@ -6,6 +6,18 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+---
+
+## [2026-08-24] Filtros de Citas: de "arriba de la tabla colapsable" a dropdown junto al buscador
+
+- Al confirmar en el entorno real el cambio anterior (título+buscador en una sola fila en todas las tablas), la tabla `/admin/citas` quedó viéndose distinta a las demás: un hueco vacío grande entre el buscador y el ícono de filtro.
+- Causa: Citas es la única tabla que usaba `layout: FiltersLayout::AboveContentCollapsible` para sus 3 filtros rápidos ("Hoy"/"Pendientes"/"Confirmadas") — por defecto aparecen colapsados (solo el ícono de embudo), y al expandirse abren un bloque grande debajo con los 3 switches + "Aplicar filtros" + "Resetear los filtros". Nada que ver con el CSS agregado en el cambio anterior.
+- Se cambió `CitasTable.php` para quitar el `layout: FiltersLayout::AboveContentCollapsible` explícito (queda el default de Filament, `Dropdown`) — mismo patrón que ya se había adoptado en `UsersTable` en una sesión anterior. El botón de filtro ahora aparece pegado al buscador, y el panel con los 3 switches se abre flotando al hacer clic, sin ocupar espacio fijo ni dejar huecos.
+- Se quitó el `use Filament\Tables\Enums\FiltersLayout;` de `CitasTable.php`, sin uso tras el cambio.
+- Los 3 filtros siguen funcionando exactamente igual (mismos toggles combinables) — solo cambió cómo se muestran, no la lógica de filtrado.
+- Sintaxis no se pudo validar con `php -l` en este entorno (sin PHP instalado); cambio de configuración de un solo Resource, sin lógica nueva.
+- Entregado como patch (`git am`). **Pendiente confirmar en el entorno real.**
+
 ## [2026-08-24] Título y buscador en la misma fila en todas las tablas del panel (primer theme propio)
 
 - Pedido original: en el widget "Citas de hoy" del Dashboard, el título quedaba en una fila y la barra de búsqueda en la fila de abajo — se pidió juntarlos en una sola fila.
