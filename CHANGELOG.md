@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Seeder con las 27 especialidades reales de la clínica
+
+- Siguiente paso mecánico tras la respuesta del contacto interno sobre áreas/especialidades (ver entrada anterior en este changelog y sección 6.1 de `MEMORIA.md`).
+- Archivo nuevo `database/seeders/AreaSeeder.php`: crea las 27 especialidades reales (Auditoría Médica, Anestesiología y Terapia del Dolor, Cardiología, ... hasta Urología — lista completa en el archivo y en `MEMORIA.md` sección 6.1) usando `Area::firstOrCreate(['nombre' => ...])` por cada una, para no duplicar filas si el seeder se corre más de una vez (ej. si ya había áreas de prueba cargadas con el mismo nombre).
+- `database/seeders/DatabaseSeeder.php`: se agregó `$this->call(AreaSeeder::class);` al final de `run()`, así que `./vendor/bin/sail artisan db:seed` (o `migrate:fresh --seed`) carga las áreas reales automáticamente junto con el usuario de prueba existente. También se puede correr solo, sin tocar el resto: `./vendor/bin/sail artisan db:seed --class=AreaSeeder`.
+- No se tocó ningún modelo, migración, ni Resource de Filament — el modelo de datos actual (`areas` como tabla con solo `nombre`) ya soportaba esto sin cambios de código (confirmado en la sesión anterior, sección 6.1 de `MEMORIA.md`).
+- Nota: no se cargaron los "servicios/infraestructura adicional" del PDF (Hospitalización, UCI, Central de Quirófanos, etc.) como filas de `areas` — esos no son especialidades médicas en el sentido del modelo actual (un área con médicos asignados), son infraestructura de la clínica; se dejaron documentados en `MEMORIA.md` como contexto, no como datos a cargar.
+- Sintaxis no se pudo validar con `php -l` en este entorno (sin PHP instalado); se revisó manualmente el archivo.
+- Entregado como patch (`git am`). **Pendiente confirmar en el entorno real** — correr el seeder y verificar que las 27 áreas aparezcan en `/admin/areas`.
+
 ## [2026-08-24] Documentación: respuesta del contacto interno sobre áreas/especialidades y alcance por fases
 
 - El usuario le preguntó al contacto interno (amigo que trabaja en la clínica) cuántas áreas/especialidades tiene la clínica — pregunta pendiente desde el inicio del proyecto (sección 6 de `MEMORIA.md`).
