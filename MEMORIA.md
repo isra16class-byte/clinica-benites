@@ -2,7 +2,7 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 23 de agosto de 2026 (branding del panel confirmado funcionando en el entorno real — logo, nombre y color primario turquesa OK. El sidebar oscuro se descartó por complicarse con clases internas de Filament sin poder inspeccionarlas en vivo; se simplificó a un tinte celeste claro de fondo, sin forzar el color del texto — ver sección 8.1 — pendiente de confirmar en el entorno real).
+Última actualización: 23 de agosto de 2026 (branding del panel confirmado funcionando en el entorno real — logo, nombre y color primario turquesa OK, sidebar simplificado a tinte celeste claro. Se encontró y corrigió un bug de fondo: la app nunca se configuró con idioma español ni con la zona horaria de Guayaquil — se quedó en los defaults de Laravel (inglés/UTC) desde el inicio del proyecto. Esto causaba fechas en inglés en las tablas y, más grave, que el widget "Citas de hoy" del Dashboard dejara de mostrar las citas del día a partir de las 19:00 hora local — ver sección 5 y 8.1 para el detalle).
 
 ---
 
@@ -128,6 +128,13 @@ facturas
 - ✅ Git: repo en GitHub confirmado funcionando — `git log --oneline` muestra `HEAD -> main, origin/main` en el mismo commit, o sea que local y remoto están sincronizados.
 - ✅ `composer require barryvdh/laravel-dompdf` corrido con `./vendor/bin/sail composer require ...` (dependencia agregada por el código de exportar Facturas a PDF, ver sección 9). `composer.json`/`composer.lock` ya están commiteados y pusheados con la entrada de `barryvdh/laravel-dompdf`.
 
+**Bug de fondo encontrado y corregido — idioma y zona horaria nunca se configuraron para Ecuador**: desde el inicio del proyecto, `config('app.locale')` y `config('app.timezone')` se quedaron en los defaults de Laravel (`en` / `UTC`), nunca se ajustaron a la clínica (español, Guayaquil = UTC-5). Dos síntomas causados por esto:
+1. **Fechas en inglés**: las columnas con `->date()` (Citas, Facturas, Historia Clínica, Pacientes) mostraban el mes abreviado en inglés (ej. "Apr 12, 2024" en vez de "abr. 12, 2024"), confuso para alguien leyendo en español — reportado por el usuario como que "no aparece la fecha completa".
+2. **Más grave — el widget "Citas de hoy" del Dashboard dejaba de mostrar las citas del día**: el widget filtra con el helper `today()` de Laravel, que calcula la fecha según la zona horaria de la app. Con la app fija en UTC y la clínica en Guayaquil (UTC-5), a partir de las 19:00 hora local en Guayaquil ya es el día siguiente en UTC — así que de esa hora en adelante, `today()` devolvía la fecha de mañana y las citas de hoy (con `fecha` = hoy en el sentido real/local) dejaban de matchear el filtro, quedando invisibles en el Dashboard justo en las horas de la tarde/noche, que es cuando más se usa el sistema.
+- **Solución aplicada**: en `config/app.php`, `locale`/`fallback_locale`/`faker_locale` ahora usan `es`/`es`/`es_ES` por defecto (antes `en`/`en`/`en_US`), y `timezone` ahora es `env('APP_TIMEZONE', 'America/Guayaquil')` (antes hardcodeado en `'UTC'`, sin poder overridearse por `.env`). `.env.example` actualizado con `APP_LOCALE=es`, `APP_FALLBACK_LOCALE=es`, `APP_FAKER_LOCALE=es_ES` y la variable nueva `APP_TIMEZONE=America/Guayaquil`.
+- **El `.env` real de cada entorno no se actualiza solo** (mismo caso que `APP_NAME`, ver sección 8.1) — si el `.env` real ya tiene `APP_LOCALE=en` (probable, Laravel lo escribe así al crear el proyecto) o no tiene `APP_TIMEZONE` en absoluto, hay que agregar/corregir esas líneas a mano ahí también, y después correr `./vendor/bin/sail artisan config:clear` para que tome el cambio (Laravel puede cachear la config).
+- **Nota para el futuro**: si la clínica llegara a tener sucursales fuera de Guayaquil con otro huso horario, este valor fijo dejaría de ser válido para todas — no es el caso hoy (una sola ubicación, confirmado en sección 1).
+
 ## 6. Preguntas pendientes (por confirmar con el contacto interno / en la entrevista formal)
 
 - [ ] ¿Cuántas áreas/especialidades tiene la clínica?
@@ -161,6 +168,7 @@ facturas
 - [x] ~~**Exportar Facturas a PDF** (botón "Exportar PDF")~~ — resuelto y confirmado funcionando por el usuario en el entorno real, incluyendo que un rol sin permiso (médico) recibe 403 al intentar la ruta directa (ver sección 9 para el detalle).
 - [x] ~~**Branding del panel** (nombre, colores, logo, favicon)~~ — resuelto y **confirmado funcionando por el usuario en el entorno real** (logo, nombre "Clínica Benites" y color turquesa OK). Se intentó un ajuste extra con sidebar oscuro que se complicó en la prueba real (texto invisible, no se pudo depurar sin acceso a inspeccionar el DOM en vivo) y se descartó a pedido del usuario — ver sección 8.1 para el detalle completo. Quedó simplificado a un tinte celeste claro de fondo en el sidebar, sin tocar el color del texto (se usa el gris default de Filament). **Pendiente confirmar en el entorno real que esta versión simplificada se ve bien.**
 - [x] ~~**Filtrar "mis pacientes" para el rol médico**~~ — **resuelto y confirmado funcionando por el usuario en el entorno real** (ver sección 10 para el detalle), incluyendo el fix del bug de `medico_id` al cambiar el rol de un usuario.
+- [x] ~~**Locale español + timezone Guayaquil**~~ (fechas en inglés y Dashboard sin citas de hoy después de las 19:00) — resuelto, ver sección 5 para el detalle. **Pendiente confirmar en el entorno real** — recordar actualizar el `.env` real (no se actualiza solo) y correr `config:clear`.
 
 ## 8. Plan para la próxima sesión — pulir UX del sistema interno
 

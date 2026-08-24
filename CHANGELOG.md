@@ -6,6 +6,18 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Fix: locale español y timezone Guayaquil (fechas en inglés + Dashboard sin citas de hoy)
+
+- El usuario reportó dos problemas a la vez: las fechas en las tablas no se veían "completas" (ej. "Apr 12, 2024") y el Dashboard no mostraba las citas de hoy.
+- **Causa raíz común**: `config('app.locale')` y `config('app.timezone')` nunca se habían configurado para la clínica — se quedaron en los defaults de Laravel (`en` / `UTC`) desde el inicio del proyecto.
+  - El mes en inglés ("Apr") venía de que la app corre en locale inglés.
+  - El bug del Dashboard es más serio: el widget `CitasDeHoyWidget` filtra con `today()`, que Laravel calcula según la zona horaria de la app. Con la app en UTC y la clínica en Guayaquil (UTC-5), a partir de las 19:00 hora local ya es el día siguiente en UTC — así que `today()` devolvía la fecha de mañana y las citas de hoy dejaban de aparecer justo en las horas de más uso del sistema (tarde/noche).
+- **Fix**: en `config/app.php`, `locale`/`fallback_locale`/`faker_locale` pasan a `es`/`es`/`es_ES`, y `timezone` pasa de estar hardcodeado en `'UTC'` a `env('APP_TIMEZONE', 'America/Guayaquil')` (ahora se puede sobreescribir por `.env` si hiciera falta). `.env.example` actualizado con las mismas variables.
+- **Importante**: el `.env` real de cada entorno no se actualiza solo (no está versionado) — hay que agregar/corregir `APP_LOCALE=es`, `APP_FALLBACK_LOCALE=es`, `APP_TIMEZONE=America/Guayaquil` ahí a mano, y correr `./vendor/bin/sail artisan config:clear` después (Laravel puede tener la config vieja cacheada).
+- No se tocó el formato de las columnas `->date()` en sí (Citas, Facturas, Historia Clínica, Pacientes) — con el locale en español, Carbon ya traduce el mes automáticamente (ej. "abr. 12, 2024"), sin necesitar cambiar cada columna una por una.
+- Sintaxis PHP no se pudo validar con `php -l` en este entorno (sin PHP instalado); son cambios simples de valores de configuración, sin lógica nueva.
+- Entregado como patch (`git am`). **Pendiente confirmar en el entorno real** (recordar actualizar el `.env` real y correr `config:clear`, o el fix no se nota).
+
 ## [2026-08-23] Simplificar el sidebar: se descarta el fondo oscuro, tinte celeste claro sin forzar el texto
 
 - El intento de sidebar oscuro (entrada de abajo) siguió sin verse bien en la prueba real incluso después del primer fix (texto invisible en el ítem activo, ver entrada de abajo): el usuario probó de nuevo en `/admin/areas` y seguía mal. Se investigó el código fuente real de Filament v5.7.6 (`item.blade.php`, descargado directo desde GitHub para la versión exacta instalada según `composer.lock`) y se confirmó que el `<li>` sí lleva las clases `fi-sidebar-item fi-active` como se esperaba — así que el CSS en teoría debía funcionar. Sin acceso a inspeccionar el DOM en vivo (herramientas de desarrollador del navegador del usuario) no se pudo determinar con certeza si el problema real era cache del navegador/Livewire (`wire:navigate` no siempre recarga el `<head>`) o algo de especificidad CSS.
