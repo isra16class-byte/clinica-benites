@@ -14,7 +14,7 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 - El proyecto no tenía un theme propio de Filament configurado — se creó por primera vez: `resources/css/filament/admin/theme.css` (importa el theme base de Filament + el ajuste de CSS que junta ambos bloques en una fila, dentro de un `@media (min-width: 640px)` para no apretar en mobile), registrado con `->viteTheme(...)` en `AdminPanelProvider.php` y agregado al `input` de `vite.config.js`.
 - Efecto: aplica a **todas** las tablas del panel (Áreas, Citas, Facturas, Historia Clínicas, Médicos, Pacientes, Usuarios, y el widget "Citas de hoy"), consistente en todo el sistema, no un parche aislado del widget.
 - Sintaxis no se pudo validar con `npm`/`php` en este entorno (sin Node/PHP instalados); cambio de CSS + configuración de Vite/Filament, sin lógica de negocio.
-- Entregado como patch (`git am`). **Pendiente correr `npm run build`** (o `npm run dev`) para que Vite compile el `theme.css` nuevo — sin eso el cambio no se ve aunque el código ya esté aplicado. Pendiente confirmar visualmente en el entorno real, incluida una vista en mobile/pantalla angosta.
+- Entregado como patch (`git am`). **Confirmado funcionando por el usuario en el entorno real, en todas las tablas del panel** (no solo el widget). Nota operativa: hubo que correr `npm install` antes del `npm run build`, porque el proyecto nunca había instalado el frontend dentro del contenedor de Sail hasta este cambio.
 
 ## [2026-08-23] Nuevo logo vectorial (inspirado en el cartel real) + color primario Teal
 
