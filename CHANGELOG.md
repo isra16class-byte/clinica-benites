@@ -8,6 +8,29 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Primer módulo construido: Medicamentos e Insumos (catálogo, lotes, movimientos)
+
+- A pedido del usuario, se empezó a **construir** (por primera vez con código, no solo documentación) la propuesta de la sección 6.3 de `MEMORIA.md` — el módulo de medicamentos/insumos que el contacto interno pidió, en vez de la infraestructura de la 6.2. El usuario también pidió avanzar con **supuestos razonables** sobre las decisiones que seguían sin confirmar con la clínica, documentándolos para poder ajustarlos después en vez de bloquear el desarrollo esperando esa confirmación.
+- **3 tablas nuevas** (migraciones `2026_08_24_120000` a `2026_08_24_120002`):
+  - `items_inventario` — catálogo (nombre, tipo medicamento/insumo, unidad_medida, stock_minimo opcional, precio_unitario opcional). Sin columna de stock — se deriva de los movimientos.
+  - `lotes_inventario` — un lote por ítem (numero_lote, fecha_vencimiento), trazabilidad FEFO. Tampoco tiene columna de cantidad, mismo criterio.
+  - `movimientos_inventario` — el ledger real: tipo_movimiento (entrada/salida/traslado/ajuste), cantidad, area_origen/area_destino (texto libre de una lista fija), fecha_hora, user_id (quién lo registró), paciente_id y cita_id opcionales (para enganchar consumo real en la atención de alguien), notas.
+- **3 modelos nuevos**: `ItemInventario` (con `stockActual()` y `bajoStockMinimo()`), `LoteInventario` (con `stockActual()`, `vencido()`, `porVencer()`), `MovimientoInventario`. Se agregó también `movimientosInventario()` (hasMany) a `Paciente` y `Cita`, siguiendo el mismo patrón de relaciones inversas que ya tenían con `Factura`.
+- **3 Resources completos de Filament** (mismo patrón de carpetas que los 7 existentes — `XResource.php`, `Schemas/XForm.php`, `Tables/XTable.php`, `Pages/{List,Create,Edit}X.php`): `ItemsInventario`, `LotesInventario`, `MovimientosInventario`.
+  - Tabla de ítems: columna "Stock actual" calculada en vivo (no de BD), en rojo si cae bajo el `stock_minimo`.
+  - Tabla de lotes: columna "Vence" con color (rojo si ya venció, ámbar si vence en ≤90 días), y stock del lote también calculado en vivo.
+  - Formulario de movimientos: campos "Área de origen"/"Área de destino" que solo aparecen según el `tipo_movimiento` elegido (ej. "origen" no tiene sentido en una entrada). El campo `usuario` no se pide en el formulario — se asigna solo con el usuario logueado al crear (`CreateMovimientoInventario::mutateFormDataBeforeCreate`), mismo criterio que ya se usaba para no poder registrar algo a nombre de otra persona por error.
+  - Protección contra borrado (mismo patrón que Área/Médico/Paciente/Cita): un ítem no se puede borrar si tiene lotes, un lote no se puede borrar si tiene movimientos. Un movimiento sí se puede borrar libremente (nada depende de él), igual que Factura/HistoriaClinica.
+- **Permisos**: no existe un rol "farmacia" separado (el sistema solo tiene admin/recepcion/medico) — se asumió que el catálogo (ítems, lotes) sigue el criterio de "configuración" (admin todo, recepción solo ver, médico sin acceso, igual que Áreas/Médicos) y que los movimientos siguen el criterio "operativo" (admin y recepción todo, médico sin acceso, igual que Facturas). **Queda abierto** si la clínica confirma que necesita un rol propio de farmacia.
+- **Supuestos documentados en esta entrada, en vez de bloquear el desarrollo** (ver detalle ampliado en la sección 6.3 actualizada de `MEMORIA.md`):
+  1. **Stock en tiempo real**: sí, se implementó — el stock de cada lote/ítem se calcula al vuelo sumando sus movimientos (nunca una columna editable a mano), así que siempre está actualizado.
+  2. **¿Farmacia es un área física propia?**: no, todavía no tiene su propio Resource — se modeló como un valor de texto (lista fija: farmacia/quirófano/admisión/facturación/bodega) dentro de cada movimiento, no como una entidad con responsable/horario propio.
+  3. **¿Todo insumo se cobra al paciente?**: no se construyó todavía la conexión con `Factura` (la `factura_items` que proponía la 6.3) — el `paciente_id`/`cita_id` en el movimiento solo deja registrado *qué se usó* en la atención de alguien, no genera un cobro automático. Facturar ese consumo, si aplica, se sigue haciendo aparte por ahora.
+  4. **Proveedores/compras externas**: no se modeló ninguna tabla de proveedores — un "entrada" simplemente registra que llegó stock, sin detalle de quién lo vendió. Se puede agregar después si hace falta.
+  5. **¿Depende de la infraestructura de la 6.2 (quirófanos/cirugías)?**: no — se construyó de forma independiente. El movimiento solo referencia `cita_id` (ya existe), no `cirugia_id` (esa tabla no existe todavía). Se puede agregar esa columna sin romper nada cuando se construya la 6.2.
+- **Qué NO se hizo todavía**: no se cargó ningún ítem/catálogo real (la clínica no ha dado esa lista), no hay seeder de datos de prueba, y no se conectó con `Factura`. El módulo está construido pero vacío, listo para que la clínica empiece a cargar su catálogo real.
+- Entregado como patch (`git am`) — incluye 3 migraciones, 3 modelos (+2 modelos existentes con una relación agregada cada uno), 18 archivos de Filament, y este changelog junto con `MEMORIA.md` actualizado.
+
 ## [2026-08-24] Documentación: validación externa de 6.2/6.3 + marco legal ecuatoriano (sección 6.4 nueva)
 
 - El usuario pidió investigar en internet si las propuestas de planificación de las secciones 6.2 (infraestructura: camas/UCI, quirófanos, procedimientos, emergencias, ambulancia) y 6.3 (medicamentos e insumos) están bien encaminadas, comparándolas con cómo lo resuelven otras clínicas/hospitales y estándares del sector, para dejar el sistema cubriendo esas buenas prácticas de antemano.

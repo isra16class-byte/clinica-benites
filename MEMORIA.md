@@ -2,7 +2,9 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 24 de agosto de 2026 — séptima entrada del día (a pedido del usuario, se investigó en internet cómo resuelven este mismo problema otros sistemas hospitalarios/clínicos y estándares del sector, para validar las propuestas de planificación de las secciones 6.2 y 6.3 y detectar huecos antes de construir nada. Resultado: ambas propuestas están bien encaminadas y no se rediseñan, pero se les agregan **3 ajustes concretos** encontrados en la investigación — ver el detalle marcado "(validado con investigación externa, 24 ago 2026)" dentro de 6.2 y 6.3 — y se agrega una sección nueva, **6.4**, con el marco legal ecuatoriano aplicable (protección de datos de salud y normativa del MSP sobre historia clínica electrónica), que no estaba documentado. Explícitamente **solo documentación e investigación, sin tocar código**.)
+Última actualización: 24 de agosto de 2026 — octava entrada del día (primer módulo **construido** con código, no solo documentado: **Medicamentos e Insumos**, sección 6.3. El usuario decidió empezar por este módulo en vez de la infraestructura de la 6.2, y pidió avanzar con **supuestos razonables** sobre las decisiones aún sin confirmar con la clínica, documentándolos para poder ajustarlos después en vez de esperar esa confirmación. Se crearon 3 tablas (`items_inventario`, `lotes_inventario`, `movimientos_inventario`), 3 modelos y 3 Resources completos de Filament — ver la sección 6.3 actualizada abajo para el detalle completo de qué se construyó y qué supuesto se aplicó en cada decisión pendiente. **Aún sin confirmar por el usuario en el entorno real** — no se ha corrido la migración todavía.)
+
+Última actualización anterior: 24 de agosto de 2026 — séptima entrada del día (a pedido del usuario, se investigó en internet cómo resuelven este mismo problema otros sistemas hospitalarios/clínicos y estándares del sector, para validar las propuestas de planificación de las secciones 6.2 y 6.3 y detectar huecos antes de construir nada. Resultado: ambas propuestas están bien encaminadas y no se rediseñan, pero se les agregan **3 ajustes concretos** encontrados en la investigación — ver el detalle marcado "(validado con investigación externa, 24 ago 2026)" dentro de 6.2 y 6.3 — y se agrega una sección nueva, **6.4**, con el marco legal ecuatoriano aplicable (protección de datos de salud y normativa del MSP sobre historia clínica electrónica), que no estaba documentado. Explícitamente **solo documentación e investigación, sin tocar código**.)
 
 Última actualización anterior: 24 de agosto de 2026 — sexta entrada del día (a pedido del usuario, se agregó la sección **6.3**: una propuesta de planificación — sin tocar código, mismo estilo que la 6.2 — de cómo modelar a futuro el módulo de **medicamentos e insumos** mencionado por el contacto interno en la sección 6.1, que debe vivir en farmacia, quirófano, admisión y facturación. A diferencia de la infraestructura física de la 6.2, este módulo no tenía ninguna propuesta previa — es dominio completamente nuevo, sin nada construido hoy. Explícitamente **solo documentación**, para planificar fase 2/3.)
 
@@ -68,6 +70,9 @@ clinica-benites/
         HistoriaClinicas/        # Resource completo + vista de solo lectura (Infolist)
         Facturas/                # Resource completo, selectores por relación + estado con colores, exportar a PDF
         Users/                   # Resource completo, solo accesible por admin (gestión de usuarios/roles)
+        ItemsInventario/         # Resource completo — catálogo de medicamentos/insumos (sección 6.3)
+        LotesInventario/         # Resource completo — lotes con vencimiento, FEFO (sección 6.3)
+        MovimientosInventario/   # Resource completo — entradas/salidas/traslados/ajustes (sección 6.3)
   database/
     migrations/
       ..._create_areas_table.php            # Completa (nombre)
@@ -76,6 +81,9 @@ clinica-benites/
       ..._create_citas_table.php            # Completa (FKs paciente/medico/area, horario, estado)
       ..._create_historia_clinicas_table.php # Completa (FKs paciente/medico/cita nullable)
       ..._create_facturas_table.php         # Completa (FKs paciente/cita nullable, monto, pago)
+      ..._create_items_inventario_table.php       # Completa — catálogo medicamentos/insumos (sección 6.3)
+      ..._create_lotes_inventario_table.php       # Completa — lotes con vencimiento (sección 6.3)
+      ..._create_movimientos_inventario_table.php # Completa — ledger de movimientos (sección 6.3)
   resources/
     views/
       pdf/
@@ -225,7 +233,9 @@ facturas
 
 **Validación externa (24 ago 2026)**: se investigó cómo modelan esto sistemas hospitalarios reales y estándares del sector (HL7 FHIR, sistemas open source como OpenMRS/OpenHospital/Bahmni, literatura de gestión hospitalaria). Conclusión general: la estructura propuesta arriba (separar "ubicación/recurso físico" de "ocupación en el tiempo", que es la base de los puntos 1 y 2) coincide con el patrón estándar de la industria, conocido como **ADT** (Admission-Discharge-Transfer) — el módulo que virtualmente todo sistema hospitalario tiene para esto. No hay que rediseñar nada, solo se incorporaron los 2 ajustes marcados arriba (estado de quirófano más granular, prioridad/triage en emergencias).
 
-### 6.3 Propuesta de modelado futuro para medicamentos e insumos (planificación — sin código)
+### 6.3 Medicamentos e insumos — MÓDULO CONSTRUIDO (24 ago 2026, octava entrada del día)
+
+**Estado**: **construido**, no solo propuesto. El usuario decidió empezar por este módulo (en vez de la infraestructura física de la 6.2) y pidió avanzar con **supuestos razonables** sobre las decisiones que seguían sin confirmar con la clínica, documentándolos para poder ajustarlos después en vez de bloquear el desarrollo esperando esa confirmación. **Aún sin confirmar por el usuario en el entorno real** — no se ha corrido la migración todavía (falta `./vendor/bin/sail artisan migrate` de su lado).
 
 **Encargo explícito del usuario (24 ago 2026, misma sesión)**: pidió avanzar con una propuesta de modelado para el módulo de medicamentos/insumos que el contacto interno mencionó en la sección 6.1 ("debe vivir en farmacia, quirófano, admisión y facturación"). Igual que la sección 6.2, es **solo para planificar** — no se tocó ningún modelo, migración, Resource ni seeder.
 
@@ -235,29 +245,41 @@ facturas
 1. Un **catálogo** de qué medicamentos/insumos existen y cuánto stock hay (inventario).
 2. Un **movimiento** de esos ítems entre las 4 áreas que mencionó (farmacia, quirófano, admisión, facturación) — entradas, salidas, traslados y consumo real en la atención de un paciente.
 
-**Propuesta de estructura (agrupación propia, a confirmar con la clínica)**:
+**Estructura construida** (3 tablas nuevas, migraciones `2026_08_24_120000` a `2026_08_24_120002`):
 
-1. **Catálogo — `items_inventario`** (nombre, tipo: medicamento/insumo, unidad_medida, stock_actual, stock_minimo opcional para alertas, precio_unitario si se va a facturar). Un solo catálogo para ambos tipos (medicamento e insumo) en vez de dos tablas separadas, ya que comparten los mismos campos y solo cambia el `tipo` — simplifica reportes y movimientos.
-   - **Ajuste (validado con investigación externa, 24 ago 2026)**: la trazabilidad por **lote y fecha de vencimiento** (que en la lista de decisiones pendientes original quedó como pregunta abierta) en realidad no es opcional en la práctica — es el eje central de cómo se maneja inventario de medicamentos en cualquier farmacia/hospital, tanto por seguridad del paciente como por norma sanitaria. Dos cajas del mismo medicamento suelen tener vencimientos distintos y necesitan tratarse como unidades separadas. El patrón estándar del sector se llama **FEFO** (First-Expired-First-Out — se despacha primero el lote que vence antes, no el que entró primero, a diferencia del FIFO más genérico). Esto sugiere que el catálogo probablemente necesite una tabla adicional de **lotes** (item_id, número de lote, fecha_vencimiento, cantidad de ese lote específico) en vez de que `items_inventario` tenga un solo `stock_actual` sin diferenciar por vencimiento — a confirmar en el diseño final, pero ya no se trata como pregunta abierta sino como algo que casi con certeza hace falta.
+1. **Catálogo — `items_inventario`** (`app/Models/ItemInventario.php`): `nombre`, `tipo` (medicamento/insumo), `unidad_medida`, `stock_minimo` (nullable, para alertas), `precio_unitario` (nullable, si se factura). Un solo catálogo para ambos tipos en vez de dos tablas separadas. **No tiene columna `stock_actual`** — se calcula en vivo con `ItemInventario::stockActual()`, sumando el `stockActual()` de todos sus lotes, para que nunca se desincronice de la realidad (mismo criterio que el estado de una cama en 6.2). `bajoStockMinimo()` compara ese valor contra `stock_minimo`.
 
-2. **Movimientos — `movimientos_inventario`** (item_id FK, tipo_movimiento: entrada/salida/traslado/ajuste, cantidad, area_origen, area_destino nullable — solo aplica en traslados, fecha_hora, usuario_id de quién lo registró, referencia opcional: paciente_id y/o cita_id/cirugia_id si el movimiento es consumo real en la atención de alguien, no solo reabastecimiento de bodega). El `stock_actual` de cada ítem se recalcularía a partir de la suma de sus movimientos, en vez de editarse a mano, para no desincronizarse — mismo criterio de diseño que se propuso para el estado de las camas en 6.2. Si se confirma la tabla de lotes del punto 1, cada movimiento probablemente necesite referenciar también el `lote_id` específico, no solo el `item_id` genérico.
-   - **Ajuste (validado con investigación externa, 24 ago 2026)**: el estándar del sector (HL7 FHIR) separa el ciclo de vida de un medicamento en **tres eventos distintos**, no uno: *prescrito* (el médico lo ordena), *dispensado* (farmacia lo entrega) y *administrado* (se le da efectivamente al paciente, relevante sobre todo si hay internamiento). Esto es importante para cuando este módulo se conecte con el futuro sistema de prescripciones (2027, mencionado en 6.1): probablemente no alcance con una sola tabla de "prescripciones" — el flujo real necesitaría poder distinguir esos 3 momentos, cada uno con su propia fecha/responsable. Vale la pena tenerlo en cuenta desde ahora para no tener que rediseñar cuando se aborde ese módulo.
+2. **Lotes — `lotes_inventario`** (`app/Models/LoteInventario.php`): `item_id` FK, `numero_lote`, `fecha_vencimiento`. Trazabilidad FEFO (First-Expired-First-Out) implementada tal como se validó con la investigación externa — cada lote es una unidad separada con su propio vencimiento. Tampoco tiene columna de cantidad: `LoteInventario::stockActual()` la calcula sumando sus movimientos (entrada + ajuste, menos salida). `vencido()` y `porVencer($dias = 90)` para la lógica de color en la tabla del panel.
 
-3. **Relación con Facturación**: si un insumo/medicamento consumido en la atención de un paciente se cobra, `movimientos_inventario` con `paciente_id` sería el puente hacia `Factura` — probablemente una tabla intermedia tipo `factura_items` (factura_id, item_id, cantidad, precio_unitario) en vez de forzarlo dentro de `movimientos_inventario`, para no mezclar "qué se usó clínicamente" con "qué se cobró" (no siempre es lo mismo — ej. insumos cubiertos por un paquete/seguro).
+3. **Movimientos — `movimientos_inventario`** (`app/Models/MovimientoInventario.php`, el ledger/fuente de verdad): `lote_id` FK, `tipo_movimiento` (entrada/salida/traslado/ajuste), `cantidad`, `area_origen`/`area_destino` (nullable, texto de una lista fija), `fecha_hora`, `user_id` (quién lo registró — se asigna solo, no se pide en el formulario), `paciente_id`/`cita_id` (nullable, para dejar registrado consumo real en la atención de alguien), `notas`. Toda entrada de stock —incluida la carga inicial de un lote— se registra como un movimiento de tipo "entrada", nunca como una columna editable a mano.
 
-4. **Relación con las 4 áreas mencionadas**: farmacia y quirófano tendrían más sentido como `area_origen`/`area_destino` de un traslado (ej. farmacia despacha a quirófano antes de una cirugía) que como tablas propias — no está claro todavía si "farmacia" necesita ser una entidad con su propio Resource (con su propio responsable, horario, etc.) o alcanza con que sea un valor más de un campo `area` en los movimientos. Admisión y facturación ya existen como conceptos en el sistema actual (el flujo de `Cita`/`Factura`), así que el enganche ahí sería más directo.
+**3 Resources completos de Filament** (mismo patrón de carpetas que los 7 existentes): `ItemsInventario`, `LotesInventario`, `MovimientosInventario`. Formulario de movimientos con campos "Área de origen"/"Área de destino" condicionales según `tipo_movimiento` (`->live()` + `->visible()`). Protección contra borrado: un ítem no se borra si tiene lotes, un lote no se borra si tiene movimientos (mismo patrón que Área/Médico/Paciente/Cita).
 
-**Decisiones que faltan confirmar con la clínica antes de construir esto** (más numerosas que en 6.2, porque acá no hay ningún punto de partida ya construido):
-- ¿"Farmacia" es un área física/organizativa propia dentro de la clínica (con personal, horario, responsable), o es solo un paso lógico dentro del flujo de atención?
-- ¿El control de stock necesita ser en tiempo real (para saber si hay suficiente antes de una cirugía, por ejemplo), o alcanza con un registro histórico de movimientos para auditoría/costos?
-- ¿Todo insumo/medicamento consumido se cobra al paciente, o hay insumos que la clínica absorbe como costo operativo sin pasar por `Factura`?
-- ¿Hay proveedores que registrar (compras a farmacias/distribuidoras externas), o el alcance es solo el consumo interno una vez que el stock ya está en la clínica?
-- ~~¿Se necesita trazabilidad por lote/vencimiento (común en medicamentos, por norma sanitaria), o alcanza con cantidad total por ítem?~~ — **(resuelta por investigación externa, 24 ago 2026)**: sí hace falta, no es opcional en la práctica real de farmacia hospitalaria (ver ajuste arriba). Lo que sigue abierto es el detalle de implementación (tabla de lotes separada vs. otro enfoque), no si hace falta.
-- ¿Este módulo se construye junto con la infraestructura de la sección 6.2 (quirófano en particular los comparte como dependencia), o puede avanzar de forma independiente antes de que exista `cirugias`/`quirofanos`?
+**Permisos aplicados** (no existe rol "farmacia" separado — el sistema solo tiene admin/recepcion/medico):
+- Catálogo (Ítems, Lotes): mismo criterio que Áreas/Médicos — admin todo, recepción solo ver, médico sin acceso.
+- Movimientos: mismo criterio que Facturas — admin y recepción todo, médico sin acceso.
+- **Queda abierto** si la clínica confirma que necesita un rol propio de farmacia; hoy cualquier persona con rol `recepcion` puede registrar movimientos.
 
-**Qué NO se hizo**: ningún modelo, migración, Resource ni seeder — mismo criterio que la sección 6.2, es una propuesta de arquitectura para discutir. El sistema actual no se ve afectado.
+**Las 6 decisiones que estaban pendientes — resueltas con supuestos razonables, editables después** (a diferencia de la 6.2, aquí sí se avanzó a construir sin esperar la confirmación de la clínica, a pedido explícito del usuario):
 
-**Validación externa (24 ago 2026)**: la separación catálogo/movimientos con stock derivado (nunca editado a mano) coincide con cómo lo resuelven sistemas de farmacia hospitalaria reales — es prácticamente unánime en las fuentes consultadas. Se incorporaron los 2 ajustes marcados arriba (lotes/vencimiento con FEFO, y separar prescrito/dispensado/administrado). Ver también la sección 6.4 (nueva) sobre el marco legal de datos de salud, relevante para este módulo si en algún momento maneja datos de pacientes.
+| Decisión pendiente | Supuesto aplicado | Qué implica si la clínica responde distinto |
+|---|---|---|
+| ¿Farmacia es área física propia o solo un paso lógico? | Solo un paso lógico — texto libre (`area_origen`/`area_destino`, lista fija: farmacia/quirófano/admisión/facturación/bodega) dentro del movimiento, sin Resource propio. | Si la clínica confirma que necesita responsable/horario propio por área, habría que crear una tabla `areas_inventario` (o reusar el concepto) y convertir esos campos en relaciones. |
+| ¿Stock en tiempo real o histórico alcanza? | **Tiempo real** — se implementó calculado en vivo desde los movimientos (`stockActual()`), nunca una columna editable a mano. | Ya cubierto en ambos escenarios: si solo hiciera falta histórico, este diseño lo sigue dando gratis (es más, no menos, de lo mínimo necesario). |
+| ¿Se cobra todo insumo consumido al paciente? | **No se conectó con `Factura` todavía** — `paciente_id`/`cita_id` en el movimiento solo deja constancia de qué se usó, no genera cobro automático. | Si la clínica confirma que sí se cobra, falta construir la tabla intermedia `factura_items` que ya proponía la 6.3 original (ver más abajo, en "Qué falta"). |
+| ¿Hace falta registrar proveedores/compras externas? | **No** — un movimiento "entrada" solo registra que llegó stock, sin detalle de quién lo vendió. | Se puede agregar una tabla `proveedores` + FK opcional en el movimiento más adelante, sin romper lo ya construido. |
+| ¿Trazabilidad por lote/vencimiento? | **Sí** (ya no era pregunta abierta desde la investigación externa) — implementado tal cual, ver `lotes_inventario` arriba. | N/A, ya resuelta. |
+| ¿Depende de la infraestructura de 6.2 (quirófanos/cirugías)? | **No, se construyó independiente.** El movimiento solo referencia `cita_id` (ya existe), no `cirugia_id` (esa tabla no existe todavía). | Cuando se construya la 6.2, se puede agregar `cirugia_id` nullable al movimiento sin romper nada de lo actual. |
+
+**Relación con Facturación — todavía no construida**: sigue siendo la propuesta original (tabla intermedia `factura_items`: factura_id, item_id, cantidad, precio_unitario), para no mezclar "qué se usó clínicamente" con "qué se cobró". No se construyó en esta pasada — es lo próximo si la clínica confirma que sí se factura el consumo de insumos.
+
+**Qué NO se hizo todavía**:
+- No se cargó ningún ítem/catálogo real (la clínica no ha dado esa lista) — no hay seeder, el módulo está construido pero vacío.
+- No se conectó con `Factura` (ver arriba).
+- No se corrió la migración en el entorno real del usuario — falta confirmar que funciona igual que se hizo con `AreaSeeder` en su momento.
+- No se agregó ningún rol nuevo (`farmacia`) — se usan los 3 roles existentes con el criterio explicado arriba.
+
+**Validación externa (24 ago 2026)**: la separación catálogo/movimientos con stock derivado (nunca editado a mano) coincide con cómo lo resuelven sistemas de farmacia hospitalaria reales — es prácticamente unánime en las fuentes consultadas. Se incorporaron los 2 ajustes marcados arriba (lotes/vencimiento con FEFO, y separar prescrito/dispensado/administrado — este último **no se implementó todavía**, sigue siendo relevante para cuando se conecte con el futuro módulo de prescripciones de 2027, ver 6.1). Ver también la sección 6.4 sobre el marco legal de datos de salud, relevante para este módulo si en algún momento maneja datos de pacientes.
 
 ### 6.4 Marco legal ecuatoriano aplicable (contexto nuevo, investigación externa, 24 ago 2026)
 

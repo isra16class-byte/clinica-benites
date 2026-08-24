@@ -32,4 +32,9 @@ class Paciente extends Model
     {
         return $this->hasMany(Factura::class);
     }
+
+    public function movimientosInventario(): HasMany
+    {
+        return $this->hasMany(MovimientoInventario::class);
+    }
 }
