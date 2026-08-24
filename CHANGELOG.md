@@ -16,7 +16,7 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 - Se quitó el `use Filament\Tables\Enums\FiltersLayout;` de `CitasTable.php`, sin uso tras el cambio.
 - Los 3 filtros siguen funcionando exactamente igual (mismos toggles combinables) — solo cambió cómo se muestran, no la lógica de filtrado.
 - Sintaxis no se pudo validar con `php -l` en este entorno (sin PHP instalado); cambio de configuración de un solo Resource, sin lógica nueva.
-- Entregado como patch (`git am`). **Pendiente confirmar en el entorno real.**
+- Entregado como patch (`git am`). **Confirmado funcionando por el usuario en el entorno real.**
 
 ## [2026-08-24] Título y buscador en la misma fila en todas las tablas del panel (primer theme propio)
 
