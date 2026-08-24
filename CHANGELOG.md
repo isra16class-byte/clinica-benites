@@ -6,6 +6,20 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Más color en el panel: sidebar, topbar e ítem de menú activo
+
+- A pedido del usuario tras confirmar el branding base ("falta más color", ver captura de `/admin/areas`): se agregó un `<style>` inline vía `->renderHook(PanelsRenderHook::HEAD_END, ...)` en `AdminPanelProvider`. Tiñe levemente el fondo del sidebar con el color primario, agrega una línea de acento turquesa bajo la barra superior, y le da más presencia de color al ítem de menú activo (antes quedaba en gris clarito).
+- Se cambió también el color neutro del panel de `Color::Gray` (default) a `Color::Slate`, con un tinte azulado que combina mejor con el turquesa primario.
+- Se usó CSS inline con `->renderHook()` en vez de compilar un tema custom de Filament (que requiere `composer create filament:theme` + build con Vite/Tailwind) — mucho más liviano para un ajuste puntual de color, sin agregar un paso de build nuevo al proyecto.
+- **Nota de riesgo dejada explícita en `MEMORIA.md`**: las clases CSS usadas (`.fi-topbar`, `.fi-sidebar`, `.fi-sidebar-item.fi-active .fi-sidebar-item-button`) no se pudieron confirmar contra Filament v5.7 corriendo de verdad (no hay forma de levantar el panel real desde este entorno) — si no se nota el cambio, hay que inspeccionar el HTML del panel en el navegador y ajustar los selectores.
+- Sintaxis PHP validada con `php -l`. Falta probar en el entorno real.
+- Entregado como patch (`git am`).
+
+## [2026-08-23] Confirmación en entorno real: branding del panel
+
+- Confirmado por el usuario con una captura de `/admin/areas`: el logo, el nombre "Clínica Benites" y el color primario turquesa se ven correctamente aplicados en el panel.
+- Feedback del usuario: "falta más color" — el resto del panel queda muy neutro (blanco/gris) por el comportamiento por defecto de Filament, que solo usa el color primario en botones y acentos puntuales. Ver entrada siguiente para el ajuste hecho a partir de este feedback.
+
 ## [2026-08-23] Branding del panel: nombre, colores, logo y favicon
 
 - `AdminPanelProvider`: `->brandName('Clínica Benites')` (antes mostraba "Laravel" por defecto), `->brandLogo(asset('images/logo.svg'))`, `->brandLogoHeight('2.5rem')`, `->favicon(asset('images/icon.svg'))` y color primario cambiado de `Color::Amber` (default de Filament) a `Color::Cyan` — turquesa, a pedido del usuario y acorde a los colores reales de la fachada/cartel de la clínica (fotos de Google Street View compartidas por el usuario).

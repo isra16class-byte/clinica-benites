@@ -10,6 +10,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -32,7 +33,28 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('images/icon.svg'))
             ->colors([
                 'primary' => Color::Cyan,
+                'gray' => Color::Slate,
             ])
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): string => <<<'HTML'
+                    <style>
+                        /* Acento turquesa extra: línea bajo la barra superior,
+                           fondo del sidebar levemente teñido, e ítem de menú
+                           activo con más presencia de color. */
+                        .fi-topbar > nav {
+                            border-bottom-width: 2px;
+                            border-bottom-color: var(--primary-400);
+                        }
+                        .fi-sidebar {
+                            background-color: color-mix(in srgb, var(--primary-500) 4%, white);
+                        }
+                        .fi-sidebar-item.fi-active .fi-sidebar-item-button {
+                            background-color: color-mix(in srgb, var(--primary-500) 14%, white) !important;
+                        }
+                    </style>
+                    HTML,
+            )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
