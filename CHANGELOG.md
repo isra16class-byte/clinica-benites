@@ -6,6 +6,13 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Más color todavía: encabezados de tabla y botones de acción
+
+- A pedido del usuario, sobre el ajuste anterior de color (sidebar/topbar/ítem activo): se sumó al mismo `<style>` en `AdminPanelProvider` un tinte turquesa en el encabezado de las tablas (`.fi-ta-header-cell`, con línea de acento debajo) y color turquesa forzado en los botones de acción de fila (ej. "Editar", vía `.fi-ta-actions`), que antes quedaban en gris y se perdían un poco.
+- Mismo mecanismo que el ajuste anterior (CSS inline vía `renderHook`, sin build nuevo) y mismo riesgo advertido: clases sin confirmar contra Filament v5.7 corriendo de verdad.
+- Sintaxis PHP validada con `php -l`. Falta probar en el entorno real.
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Más color en el panel: sidebar, topbar e ítem de menú activo
 
 - A pedido del usuario tras confirmar el branding base ("falta más color", ver captura de `/admin/areas`): se agregó un `<style>` inline vía `->renderHook(PanelsRenderHook::HEAD_END, ...)` en `AdminPanelProvider`. Tiñe levemente el fondo del sidebar con el color primario, agrega una línea de acento turquesa bajo la barra superior, y le da más presencia de color al ítem de menú activo (antes quedaba en gris clarito).

@@ -52,6 +52,24 @@ class AdminPanelProvider extends PanelProvider
                         .fi-sidebar-item.fi-active .fi-sidebar-item-button {
                             background-color: color-mix(in srgb, var(--primary-500) 14%, white) !important;
                         }
+
+                        /* Tablas: encabezado con tinte turquesa y línea de
+                           acento debajo, para que se note más que hoy (que
+                           queda todo blanco/gris). */
+                        .fi-ta-header-cell {
+                            background-color: color-mix(in srgb, var(--primary-500) 6%, white);
+                        }
+                        .fi-ta-table thead tr {
+                            border-bottom: 2px solid var(--primary-300);
+                        }
+
+                        /* Botones de acción en tabla (ej. "Editar"), para que
+                           tengan más presencia de color y no se pierdan en
+                           gris junto al resto de la fila. */
+                        .fi-ta-actions .fi-btn,
+                        .fi-ta-actions .fi-link {
+                            color: var(--primary-600) !important;
+                        }
                     </style>
                     HTML,
             )
