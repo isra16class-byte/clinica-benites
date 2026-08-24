@@ -6,6 +6,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-23] Rediseño del color extra con criterio (60/30/10, sidebar oscuro)
+
+- El usuario pidió una segunda vuelta más pensada sobre el ajuste de color anterior ("¿cómo lo arreglarías vos? buscá en internet la mejor combinación"). Se investigaron guías de diseño (UAB Medicine, CMS.gov, regla 60/30/10) antes de tocar el código de nuevo.
+- Se identificó un problema en la versión anterior: pintar todo el encabezado de la tabla de turquesa sólido competía visualmente con los badges de estado (`pendiente`/`confirmada`/`cancelada`), que ya usan color con significado propio (gray/info/danger). Se revirtió esa parte: el encabezado de tabla vuelve a blanco/gris neutro, con una línea de acento fina debajo.
+- Se rediseñó el sidebar con un fondo turquesa oscuro sólido (`var(--primary-900)`) en vez de un tinte casi imperceptible — patrón común en paneles SaaS (Linear, Vercel). Texto/íconos del menú en turquesa clarito, blanco en hover y en el ítem activo. La cabecera con el logo se mantiene sin cambios (blanca).
+- Se mantiene el resto sin cambios: línea de acento en la barra superior, botones de acción de tabla en color primario.
+- **Nota de riesgo**: las clases nuevas de esta vuelta (`.fi-sidebar-item-label`, `.fi-icon`, `.fi-sidebar-group-label`) todavía no están confirmadas contra Filament v5.7 real — si el texto del menú queda invisible sobre el fondo oscuro, hay que inspeccionar el HTML y ajustar el selector.
+- Sintaxis PHP validada con `php -l`. Falta probar en el entorno real.
+- Entregado como patch (`git am`).
+
 ## [2026-08-23] Más color todavía: encabezados de tabla y botones de acción
 
 - A pedido del usuario, sobre el ajuste anterior de color (sidebar/topbar/ítem activo): se sumó al mismo `<style>` en `AdminPanelProvider` un tinte turquesa en el encabezado de las tablas (`.fi-ta-header-cell`, con línea de acento debajo) y color turquesa forzado en los botones de acción de fila (ej. "Editar", vía `.fi-ta-actions`), que antes quedaban en gris y se perdían un poco.

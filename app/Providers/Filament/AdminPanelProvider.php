@@ -39,33 +39,55 @@ class AdminPanelProvider extends PanelProvider
                 PanelsRenderHook::HEAD_END,
                 fn (): string => <<<'HTML'
                     <style>
-                        /* Acento turquesa extra: línea bajo la barra superior,
-                           fondo del sidebar levemente teñido, e ítem de menú
-                           activo con más presencia de color. */
+                        /* Regla 60/30/10 (neutro/estructural/acento) y separar
+                           el color de marca del color semántico de estado
+                           (los badges de "confirmada"/"cancelada"/"pendiente"
+                           ya usan color con significado propio — no hay que
+                           competir con eso pintando todo turquesa). Patrón:
+                           sidebar oscuro con identidad propia (común en
+                           paneles SaaS), contenido y tablas en blanco/gris
+                           para que los datos y los badges se lean bien, y
+                           turquesa reservado a lo accionable (botones,
+                           enlaces, ítem de menú activo). */
+
+                        /* Sidebar: fondo turquesa oscuro sólido en vez de un
+                           tinte casi imperceptible sobre blanco. */
+                        .fi-sidebar {
+                            background-color: var(--primary-900);
+                        }
+                        .fi-sidebar .fi-sidebar-item-label,
+                        .fi-sidebar .fi-sidebar-group-label,
+                        .fi-sidebar .fi-icon {
+                            color: color-mix(in srgb, white 70%, var(--primary-900));
+                        }
+                        .fi-sidebar .fi-sidebar-item-button:hover .fi-sidebar-item-label,
+                        .fi-sidebar .fi-sidebar-item-button:hover .fi-icon {
+                            color: #ffffff;
+                        }
+                        .fi-sidebar .fi-sidebar-item.fi-active .fi-sidebar-item-button {
+                            background-color: var(--primary-700) !important;
+                        }
+                        .fi-sidebar .fi-sidebar-item.fi-active .fi-sidebar-item-label,
+                        .fi-sidebar .fi-sidebar-item.fi-active .fi-icon {
+                            color: #ffffff !important;
+                        }
+
+                        /* Barra superior: línea de acento fina, nada más. */
                         .fi-topbar > nav {
                             border-bottom-width: 2px;
                             border-bottom-color: var(--primary-400);
                         }
-                        .fi-sidebar {
-                            background-color: color-mix(in srgb, var(--primary-500) 4%, white);
-                        }
-                        .fi-sidebar-item.fi-active .fi-sidebar-item-button {
-                            background-color: color-mix(in srgb, var(--primary-500) 14%, white) !important;
-                        }
 
-                        /* Tablas: encabezado con tinte turquesa y línea de
-                           acento debajo, para que se note más que hoy (que
-                           queda todo blanco/gris). */
-                        .fi-ta-header-cell {
-                            background-color: color-mix(in srgb, var(--primary-500) 6%, white);
-                        }
+                        /* Tablas: encabezado neutro (blanco/gris) con una
+                           línea de acento debajo — se descartó teñir todo el
+                           encabezado de color (versión anterior) porque
+                           competía visualmente con los badges de estado. */
                         .fi-ta-table thead tr {
-                            border-bottom: 2px solid var(--primary-300);
+                            border-bottom: 2px solid var(--primary-400);
                         }
 
-                        /* Botones de acción en tabla (ej. "Editar"), para que
-                           tengan más presencia de color y no se pierdan en
-                           gris junto al resto de la fila. */
+                        /* Botones de acción en tabla (ej. "Editar") en color
+                           primario, reservado a lo accionable. */
                         .fi-ta-actions .fi-btn,
                         .fi-ta-actions .fi-link {
                             color: var(--primary-600) !important;
