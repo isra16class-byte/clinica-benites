@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Fix: Orden de Estudio — adjunto sin ver/descargar, sin restricción de tipo, y nombre de archivo ilegible
+
+- **Bug 1 — sin botones de ver/descargar**: el campo `FileUpload::make('resultado_archivo')` en `OrdenEstudioForm.php` no tenía `->openable()`/`->downloadable()`, así que no aparecía ninguna forma de abrir o descargar el archivo ya subido desde el formulario de edición.
+- **Bug 2 — sin restricción de tipo de archivo**: el campo aceptaba cualquier tipo de archivo (Word, ZIP, ejecutables, etc.), no ideal para un campo de "resultado de estudio". Se restringió con `->acceptedFileTypes()` a PDF, JPG, PNG y WEBP.
+- **Bug 3 — `ERR_CONNECTION_REFUSED` al usar "ver"**: después de agregar `->openable()`, el botón llevaba a `http://localhost:8000/storage/...`, un puerto donde no había nada escuchando. **Causa real, de configuración del entorno del usuario, no de código**: su `.env` tenía `APP_URL=http://localhost:8000`, pero Sail expone la app en el puerto 80 (`http://localhost`, sin puerto), según `compose.yaml` (`APP_PORT:-80`). Se corrigió cambiando `APP_URL=http://localhost` en el `.env` del usuario y corriendo `sail artisan config:clear` — no fue necesario ningún cambio de código para este punto. **Confirmado funcionando.**
+- **Cambio adicional a pedido del usuario — nombre de archivo legible**: el nombre generado por Filament por defecto es un string aleatorio de 26 caracteres sin relación con el archivo original (ej. `01M0VJ41XRD4TQH9RXGDZAV491.pdf`), lo cual es normal (evita colisiones) pero dificulta identificar el archivo a simple vista en el disco. Se agregó `->getUploadedFileNameForStorageUsing()` para generar en cambio un **ULID corto + el nombre original slugificado + extensión** (ej. `01jz3k9x8h2m4n6p8q0r2s4t-radiografia-torax.pdf`). Se descartó usar `->preserveFilenames()` a secas (nombre original tal cual) porque tiene riesgo real de colisión — dos resultados con el mismo nombre de archivo se sobreescribirían entre sí sin aviso — el ULID adelante lo evita sin perder legibilidad.
+- **Confirmado funcionando por el usuario en el entorno real** (ver y descargar el PDF adjunto, con nombre legible).
+
+---
+
 ## [2026-08-24] Fix: Cirugía — Repeater de médicos adicionales insertaba médicos vacíos
 
 - **Bug reportado por el usuario** al probar el módulo de Infraestructura física (sección 6.2) en el entorno real por primera vez: al crear una Cirugía agregando al menos un "médico adicional" (anestesiólogo/ayudante), Filament tiraba `SQLSTATE[HY000]: General error: 1364 Field 'nombres' doesn't have a default value` al intentar `insert into medicos (updated_at, created_at) values (...)`.
