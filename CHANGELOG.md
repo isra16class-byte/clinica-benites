@@ -8,6 +8,20 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Feature: Sesión 1 del Dashboard gerencial — indicadores clave
+
+- Se construyó `app/Filament/Widgets/IndicadoresGerencialesWidget.php` (`StatsOverviewWidget`), la Sesión 1 del plan documentado en la entrada anterior.
+- 4 indicadores, visibles solo para el rol `admin` (`canView()`), ubicados arriba de `CitasDeHoyWidget` en el Dashboard (`$sort = 0`):
+  - **Ingresos del mes**: suma de `facturas.monto` pagadas en el mes actual, con variación % vs. mes anterior.
+  - **Por cobrar**: suma de `facturas.monto` en estado pendiente (cartera completa, no solo del mes).
+  - **Citas atendidas hoy**: cuenta de citas con estado `atendida` hoy, con el total de la semana como descripción.
+  - **Ocupación de camas**: camas con internamiento activo sobre el total, con porcentaje y color según el nivel de ocupación.
+- No se creó ninguna tabla ni migración — solo queries sobre `Factura`, `Cita` y `Cama`/`Internamiento`, ya existentes.
+- Sintaxis validada con `php -l`. **Pendiente confirmar en el entorno real.**
+- Detalle completo en la sección **6.6.1** de `MEMORIA.md`.
+
+---
+
 ## [2026-08-25] Documentación: plan del Dashboard gerencial dividido en 3 sesiones
 
 - El usuario pidió dividir la construcción del Dashboard gerencial (propuesta documentada en la entrada anterior) en 3 sesiones separadas, porque el módulo completo es demasiado para una sola sesión.

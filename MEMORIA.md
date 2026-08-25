@@ -2,7 +2,9 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 25 de agosto de 2026 — quinta entrada del día (el usuario pidió dividir la construcción del **Dashboard gerencial** (propuesta de la sección 6.6, cuarta entrada de hoy) en **3 sesiones separadas**, porque el módulo completo es demasiado para una sola sesión. Se agregó el plan de división dentro de la misma sección 6.6 — Sesión 1: indicadores clave (`StatsOverviewWidget`); Sesión 2: los 2 gráficos (ingresos por mes, por área); Sesión 3: alertas operativas. **Solo planificación, no se generó ningún código** — a pedido explícito del usuario.)
+Última actualización: 25 de agosto de 2026 — sexta entrada del día (se construyó la **Sesión 1** del Dashboard gerencial planificado en la entrada anterior: `app/Filament/Widgets/IndicadoresGerencialesWidget.php`, un `StatsOverviewWidget` visible solo para `admin` con los 4 indicadores clave — ingresos del mes con comparación % vs. mes anterior, por cobrar, citas atendidas hoy/semana, y ocupación de camas en tiempo real — ubicado arriba de `CitasDeHoyWidget` en el Dashboard. No se creó ninguna tabla/migración nueva, solo queries sobre `Factura`, `Cita` y `Cama`/`Internamiento` ya existentes. Ver la sección 6.6.1 nueva más abajo para el detalle completo. **Aún sin confirmar por el usuario en el entorno real** — escrito sin acceso a PHP/Sail, se validó sintaxis con `php -l`.)
+
+Última actualización anterior: 25 de agosto de 2026 — quinta entrada del día (el usuario pidió dividir la construcción del **Dashboard gerencial** (propuesta de la sección 6.6, cuarta entrada de hoy) en **3 sesiones separadas**, porque el módulo completo es demasiado para una sola sesión. Se agregó el plan de división dentro de la misma sección 6.6 — Sesión 1: indicadores clave (`StatsOverviewWidget`); Sesión 2: los 2 gráficos (ingresos por mes, por área); Sesión 3: alertas operativas. **Solo planificación, no se generó ningún código** — a pedido explícito del usuario.)
 
 Última actualización anterior: 25 de agosto de 2026 — cuarta entrada del día (el usuario preguntó cómo puede el administrador saber si la clínica "está ganando o no", dado que el Dashboard no tiene ningún indicador financiero ni gráfico — solo la tabla de Citas de hoy. Se confirmó el problema revisando el Dashboard actual y se agregó, **solo como documentación** a pedido explícito del usuario, una propuesta de **Dashboard gerencial** para el rol admin: indicadores clave de ingresos/por cobrar/ocupación, gráfico de ingresos por mes, gráfico por área, y alertas operativas (inventario por vencer, facturas vencidas). No se tocó ningún código. Ver la sección 6.6 nueva más abajo para el detalle completo.)
 
@@ -110,6 +112,9 @@ clinica-benites/
         Cirugias/                # Resource completo — agenda de quirófano, médicos adicionales con Repeater (sección 6.2)
         OrdenesEstudio/          # Resource completo — laboratorio/imagenología, adjunto opcional (sección 6.2)
         ServiciosAmbulancia/     # Resource completo — traslados, el más simple del módulo (sección 6.2)
+      Widgets/
+        CitasDeHoyWidget.php               # Tabla de citas del día en el Dashboard (sección 8, punto 1)
+        IndicadoresGerencialesWidget.php   # Stats: ingresos del mes, por cobrar, citas atendidas, ocupación de camas — solo admin (sección 6.6.1)
   database/
     migrations/
       ..._create_areas_table.php            # Completa (nombre)
@@ -419,13 +424,30 @@ Orden sugerido para construirlos (por seguridad del paciente primero, y porque a
 
 **Plan de construcción dividido en 3 sesiones (25 ago 2026, sin tocar código todavía)**: a pedido del usuario, la propuesta de arriba se divide en 3 partes independientes para construirse en sesiones separadas — el módulo completo (4 puntos, con gráficos y queries agregadas) es demasiado para una sola sesión. Cada sesión entrega algo funcional por sí solo (no depende de que las otras ya estén hechas), y todas siguen el mismo patrón ya usado en el resto del panel: Widgets nuevos, visibles solo para `admin` (`->visible()`), ubicados arriba de `CitasDeHoyWidget`, sin tablas/migraciones nuevas.
 
-- **Sesión 1 — Indicadores clave (`StatsOverviewWidget`)**: los 4 números del punto 1 de la propuesta (ingresos del mes con comparación % vs. mes anterior, por cobrar, citas atendidas hoy/semana, ocupación de camas). Es la pieza más simple — un solo widget de tipo "stats", sin librería de gráficos — y la que responde más directo a la pregunta original del usuario ("¿está ganando o no?"), por eso va primera.
+- [x] ~~**Sesión 1 — Indicadores clave (`StatsOverviewWidget`)**~~ — **construida** (25 ago 2026, sexta entrada del día). Los 4 números del punto 1 de la propuesta (ingresos del mes con comparación % vs. mes anterior, por cobrar, citas atendidas hoy/semana, ocupación de camas). Es la pieza más simple — un solo widget de tipo "stats", sin librería de gráficos — y la que responde más directo a la pregunta original del usuario ("¿está ganando o no?"), por eso fue primera. Ver el detalle completo en la nueva sección **6.6.1** más abajo. **Aún sin confirmar por el usuario en el entorno real** — escrito sin acceso a PHP/Sail (se validó sintaxis con `php -l`, pero no se corrió en `/admin`).
 - **Sesión 2 — Gráficos (`ChartWidget` x2)**: el punto 2 (ingresos por mes, últimos 6-12 meses) y el punto 3 (por área/especialidad) de la propuesta. Se agrupan juntos porque ambos son gráficos y comparten la misma decisión pendiente de diseño (ver abajo). Depende de que, antes de esta sesión, se resuelvan las 2 preguntas pendientes que le tocan: si el gráfico por área cuenta citas, facturación, o ambos con un selector; y si el rango de fechas es fijo o seleccionable.
 - **Sesión 3 — Alertas operativas**: el punto 4 de la propuesta (lotes de inventario vencidos/por vencer, facturas vencidas, camas ocupadas hace demasiado tiempo). Va última porque es la única que depende de una decisión de negocio sin resolver todavía: el umbral de días para considerar una cama "ocupada hace demasiado tiempo".
 
 **Pendiente de definir antes de construir** (sin cambios respecto a la entrada anterior, se repite aquí para que quede junto al plan): umbral de días para la alerta de camas (Sesión 3), si el gráfico por área mide citas/facturación/ambos (Sesión 2), y si el rango de fechas del dashboard es fijo o seleccionable (Sesión 2). La Sesión 1 no tiene ninguna decisión pendiente — puede construirse primero sin esperar respuesta a nada.
 
 **Qué NO se hizo en esta entrada**: solo se dividió el plan en sesiones — sigue sin tocarse ningún Widget, modelo ni código.
+
+### 6.6.1 Sesión 1 construida — Indicadores clave (25 ago 2026, sexta entrada del día)
+
+Se creó `app/Filament/Widgets/IndicadoresGerencialesWidget.php` (extiende `Filament\Widgets\StatsOverviewWidget`), con los 4 números acordados en el plan de sesiones de arriba:
+
+1. **Ingresos del mes** — suma de `facturas.monto` donde `estado_pago = pagado` con `fecha` dentro del mes actual, con la variación % contra el mismo total del mes anterior como descripción (flecha verde arriba / roja abajo). Si el mes anterior no tuvo ingresos pagados, se evita la división entre cero mostrando un texto ("Sin ingresos este mes" / "Mes anterior sin ingresos registrados") en vez de un porcentaje.
+2. **Por cobrar** — suma de `facturas.monto` donde `estado_pago = pendiente`, **sin** restringir por mes: es la cartera pendiente completa (dinero ya facturado que no ha entrado a caja), no solo la del mes en curso, para que no se pierda de vista una factura pendiente de un mes anterior.
+3. **Citas atendidas hoy** — cuenta de `citas` con `fecha = hoy` y `estado = atendida`, con la cuenta de la semana (`startOfWeek()`/`endOfWeek()` de Carbon, lunes a domingo) como descripción. A diferencia del widget `CitasDeHoyWidget` ya existente (que muestra **todas** las citas del día sin importar su estado), este número cuenta solo las que ya se marcaron como atendidas.
+4. **Ocupación de camas** — camas con un internamiento activo (`fecha_alta` nula) sobre el total de camas, mismo criterio que `Cama::ocupada()` (sección 6.2) pero como una sola query agregada (`whereHas`) en vez de recorrer cama por cama. Muestra "X / Y" con el porcentaje como descripción, y cambia de color (verde/ámbar/rojo) según el porcentaje de ocupación.
+
+**Visibilidad**: `public static function canView(): bool` restringido a `Auth::user()?->isAdmin() ?? false` — mismo criterio de "solo admin" que ya usan otros controles del panel (ver sección 10), pero a nivel de widget completo en vez de un botón suelto, que es el mecanismo que Filament expone para widgets (no hay un botón que ocultar, es la tarjeta entera).
+
+**Ubicación en el Dashboard**: `protected static ?int $sort = 0`, un puesto antes que `CitasDeHoyWidget` (`$sort = 1`), así los indicadores gerenciales quedan arriba de la tabla de citas del día — sin tocar ese widget existente.
+
+**Alcance**: no se creó ninguna tabla, migración ni modelo nuevo — es 100% queries sobre `Factura`, `Cita` y `Cama`/`Internamiento`, como estaba confirmado en la propuesta original.
+
+**Qué NO se hizo en esta entrada**: no se tocaron los 2 gráficos ni las alertas operativas (Sesiones 2 y 3, siguen pendientes) — la Sesión 1 se entrega completa por sí sola.
 
 ## 7. Roadmap / pendientes técnicos
 
