@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Fix: layout de 3 columnas roto en AlertasOperativasWidget — faltaba `@source` en theme.css
+
+- Tras el fix de `$view`, el panel volvía a cargar, pero el usuario reportó que las 3 secciones de "Alertas operativas" salían apiladas en una sola columna en vez de lado a lado.
+- Causa (preexistente en el proyecto, no introducida en esta sesión): `resources/css/filament/admin/theme.css` solo declaraba `@source '../../../../app/Filament';` — le faltaba `resources/views/filament`, la carpeta de vistas Blade custom de widgets. Nunca se había notado porque `AlertasOperativasWidget` es el primer widget del proyecto con una vista Blade propia que usa clases sueltas de Tailwind (el resto se apoya solo en componentes ya estilizados de Filament).
+- Fix: se agregó `@source '../../../../resources/views/filament';` al `theme.css` — una sola línea, no se tocó el widget ni su vista.
+- Ver `MEMORIA.md` secciones 6.6.3 y 8.2 para el detalle completo.
+- **Aún sin confirmar por el usuario en el entorno real** — corregido sin acceso a Vite/`npm run build`, pendiente que el usuario aplique el patch y recompile los assets del tema.
+
+---
+
 ## [2026-08-25] Fix: panel completo caído por `$view` estática en AlertasOperativasWidget
 
 - Al aplicar el patch de la Sesión 3 y correr `sail artisan optimize:clear`, apareció un error fatal de PHP que tumbaba **todo el panel** (`/admin` no cargaba en absoluto): `Cannot redeclare non static Filament\Widgets\Widget::$view as static App\Filament\Widgets\AlertasOperativasWidget::$view`.

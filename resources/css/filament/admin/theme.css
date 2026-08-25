@@ -1,6 +1,7 @@
 @import '/vendor/filament/filament/resources/css/theme.css';
 
 @source '../../../../app/Filament';
+@source '../../../../resources/views/filament';
 
 /*
  * Junta, en todas las tablas del panel (Resources y widgets como
