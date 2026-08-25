@@ -8,6 +8,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Documentación: plan del Dashboard gerencial dividido en 3 sesiones
+
+- El usuario pidió dividir la construcción del Dashboard gerencial (propuesta documentada en la entrada anterior) en 3 sesiones separadas, porque el módulo completo es demasiado para una sola sesión.
+- Se documentó el plan (sin tocar código, a pedido explícito del usuario): **Sesión 1** — indicadores clave (`StatsOverviewWidget`, sin decisiones pendientes, puede construirse ya); **Sesión 2** — los 2 gráficos (ingresos por mes y por área), depende de definir si el gráfico por área mide citas/facturación/ambos y si el rango de fechas es fijo o seleccionable; **Sesión 3** — alertas operativas, depende de definir el umbral de días para la alerta de camas.
+- Detalle completo en la sección **6.6** de `MEMORIA.md`.
+
+---
+
 ## [2026-08-25] Documentación: propuesta de Dashboard gerencial para el admin
 
 - El usuario preguntó cómo puede el administrador saber si la clínica "está ganando o no" — el Dashboard actual solo tiene el widget de Citas de hoy, sin ningún indicador financiero, gráfico ni resumen operativo.
