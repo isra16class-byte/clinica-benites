@@ -42,7 +42,7 @@ class AlertasOperativasWidget extends Widget
 {
     protected static ?int $sort = 3;
 
-    protected static string $view = 'filament.widgets.alertas-operativas-widget';
+    protected string $view = 'filament.widgets.alertas-operativas-widget';
 
     protected int|string|array $columnSpan = 'full';
 

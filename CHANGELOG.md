@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Fix: panel completo caído por `$view` estática en AlertasOperativasWidget
+
+- Al aplicar el patch de la Sesión 3 y correr `sail artisan optimize:clear`, apareció un error fatal de PHP que tumbaba **todo el panel** (`/admin` no cargaba en absoluto): `Cannot redeclare non static Filament\Widgets\Widget::$view as static App\Filament\Widgets\AlertasOperativasWidget::$view`.
+- Causa: `AlertasOperativasWidget` declaraba `protected static string $view`, siguiendo un patrón de documentación/ejemplos de **Filament 3.x**. Este proyecto usa **Filament 5.7.6**, donde `Filament\Widgets\Widget::$view` es no estática (`protected string $view;`) — PHP no permite cambiar de estática a no estática (ni al revés) al heredar.
+- Fix: se cambió a `protected string $view = '...'` (no estática) en `app/Filament/Widgets/AlertasOperativasWidget.php`, verificado contra el código fuente real de la v5.7.6.
+- Ver `MEMORIA.md` sección 6.6.3 para el detalle completo y una nota de troubleshooting para casos similares.
+- **Aún sin confirmar por el usuario en el entorno real** — corregido y validado con `php -l`, pendiente que el usuario aplique el patch nuevo.
+
+---
+
 ## [2026-08-25] Sesión 3 del Dashboard gerencial — Alertas operativas (última de las 3 sesiones)
 
 - Se construyó `app/Filament/Widgets/AlertasOperativasWidget.php` + su vista `resources/views/filament/widgets/alertas-operativas-widget.blade.php`, un widget custom (`Filament\Widgets\Widget`, no `StatsOverviewWidget`/`ChartWidget`) con 3 alertas operativas, cada una con contador, hasta 5 ítems concretos y link al listado completo del recurso:
