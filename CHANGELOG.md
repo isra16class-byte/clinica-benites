@@ -8,6 +8,15 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Fix/UX: formato $ en gráficos del Dashboard gerencial + confirmación en real
+
+- Sesión 2 (entrada anterior) **confirmada funcionando en el entorno real**: probada con 4 facturas de prueba, incluida una sin `cita_id` — se verificó que queda correctamente excluida del gráfico "Por área" (limitación ya documentada), mientras sí cuenta en "Ingresos por mes".
+- A pedido del usuario, se agregó formato `$` + separador de miles al eje Y y al tooltip de `IngresosPorMesChartWidget` (siempre, ambas series son montos) y `FacturacionPorAreaChartWidget` (solo cuando la métrica activa es "Monto facturado"). Implementado con `getOptions()` + `Filament\Support\RawJs` (callback de Chart.js), el mecanismo documentado por Filament para este caso.
+- Sintaxis validada con `php -l`. **Pendiente confirmar este ajuste puntual en el entorno real.**
+- Detalle completo en la sección **6.6.2** de `MEMORIA.md`.
+
+---
+
 ## [2026-08-25] Feature: Sesión 2 del Dashboard gerencial — gráficos
 
 - Se construyeron los 2 `ChartWidget` de la Sesión 2: `app/Filament/Widgets/IngresosPorMesChartWidget.php` y `app/Filament/Widgets/FacturacionPorAreaChartWidget.php`, ubicados entre `IndicadoresGerencialesWidget` (`$sort = 0`) y `CitasDeHoyWidget` (corrido de `$sort = 1` a `3`). Visibles solo para el rol `admin`, mismo patrón `canView()` que el resto del Dashboard gerencial.

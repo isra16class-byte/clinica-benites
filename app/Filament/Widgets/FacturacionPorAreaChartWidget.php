@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\Area;
 use App\Models\Factura;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -50,6 +51,39 @@ class FacturacionPorAreaChartWidget extends ChartWidget
     protected function getType(): string
     {
         return 'bar';
+    }
+
+    /**
+     * Con la métrica "Monto facturado", formatea el eje Y y el tooltip
+     * con signo $ y separador de miles — antes solo mostraban el número
+     * pelado (ej. "1200"). Con "Cantidad de citas" no aplica ningún
+     * formato especial (son números enteros simples), se devuelve un
+     * array vacío para dejar los valores por defecto de Chart.js.
+     */
+    protected function getOptions(): RawJs|array
+    {
+        if ($this->filter !== 'facturacion') {
+            return [];
+        }
+
+        return RawJs::make(<<<'JS'
+            {
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: (value) => '$' + value.toLocaleString('es-EC'),
+                        },
+                    },
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => context.dataset.label + ': $' + context.parsed.y.toLocaleString('es-EC'),
+                        },
+                    },
+                },
+            }
+        JS);
     }
 
     protected function getData(): array

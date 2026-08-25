@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Factura;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
@@ -45,6 +46,33 @@ class IngresosPorMesChartWidget extends ChartWidget
     protected function getType(): string
     {
         return 'bar';
+    }
+
+    /**
+     * Las 2 series son siempre montos en dólares, así que a diferencia
+     * de FacturacionPorAreaChartWidget (donde el formato solo aplica en
+     * una de las 2 métricas) acá se aplica siempre, sin condicional.
+     */
+    protected function getOptions(): RawJs
+    {
+        return RawJs::make(<<<'JS'
+            {
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: (value) => '$' + value.toLocaleString('es-EC'),
+                        },
+                    },
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => context.dataset.label + ': $' + context.parsed.y.toLocaleString('es-EC'),
+                        },
+                    },
+                },
+            }
+        JS);
     }
 
     protected function getData(): array
