@@ -13,7 +13,7 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 - El usuario, revisando el formulario de **Movimientos de Inventario**, notó dos cosas: (1) al registrar un traslado entre áreas seguían apareciendo los campos "Paciente" y "Cita relacionada", que no tienen sentido ahí porque un traslado no es consumo de un paciente; y (2) confirmó que la ausencia del campo "Usuario" en el formulario es intencional (se completa solo con `Auth::id()` al crear, ver `CreateMovimientoInventario.php`) y que el registro queda visible después en la columna "Registrado por" del listado.
 - `MovimientoInventarioForm.php`: se agregó `->visible(fn ($get) => $get('tipo_movimiento') === 'salida')` a `paciente_id` y `cita_id`, mismo patrón reactivo (`->live()` en `tipo_movimiento`) que ya usaban `area_origen`/`area_destino`. Ahora esos dos campos solo aparecen cuando el tipo de movimiento es "Salida", el único caso que representa consumo real en atención al paciente.
 - No se tocó nada más del formulario ni de la tabla — `area_origen`/`area_destino` y la columna "Registrado por" (`usuario.name`) siguen igual, ya funcionaban correctamente.
-- **Pendiente probar en el entorno real** (no se pudo correr la app en este entorno de trabajo).
+- **Confirmado funcionando por el usuario en el entorno real.**
 
 ---
 
