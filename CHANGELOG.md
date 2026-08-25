@@ -8,6 +8,18 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Preparación entrevista de seguimiento — expediente clínico y checklist
+
+- Sesión de planificación en paralelo al patch grande, sin tocar código hasta este cambio (documentación únicamente).
+- El cliente confirmó por WhatsApp que la clínica **sí tiene personal dedicado en farmacia** — respalda la idea de un 4º rol `farmacéutico`/`bodega`, aunque el mecanismo real (cuándo/quién registra el consumo de insumos) sigue sin confirmarse, pendiente para la entrevista formal del 25/08 con Ysrael Calle.
+- El cliente confirmó explícitamente que "digitalizar el historial clínico" apunta a un **expediente completo**: antecedentes, alergias, signos vitales y resultados de exámenes, todo conectado.
+- Al reconciliar contra lo ya construido (ver sección 6.2/6.3 de `MEMORIA.md`), se detectó que **resultados de exámenes con archivo adjunto ya está cubierto** por `OrdenEstudio` — no hace falta módulo nuevo para eso. Los 3 módulos que sí faltan: **Alergias, Antecedentes, Signos Vitales** (diseño pensado, sin implementar).
+- Se detectó un matiz nuevo sobre el módulo de inventario (sección 6.3): el cliente pidió que el registro de insumos cubra farmacia, quirófano, admisión y facturación — 4 puntos, no solo farmacia. Pendiente de confirmar el detalle en la entrevista.
+- Se armó un checklist completo de preguntas para la entrevista (entregado al usuario como documento Word, no versionado en el repo).
+- Detalle completo en la sección **6.5** de `MEMORIA.md`.
+
+---
+
 ## [2026-08-25] Agrupar el menú lateral del panel en categorías
 
 - Solo el módulo de Infraestructura tenía `$navigationGroup` asignado; los otros 10 Resources aparecían sueltos y mezclados en el sidebar. El usuario lo notó al ver el listado de Facturas y pidió aplicar el mismo criterio de agrupación al resto.

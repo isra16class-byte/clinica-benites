@@ -214,6 +214,7 @@ facturas
 - [ ] ¿Planean crecer (más sucursales) pronto?
 - [ ] ¿Qué es exactamente lo que el amigo/contacto interno llamó "cuantificos" al describir cómo se maneja hoy la administración de la clínica? Término sin aclarar (posibles hipótesis sin confirmar: recibos/comprobantes en papel, un cuaderno de registro manual, cálculos de caja a mano) — no se puede saber a qué proceso actual corresponde ni si el sistema ya lo resuelve o falta cubrirlo, hasta preguntarle directamente a él o al dueño.
 - [ ] **¿Los 3 roles actuales (admin/recepción/médico) alcanzan, o falta un 4º rol de farmacia?** Surgió al explicarle el sistema al usuario (24 ago 2026): hoy el rol **médico no tiene acceso a Ítems/Lotes/Movimientos de Inventario** (ni siquiera para ver), aunque es quien físicamente aplica el medicamento/insumo en la consulta — el registro de ese consumo depende de que recepción lo cargue por su cuenta. Es una decisión de negocio, no un bug: hay que decidir (a) si el médico debería poder registrar sus propios movimientos de inventario (ej. solo lo usado en su propia cita), y (b) si más adelante, cuando farmacia empiece a operar como un puesto dedicado (ver sección 6.3, punto sobre si "farmacia" es una entidad propia), conviene un rol **farmacéutico/bodega** separado con acceso a inventario pero sin ver historias clínicas ni facturación. Por ahora, con el volumen actual, 3 roles sigue pareciendo suficiente — no se ha tomado ninguna decisión ni se tocó código.
+  **Parcialmente respondido (24 ago 2026, por WhatsApp con el contacto interno, fuera del entorno de código):** la clínica **sí tiene personal dedicado en farmacia** — esto respalda que probablemente conviene el rol `farmacéutico`/`bodega` separado. **Sigue sin confirmarse el mecanismo real**: no se sabe si el médico registra el consumo del insumo en el momento, si avisa después a farmacia, o si farmacia ya prepara el insumo antes de la consulta — sin esa respuesta no se puede diseñar bien el flujo prescripción → despacho → descuento de stock (`movimientos_inventario`, sección 6.3). Pregunta pendiente para la entrevista formal del 25 ago con Ysrael Calle (contabilidad, conoce el flujo operativo). Ver sección 6.5 para el detalle completo y el resto de preguntas preparadas para esa entrevista.
 
 ### 6.1 Áreas/especialidades reales y alcance por fases — respuesta del contacto interno (24 ago 2026)
 
@@ -344,6 +345,41 @@ facturas
 - Es relevante sobre todo **de cara al futuro**: cuando se aborde el módulo de prescripciones (2027, sección 6.1) o cualquier ampliación de `HistoriaClinica`, conviene tener en mente el principio de "protección desde el diseño" (quién puede ver qué, por qué, y durante cuánto tiempo se conserva la información).
 - El estándar HL7 mencionado por el MSP es la misma familia de estándares (HL7/FHIR) que se usó como referencia para validar las propuestas de 6.2 y 6.3 — no es una coincidencia forzada, es el estándar de facto del sector tanto a nivel internacional como en la normativa local.
 - **No hay ninguna acción pendiente inmediata por esto** — se documenta como contexto para que, si en algún momento la clínica pregunta por cumplimiento normativo o el dueño lo plantea en la entrevista formal (sección 1, aún pendiente), ya haya un punto de partida investigado en vez de partir de cero.
+
+### 6.5 Preparación entrevista de seguimiento (24-25 ago 2026) — planificación, sin tocar código
+
+**Contexto**: sesión aparte, en paralelo a la que construyó 6.2/6.3 y el resto de cambios de UX (sección 8). Sirvió solo para preparar la entrevista formal del **25 ago 2026, después de las 9am, con Ysrael Calle** (contabilidad, pero conoce el flujo operativo) — no generó ningún cambio de código hasta que el usuario lo pidió explícitamente. El detalle completo de la conversación queda en `MEMORIA_SESION_ENTREVISTA_2026-08-24.md` y `PLAN_MODULOS.md` (archivos de trabajo, no versionados en el repo salvo lo que se resume acá).
+
+**Expediente clínico completo — alcance confirmado por el cliente**: al preguntarle directamente si "digitalizar la mayor parte del historial clínico" significa un expediente completo (antecedentes, alergias, signos vitales, resultados de exámenes, todo conectado), **confirmó que sí**. Esto amplía lo que hoy hace `HistoriaClinica` (solo `diagnostico`/`tratamiento`/`notas` en texto libre, ver sección 4).
+
+**Reconciliado contra lo ya construido en 6.2/6.3 (importante — evita duplicar trabajo)**:
+- **Resultados de exámenes con archivo adjunto**: **ya cubierto**, es exactamente lo que hace `OrdenEstudio` (sección 6.2) — no hace falta ningún módulo nuevo para esto.
+- **Antecedentes, alergias, signos vitales**: **no existen todavía**, ni como tabla ni como campo — son los 3 módulos nuevos reales que hacen falta para completar el expediente.
+
+**Los 3 módulos pendientes, con diseño ya pensado (no implementado)**:
+1. **Alergias**: por paciente (no por consulta), tipo (medicamento/alimento/otro) + severidad. Debe verse destacado en la ficha del paciente y en Historia Clínica, no como texto libre escondido — es la razón de separarlo en su propia tabla.
+2. **Antecedentes**: por paciente, categorizado (personal/quirúrgico/familiar/hábito), más grupo sanguíneo.
+3. **Signos vitales**: por consulta (vinculado a `HistoriaClinica`), presión arterial/temperatura/frecuencia cardíaca/frecuencia respiratoria/peso/talla/saturación de oxígeno.
+
+Orden sugerido para construirlos (por seguridad del paciente primero, y porque alergias/antecedentes son más simples que signos vitales al ser "por paciente" en vez de "por consulta"): alergias → antecedentes → signos vitales.
+
+**Requerimiento del cliente sobre inventario — matiz nuevo, no resuelto en 6.3**: el cliente pidió que el registro de insumos cubra **farmacia, quirófano, admisión y facturación** — 4 puntos, no solo farmacia. El módulo de 6.3 ya soporta esto a nivel de dato (`area_origen`/`area_destino` como texto libre con esa lista fija, ver 6.3 punto 1 de la tabla de decisiones), pero no está confirmado si debe ser un inventario compartido entre las 4 áreas o si cada una maneja el suyo, ni qué hace específicamente cada área con ese registro — depende de la misma pregunta pendiente sobre el mecanismo real de farmacia (ver ítem sin resolver en la sección 6, arriba).
+
+**Prescripciones (2027)**: sigue sin construirse (ya documentado en 6.1). Nuevo detalle: falta confirmar si el médico prescribe solo lo que existe en `items_inventario`, o también medicamentos que el paciente compra afuera de la clínica — define si la prescripción se vincula o no al inventario de 6.3.
+
+**Checklist completo preparado para la entrevista del 25/08** (documento Word entregado al usuario, no versionado en el repo):
+- Mecanismo real de farmacia (pregunta nueva, prioridad alta — ver arriba).
+- Prioridad dentro del expediente clínico: ¿qué construir primero de los 3 módulos pendientes?
+- Qué significa "innovar los consultorios" (2027).
+- Mecánica de prescripciones: ¿solo inventario interno, o también medicamentos externos?
+- El resto de preguntas de negocio ya documentadas en la sección 6 principal (precios web, confirmación de citas, facturación SRI/seguros, cantidad de usuarios, "cuantificos", acceso remoto, presupuesto, plazos, sucursales futuras) — sin cambios, siguen abiertas.
+
+**Puntos detectados en esta planificación que ni siquiera tienen pregunta preparada todavía** (quedan para una vuelta futura, después de que se resuelvan las preguntas de arriba):
+- Si algún examen (`OrdenEstudio`) consume insumos del inventario (agujas, reactivos) y si eso debería descontar stock automáticamente.
+- Permisos/roles para los 3 módulos nuevos (alergias, antecedentes, signos vitales) — falta extender la matriz de la sección 10 cuando se construyan.
+- Si un antecedente/alergia corregido debe conservar historial de cambios o simplemente editarse.
+
+**Qué NO se hizo en esta sesión de planificación**: no se tocó ningún modelo, migración, Resource ni seeder — es 100% preparación para la entrevista, a pedido explícito del usuario de no interferir con el patch grande que se estaba aplicando en otra sesión en paralelo.
 
 ## 7. Roadmap / pendientes técnicos
 
