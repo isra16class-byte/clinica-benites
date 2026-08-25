@@ -482,9 +482,11 @@ El usuario compartió el logo oficial de la clínica (imagen suelta + embebido e
 
 **Nota sobre permisos y grupos**: Filament oculta automáticamente un grupo entero del sidebar si el usuario logueado no tiene acceso a ningún Resource de ese grupo (según los `canViewAny()` ya existentes en cada Resource) — no hizo falta ningún ajuste extra para que, por ejemplo, un médico no vea el grupo "Administración".
 
+**Orden de los grupos forzado explícitamente**: el usuario confirmó que quería el orden propuesto (no el alfabético por defecto de Filament), así que se agregó `->navigationGroups([...])` en `AdminPanelProvider.php` con el orden exacto: Atención al paciente → Facturación → Infraestructura → Inventario → Administración.
+
 **Pendiente, no incluido en este cambio**: diferenciar los íconos del sidebar — hoy varios Resources comparten el mismo ícono genérico (`Heroicon::OutlinedRectangleStack`): Áreas, Citas, Facturas, Historia Clínicas, Médicos y Pacientes lo usan los seis. Ayudaría a distinguirlos de un vistazo dentro de cada grupo, pero no se aplicó en esta vuelta porque este entorno de trabajo no tiene `vendor/` instalado (no se pudo verificar contra el enum real `Filament\Support\Icons\Heroicon` qué nombres de ícono son válidos en la versión de Filament instalada, y poner un nombre inválido rompería el panel). Si se quiere hacer, conviene definir los íconos junto al usuario con el entorno real corriendo para poder probar cada uno antes de commitear.
 
-**Pendiente probar en el entorno real**: cómo queda el sidebar con los 5 grupos, y si el orden entre grupos (Atención al paciente → Facturación → Infraestructura → Inventario → Administración) es el orden en que realmente aparecen — Filament los muestra por orden de aparición/registro de los Resources salvo que se use `navigationGroups()` explícito en el `AdminPanelProvider` para forzar un orden; no se tocó eso en esta vuelta, así que el orden final depende del orden de descubrimiento de Filament (alfabético por defecto salvo indicación contraria).
+**Confirmado funcionando por el usuario en el entorno real** (los 5 grupos aparecen colapsados en el sidebar, con los ítems correctos en cada uno — ver captura compartida). El orden explícito (`navigationGroups()`) se agregó después, aún sin confirmar visualmente por el usuario.
 
 ## 9. Propuesta de funciones futuras (investigadas, no priorizadas aún)
 
