@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Seeder de datos históricos de demostración
+
+- A pedido del usuario, se creó `database/seeders/DemoHistoricoSeeder.php` para poblar el sistema con datos de prueba realistas y ver el Dashboard gerencial (sección 6.6) funcionando con contenido en vez de vacío.
+- Genera ~110 registros repartidos en los últimos 12 meses: 10 médicos, 22 pacientes, 18 citas, historias clínicas para las atendidas, 18 facturas, 6 ítems de inventario con 8 lotes, ~16 movimientos de inventario, 6 camas, 2 quirófanos, 5 internamientos, 3 cirugías (con médico adicional en el pivote), 5 órdenes de estudio y 2 servicios de ambulancia.
+- Diseñado a propósito para cruzar los 3 umbrales de `AlertasOperativasWidget` (lote por vencer ≤90 días, factura pendiente vencida >30 días, cama ocupada >14 días) además de darle curva mensual a los 2 `ChartWidget`.
+- Es standalone, no se agregó a `DatabaseSeeder.php` — se corre aparte con `sail artisan db:seed --class=DemoHistoricoSeeder`, sobre una base ya limpia de `citas`/`facturas`/etc. (el usuario limpió antes a mano vía `tinker`, conservando `areas` y `users`).
+- Ver `MEMORIA.md` (decimocuarta entrada del día) para el detalle completo.
+- **Aún sin confirmar por el usuario en el entorno real** — validado solo con `php -l`, no se corrió contra una base de datos real (sin acceso a Sail/MySQL en este entorno de trabajo).
+
+---
+
 ## [2026-08-25] Confirmación: Dashboard gerencial completo, de punta a punta en el entorno real
 
 - El usuario confirmó que, tras aplicar el patch del `@source` faltante y recompilar con `npm run build`, las 3 tarjetas de "Alertas operativas" ya se ven lado a lado en 3 columnas.
