@@ -54,31 +54,37 @@ class FacturacionPorAreaChartWidget extends ChartWidget
     }
 
     /**
-     * Con la métrica "Monto facturado", formatea el eje Y y el tooltip
-     * con signo $ y separador de miles — antes solo mostraban el número
-     * pelado (ej. "1200"). Con "Cantidad de citas" no aplica ningún
-     * formato especial (son números enteros simples), se devuelve un
-     * array vacío para dejar los valores por defecto de Chart.js.
+     * Formatea el eje Y y el tooltip. Con "Monto facturado" agrega
+     * signo $ y separador de miles; con "Cantidad de citas" deja el
+     * número simple (con separador de miles igual, por prolijidad).
+     *
+     * FIX (25 ago 2026): antes esto devolvía un array vacío `[]` para
+     * "Cantidad de citas" y un `RawJs` para "Monto facturado" — ese
+     * cambio de *tipo* de valor entre una métrica y otra rompía el
+     * gráfico (quedaba en blanco) al cambiar el selector con Livewire,
+     * confirmado por el usuario en el entorno real. Ahora siempre
+     * devuelve `RawJs` con el mismo tipo/estructura, y la decisión de
+     * anteponer "$" o no queda resuelta *adentro* del JS (interpolando
+     * un booleano de PHP), en vez de cambiar la forma de lo que se
+     * devuelve.
      */
-    protected function getOptions(): RawJs|array
+    protected function getOptions(): RawJs
     {
-        if ($this->filter !== 'facturacion') {
-            return [];
-        }
+        $esFacturacion = $this->filter === 'facturacion' ? 'true' : 'false';
 
-        return RawJs::make(<<<'JS'
+        return RawJs::make(<<<JS
             {
                 scales: {
                     y: {
                         ticks: {
-                            callback: (value) => '$' + value.toLocaleString('es-EC'),
+                            callback: (value) => ({$esFacturacion} ? '$' : '') + value.toLocaleString('es-EC'),
                         },
                     },
                 },
                 plugins: {
                     tooltip: {
                         callbacks: {
-                            label: (context) => context.dataset.label + ': $' + context.parsed.y.toLocaleString('es-EC'),
+                            label: (context) => context.dataset.label + ': ' + ({$esFacturacion} ? '$' : '') + context.parsed.y.toLocaleString('es-EC'),
                         },
                     },
                 },

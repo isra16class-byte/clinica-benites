@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Fix: gráfico "Por área" en blanco con métrica "Cantidad de citas"
+
+- Bug reportado por el usuario al probar en el entorno real el ajuste de formato `$` de la entrada anterior: el gráfico "Por área" quedaba completamente vacío (sin barras, sin ejes) con "Cantidad de citas" seleccionado; solo funcionaba con "Monto facturado".
+- Causa: `getOptions()` en `FacturacionPorAreaChartWidget` devolvía tipos de dato distintos según la métrica — array vacío `[]` para citas, objeto `RawJs` para facturación. Ese cambio de tipo entre una respuesta y otra rompía el JS del gráfico al recambiar el selector con Livewire.
+- Fix: `getOptions()` ahora siempre devuelve `RawJs`, con la misma estructura en ambos casos — el signo `$` se decide *adentro* del JS interpolando un booleano de PHP, no cambiando el tipo devuelto.
+- Verificado con un script PHP chico (fuera del repo) simulando el heredoc, para confirmar la interpolación antes de dar el fix por bueno.
+- Sintaxis validada con `php -l`. **Pendiente confirmar este fix puntual en el entorno real.**
+- Detalle completo, incluido el troubleshooting general para casos similares, en la sección **6.6.2** de `MEMORIA.md`.
+
+---
+
 ## [2026-08-25] Fix/UX: formato $ en gráficos del Dashboard gerencial + confirmación en real
 
 - Sesión 2 (entrada anterior) **confirmada funcionando en el entorno real**: probada con 4 facturas de prueba, incluida una sin `cita_id` — se verificó que queda correctamente excluida del gráfico "Por área" (limitación ya documentada), mientras sí cuenta en "Ingresos por mes".
