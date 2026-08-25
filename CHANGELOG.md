@@ -8,6 +8,15 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Confirmación: DemoHistoricoSeeder corrió sin errores en el entorno real
+
+- El usuario corrió `./vendor/bin/sail artisan db:seed --class=DemoHistoricoSeeder` y terminó con "Datos de demostración cargados." en ~1.8s, sin errores de foreign key ni de tipo.
+- Nota de entorno (no del proyecto): el usuario no tenía el alias `sail` definido — se usó la ruta directa `./vendor/bin/sail`, sin cambios de código.
+- Pendiente: confirmación visual de que el Dashboard gerencial se ve poblado como se esperaba en `/admin`.
+- Solo actualización de estado en `MEMORIA.md`/`CHANGELOG.md` — no se tocó código en esta entrada.
+
+---
+
 ## [2026-08-25] Seeder de datos históricos de demostración
 
 - A pedido del usuario, se creó `database/seeders/DemoHistoricoSeeder.php` para poblar el sistema con datos de prueba realistas y ver el Dashboard gerencial (sección 6.6) funcionando con contenido en vez de vacío.
