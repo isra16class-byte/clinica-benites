@@ -110,7 +110,7 @@ class FacturacionPorAreaChartWidget extends ChartWidget
                 [
                     'label' => $esFacturacion ? 'Monto facturado ($)' : 'Citas',
                     'data' => $valores,
-                    'backgroundColor' => '#0e7490',
+                    'backgroundColor' => '#0C447C',
                 ],
             ],
             'labels' => $areas->pluck('nombre')->all(),

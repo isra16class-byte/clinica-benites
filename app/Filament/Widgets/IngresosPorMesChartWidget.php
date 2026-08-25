@@ -108,12 +108,12 @@ class IngresosPorMesChartWidget extends ChartWidget
                 [
                     'label' => 'Facturado',
                     'data' => $facturado,
-                    'backgroundColor' => '#94a3b8',
+                    'backgroundColor' => '#85B7EB',
                 ],
                 [
                     'label' => 'Cobrado',
                     'data' => $cobrado,
-                    'backgroundColor' => '#0e7490',
+                    'backgroundColor' => '#0F6E56',
                 ],
             ],
             'labels' => $labels,

@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Rediseño visual: paleta de marca (azul marino + verde azulado) en panel y gráficos
+
+- A pedido del usuario, que compartió una captura del Dashboard gerencial pidiendo ideas de color/organización, se propuso una paleta de 3 colores con significado (no decorativa) y se aplicó directo al panel.
+- `AdminPanelProvider.php`: color primario del panel (botones, navegación, elementos activos de Filament) cambiado de `Color::Teal` (paleta Tailwind por defecto) a `Color::hex('#0C447C')` — azul marino, tomado del logo real de la clínica (ver sección 8.1 de `MEMORIA.md`).
+- `IngresosPorMesChartWidget.php`: color de la serie "Facturado" cambiado de gris (`#94a3b8`) a azul claro (`#85B7EB`); color de la serie "Cobrado" cambiado de cian (`#0e7490`) a verde azulado (`#0F6E56`) — refuerza la distinción semántica ya existente entre "lo que se vendió" y "lo que entró a caja" (facturado = tono neutro de la marca, cobrado = verde, asociado a positivo/completado).
+- `FacturacionPorAreaChartWidget.php`: color de la única serie (citas o monto facturado, según el selector) cambiado de cian (`#0e7490`) al mismo azul marino de marca (`#0C447C`), consistente con el resto del panel.
+- Solo colores — no se tocó ninguna query, layout, ni estructura de datos de los 3 widgets. `theme.css` no requirió cambios (el color primario de Filament no depende de ese archivo, se resuelve vía `FilamentColor`/`Color::hex()`).
+- **Aún sin confirmar por el usuario en el entorno real** — cambio de colores puros, sin acceso a Sail/npm para compilar y ver el resultado; no se pudo correr `php -l` porque el entorno de trabajo no tiene PHP disponible esta vez (instalación de `php-cli` falló por 404 en los paquetes de Ubuntu). Cambios acotados a valores de string/hex, riesgo de sintaxis bajo, pero pendiente de confirmación visual real.
+
+---
+
 ## [2026-08-25] Confirmación final: Dashboard gerencial probado con datos históricos reales
 
 - El usuario confirmó por captura que, tras el fix de Carbon 3, "Alertas operativas" muestra días enteros y positivos en sus 3 secciones, y el resto del Dashboard gerencial (indicadores, ambos gráficos) se ve correcto.

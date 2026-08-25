@@ -31,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogoHeight('2.5rem')
             ->favicon(asset('favicon.ico'))
             ->colors([
-                'primary' => Color::Teal,
+                'primary' => Color::hex('#0C447C'),
             ])
             ->navigationGroups([
                 'Atención al paciente',
