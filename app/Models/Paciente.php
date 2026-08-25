@@ -37,4 +37,25 @@ class Paciente extends Model
     {
         return $this->hasMany(MovimientoInventario::class);
     }
+
+    // Relaciones de la infraestructura física (sección 6.2 de MEMORIA.md).
+    public function internamientos(): HasMany
+    {
+        return $this->hasMany(Internamiento::class);
+    }
+
+    public function cirugias(): HasMany
+    {
+        return $this->hasMany(Cirugia::class);
+    }
+
+    public function ordenesEstudio(): HasMany
+    {
+        return $this->hasMany(OrdenEstudio::class);
+    }
+
+    public function serviciosAmbulancia(): HasMany
+    {
+        return $this->hasMany(ServicioAmbulancia::class);
+    }
 }

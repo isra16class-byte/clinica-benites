@@ -2,7 +2,9 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 24 de agosto de 2026 — décima entrada del día (se le explicó al usuario, en un documento Word entregado aparte (no versionado en el repo), qué es cada módulo del sistema, sus opciones y cómo se relacionan entre sí. De esa conversación salió una pregunta pendiente nueva, agregada a la sección 6: si los 3 roles actuales alcanzan o falta un rol de farmacia, dado que hoy el médico no tiene acceso al módulo de inventario aunque es quien aplica los insumos. Solo documentación — no se tocó código.)
+Última actualización: 24 de agosto de 2026 — undécima entrada del día (la sección **6.2** — infraestructura física: camas/internamiento, quirófanos/cirugías, procedimientos/estudios, emergencias, ambulancia — pasó de propuesta documentada a **módulo construido**, mismo criterio que se usó con 6.3: el usuario pidió avanzar con **supuestos razonables** sobre las 5 decisiones que seguían sin confirmar con la clínica, documentándolos para poder ajustarlos después. Se crearon 7 tablas nuevas (`camas`, `quirofanos`, `internamientos`, `cirugias`, `cirugia_medico`, `ordenes_estudio`, `servicios_ambulancia`) + 2 columnas nuevas en `citas` (`origen`/`prioridad`), 6 modelos nuevos, 6 Resources completos de Filament, y se tocó `CitaForm`/`CitasTable` para agregar los campos de emergencia. Ver la sección 6.2 actualizada abajo para el detalle completo. **Aún sin confirmar por el usuario en el entorno real** — escrito sin acceso a PHP/Sail (se validó sintaxis con `php -l`, pero no se corrió la migración ni se probó en `/admin`).)
+
+Última actualización anterior: 24 de agosto de 2026 — décima entrada del día (se le explicó al usuario, en un documento Word entregado aparte (no versionado en el repo), qué es cada módulo del sistema, sus opciones y cómo se relacionan entre sí. De esa conversación salió una pregunta pendiente nueva, agregada a la sección 6: si los 3 roles actuales alcanzan o falta un rol de farmacia, dado que hoy el médico no tiene acceso al módulo de inventario aunque es quien aplica los insumos. Solo documentación — no se tocó código.)
 
 Última actualización anterior: 24 de agosto de 2026 — novena entrada del día (el módulo de **Medicamentos e Insumos** (sección 6.3), construido en la entrada anterior, quedó **confirmado funcionando por el usuario en el entorno real**: catálogo, lotes con vencimiento, movimientos de entrada/salida con stock recalculado en vivo, protección contra borrado y permisos por rol, todo probado en vivo sin problemas.)
 
@@ -62,6 +64,15 @@ clinica-benites/
       HistoriaClinica.php      # Con $fillable y relaciones belongsTo(Paciente, Medico, Cita)
       Factura.php              # Con $fillable y relaciones belongsTo(Paciente, Cita)
       User.php                # Con $fillable, campo `rol` y métodos isAdmin()/isRecepcion()/isMedico()
+      ItemInventario.php       # Con $fillable y métodos stockActual()/bajoStockMinimo() (sección 6.3)
+      LoteInventario.php       # Con $fillable, relación item, y stockActual()/vencido()/porVencer() (sección 6.3)
+      MovimientoInventario.php # Con $fillable y relaciones lote/usuario/paciente/cita (sección 6.3)
+      Cama.php                 # Con $fillable, relación internamientos, y ocupada() derivado (sección 6.2)
+      Quirofano.php            # Con $fillable y relación cirugias (sección 6.2)
+      Internamiento.php        # Con $fillable y relaciones paciente/cama/medico/cita (sección 6.2)
+      Cirugia.php              # Con $fillable, relaciones + medicosAdicionales (BelongsToMany con pivot) (sección 6.2)
+      OrdenEstudio.php         # Con $fillable y relaciones paciente/medicoSolicitante/cita (sección 6.2)
+      ServicioAmbulancia.php   # Con $fillable y relación paciente (sección 6.2)
     Http/
       Controllers/
         FacturaPdfController.php  # Genera el PDF de una factura (dompdf), reutiliza permisos de FacturaResource
@@ -70,13 +81,19 @@ clinica-benites/
         Areas/                   # Resource completo (Form, Table, Pages)
         Pacientes/               # Resource completo
         Medicos/                 # Resource completo, selector de Área por relación
-        Citas/                   # Resource completo, selectores por relación + estado con colores
+        Citas/                   # Resource completo, selectores por relación + estado con colores + origen/prioridad (sección 6.2)
         HistoriaClinicas/        # Resource completo + vista de solo lectura (Infolist)
         Facturas/                # Resource completo, selectores por relación + estado con colores, exportar a PDF
         Users/                   # Resource completo, solo accesible por admin (gestión de usuarios/roles)
         ItemsInventario/         # Resource completo — catálogo de medicamentos/insumos (sección 6.3)
         LotesInventario/         # Resource completo — lotes con vencimiento, FEFO (sección 6.3)
         MovimientosInventario/   # Resource completo — entradas/salidas/traslados/ajustes (sección 6.3)
+        Camas/                   # Resource completo — catálogo de camas, estado derivado (sección 6.2)
+        Quirofanos/              # Resource completo — catálogo de quirófanos, estado editable (sección 6.2)
+        Internamientos/          # Resource completo — ingreso/alta, filtrado "mis pacientes" para médico (sección 6.2)
+        Cirugias/                # Resource completo — agenda de quirófano, médicos adicionales con Repeater (sección 6.2)
+        OrdenesEstudio/          # Resource completo — laboratorio/imagenología, adjunto opcional (sección 6.2)
+        ServiciosAmbulancia/     # Resource completo — traslados, el más simple del módulo (sección 6.2)
   database/
     migrations/
       ..._create_areas_table.php            # Completa (nombre)
@@ -88,6 +105,14 @@ clinica-benites/
       ..._create_items_inventario_table.php       # Completa — catálogo medicamentos/insumos (sección 6.3)
       ..._create_lotes_inventario_table.php       # Completa — lotes con vencimiento (sección 6.3)
       ..._create_movimientos_inventario_table.php # Completa — ledger de movimientos (sección 6.3)
+      ..._create_camas_table.php                  # Completa — camas hospitalización/UCI/UCIN (sección 6.2)
+      ..._create_quirofanos_table.php              # Completa — quirófanos con estado editable (sección 6.2)
+      ..._create_internamientos_table.php          # Completa — FKs paciente/cama/medico/cita, origen/prioridad (sección 6.2)
+      ..._create_cirugias_table.php                # Completa — FKs paciente/quirofano/medico_principal/cita (sección 6.2)
+      ..._create_cirugia_medico_table.php          # Completa — pivote médicos adicionales de una cirugía (sección 6.2)
+      ..._create_ordenes_estudio_table.php         # Completa — laboratorio/imagenología/etc, adjunto opcional (sección 6.2)
+      ..._create_servicios_ambulancia_table.php    # Completa — traslados (sección 6.2)
+      ..._add_origen_prioridad_to_citas_table.php  # Alter — cubre "Emergencias" sin tabla propia (sección 6.2)
   resources/
     views/
       pdf/
@@ -195,46 +220,54 @@ facturas
 
 **Aún sin responder**: aunque ahora se sabe la lista de especialidades, sigue sin confirmarse si la clínica planea usar el sistema para *todas* esas 27 especialidades desde ya, o si el registro de citas/pacientes por especialidad se ampliará gradualmente. Tampoco se aclaró qué son exactamente "consultorios" en el contexto de "innovar los consultorios" (¿construcción física, digitalización de citas por consultorio, otra cosa?).
 
-### 6.2 Propuesta de modelado futuro para la infraestructura (planificación — sin código)
+### 6.2 Infraestructura física — MÓDULO CONSTRUIDO (24 ago 2026)
 
-**Encargo explícito del usuario (24 ago 2026)**: pidió avanzar con la infraestructura del PDF (`Servicios_CB_2026.pdf`, ver 6.1), pero aclaró que es **solo para planificar el módulo futuro (fase 2/3)** — no para construir nada todavía. Esta subsección es una propuesta de cómo se podría modelar cuando la clínica confirme que es momento de construirlo; no se tocó ningún modelo, migración ni Resource.
+**Estado**: **construido, validado con `php -l` (sin errores de sintaxis), pero aún sin correr la migración ni probar en el entorno real** — a diferencia de 6.3 (que sí llegó a probarse en vivo), esta pasada se hizo sin acceso a PHP/Sail. El usuario decidió avanzar con **supuestos razonables** sobre las 5 decisiones que seguían sin confirmar con la clínica (mismo criterio que se usó en 6.3), documentándolos abajo para poder ajustarlos después.
 
 **Por qué no entra en el modelo actual de `areas`**: un `Area` hoy representa una especialidad médica (algo a lo que un `Medico` pertenece). Hospitalización, UCI, quirófanos, etc. no son especialidades — son **capacidad física/operativa** (camas, salas, equipos) que se ocupa y se libera con el tiempo. Necesitan su propio concepto de "ocupado/libre" y de "quién está usando qué, desde cuándo hasta cuándo", que `Area` no tiene ni debería tener.
 
-**Los 15 ítems del PDF agrupados por el tipo de dato que implican** (agrupación propia, no viene del PDF ni del contacto interno — a confirmar):
+**Estructura construida** (7 tablas nuevas + 2 columnas en `citas`, migraciones `2026_08_24_130000` a `2026_08_24_130007`):
 
-1. **Camas / internamiento** — Hospitalización, UCI, UCIN. Las tres son variantes de lo mismo: un paciente ocupa una cama durante un rango de fechas. Posible modelo:
-   - `camas` (identificador/número, `tipo`: hospitalización/UCI/UCIN, estado: libre/ocupada/mantenimiento)
-   - `internamientos` (paciente_id, cama_id, medico_id responsable, fecha_ingreso, fecha_alta nullable — nulo mientras sigue internado, motivo, y opcionalmente cita_id si el ingreso viene de una cita ya agendada)
-   - El estado de la cama se podría derivar de si tiene un internamiento activo (sin `fecha_alta`), en vez de mantenerlo como campo separado que se pueda desincronizar — a decidir cuando se construya.
+1. **Camas — `camas`** (`app/Models/Cama.php`): `numero` (único), `tipo` (hospitalizacion/uci/ucin), `piso` (nullable). **No tiene columna `estado`** — `ocupada()` la deriva en vivo de si existe un `Internamiento` sin `fecha_alta`, mismo criterio que el stock del módulo de inventario (sección 6.3), para que nunca se desincronice de la realidad.
 
-2. **Quirófanos / cirugías** — Central de Quirófanos. Modelo tipo agenda, similar a `Cita` pero para cirugías:
-   - `quirofanos` (número/nombre, estado)
-   - `cirugias` (paciente_id, quirofano_id, fecha, hora_inicio, hora_fin, tipo_cirugia, estado, notas). Punto abierto: una cirugía suele involucrar más de un médico (cirujano principal, anestesiólogo, ayudantes) — probablemente necesite una tabla intermedia `cirugia_medico` en vez de un solo `medico_id`, a diferencia de `Cita` que asume un médico único.
-   - Relacionado con las especialidades quirúrgicas ya cargadas (Cirugía General, Cirugía Vascular, Cirugía Plástica, Cirugía Oncológica, Cirugía Pediátrica, Cirugía Holep de Próstata, Cirugía Torácica, Cateterismo Cardiaco, Laparoscopía — son varias de las 27 áreas ya en el sistema).
-   - **Ajuste (validado con investigación externa, 24 ago 2026)**: la idea original de `estado` en `quirofanos` como simple libre/ocupado se queda corta — la práctica común en gestión de quirófanos usa un estado con más pasos (ej. preparación → en cirugía → limpieza → libre), porque el tiempo de limpieza entre una cirugía y la siguiente es un dato real que afecta cuándo el quirófano vuelve a estar disponible, no es instantáneo. A tener en cuenta en el diseño final del campo `estado`.
+2. **Internamientos — `internamientos`** (`app/Models/Internamiento.php`): `paciente_id`, `cama_id`, `medico_id` responsable, `cita_id` (nullable), `fecha_ingreso`, `fecha_alta` (nullable — nulo mientras sigue internado), `motivo`, `origen` (programado/emergencia), `prioridad` (nullable, escala ESI), `notas`.
 
-3. **Procedimientos / estudios** — Laboratorio, Rayos X, Ecografía, Centro de Imagen, Unidad de Endoscopía (alta y baja), Centro de Gastroenterología, Procedimientos Ambulatorios. Todos comparten el mismo patrón: un médico solicita un estudio, el paciente lo hace, y en algún momento hay un resultado (posiblemente un archivo adjunto — PDF, imagen). Posible modelo unificado en vez de una tabla por tipo de estudio:
-   - `ordenes_estudio` (paciente_id, medico_solicitante_id, tipo — con esos mismos 7 valores u otra taxonomía a confirmar, fecha_solicitud, fecha_realizacion nullable, estado: solicitado/en_proceso/completado, resultado como texto y/o archivo adjunto).
-   - Punto abierto: si el resultado necesita adjuntar archivos (ej. una radiografía escaneada), hace falta definir dónde se guardan (disco local vía Sail, o storage externo tipo S3) — no evaluado todavía.
+3. **Quirófanos — `quirofanos`** (`app/Models/Quirofano.php`): `numero` (único), `nombre` (nullable), `estado` — a diferencia de `camas`, este sí es una columna guardada y editable, con 4 pasos (preparación → en cirugía → limpieza → libre) en vez de solo libre/ocupado, tal como se validó con la investigación externa de la entrada anterior.
 
-4. **Emergencias** — a diferencia de los tres grupos anteriores, no parece necesitar una tabla propia: es más bien una **forma de llegar** a un internamiento o una cita (paciente que llega sin cita previa, por urgencia) más que un recurso físico. Posible tratamiento: un campo `origen` (programada/emergencia) en `Cita` o en `internamientos`, en vez de un modelo nuevo — a confirmar si la clínica maneja triage o algo más elaborado.
-   - **Ajuste (validado con investigación externa, 24 ago 2026)**: un simple campo `origen` se queda corto frente a cómo funciona un área de emergencias real. El estándar del sector (ESI — Emergency Severity Index, usado internacionalmente) asigna a cada paciente que llega un **nivel de prioridad clínica** (típicamente 5 niveles, del más urgente al menos urgente) al momento de la llegada, antes de que lo vea el médico — no es solo una etiqueta de "cómo llegó", determina el orden real de atención. Si la clínica ya aplica algún criterio de prioridad hoy (aunque sea informal/a ojo), probablemente el modelo futuro necesite un campo de **prioridad/triage** además de `origen`, no solo `origen`. Se agrega como pregunta más específica para la clínica en la lista de decisiones pendientes, abajo.
+4. **Cirugías — `cirugias`** (`app/Models/Cirugia.php`): `paciente_id`, `quirofano_id`, `medico_principal_id` (cirujano responsable), `cita_id` (nullable), `fecha`, `hora_inicio`, `hora_fin` (nullable), `tipo_cirugia`, `estado` (programada/en_curso/completada/cancelada), `notas`. Médicos adicionales (anestesiólogo, ayudantes) se modelan en una tabla pivote aparte — ver siguiente punto.
 
-5. **Ambulancia** — servicio de transporte, no de permanencia. Si se llega a modelar, sería algo simple tipo `servicios_ambulancia` (paciente_id nullable, origen, destino, fecha_hora, motivo) — menor prioridad, conexión más débil con el resto del dominio (Paciente/Cita/HistoriaClinica).
+5. **Médicos adicionales de una cirugía — `cirugia_medico`** (pivote, gestionado con un `Repeater` en el formulario de Cirugía, sin Resource propio): `cirugia_id`, `medico_id`, `rol` (texto libre, ej. "Anestesiólogo"). Resuelve el punto abierto de la propuesta original: una cirugía suele involucrar más de un médico, a diferencia de `Cita` que asume uno solo.
 
-6. **Consulta Externa** — esto **ya está cubierto** por el sistema actual: es exactamente lo que hoy modela `Cita` (consulta en consultorio, no internamiento). No necesita nada nuevo, solo se menciona para que quede explícito que no es un hueco.
+6. **Órdenes de estudio — `ordenes_estudio`** (`app/Models/OrdenEstudio.php`): modelo unificado para Laboratorio, Rayos X, Ecografía, Centro de Imagen, Endoscopía (alta/baja), Gastroenterología y Procedimientos Ambulatorios, en vez de una tabla por tipo. Campos: `paciente_id`, `medico_solicitante_id`, `cita_id` (nullable), `tipo`, `fecha_solicitud`, `fecha_realizacion` (nullable), `estado` (solicitado/en_proceso/completado), `resultado_texto`, `resultado_archivo` (path, nullable), `notas`.
 
-7. **Cafetería** — no es infraestructura clínica, se descarta explícitamente de cualquier modelado (no hay paciente, médico ni historia clínica involucrados).
+7. **Servicios de ambulancia — `servicios_ambulancia`** (`app/Models/ServicioAmbulancia.php`): la tabla más simple del módulo — `paciente_id` (nullable), `origen`, `destino`, `fecha_hora`, `motivo`, `notas`.
 
-**Decisiones que faltan confirmar con la clínica antes de construir cualquiera de estos** (no se puede avanzar de "propuesta" a "diseño final" sin esto):
-- ¿Se necesita saber en tiempo real cuántas camas/quirófanos están libres (para tomar decisiones operativas), o alcanza con un registro histórico de quién ocupó qué y cuándo?
-- ¿Una cirugía siempre nace de una `Cita` ya agendada, o puede agendarse directo como cirugía sin pasar por Citas?
-- ¿Los resultados de laboratorio/imagenología se van a poder adjuntar como archivo desde el día uno, o alcanza con texto libre al principio?
-- ¿"Emergencias" implica un flujo de triage/prioridad, o es solo una etiqueta de cómo llegó el paciente? — **(refinada, 24 ago 2026)**: más específicamente, ¿el personal de emergencias ya aplica hoy algún criterio de prioridad (aunque sea informal), o todos los pacientes se atienden estrictamente por orden de llegada? La respuesta define si además de `origen` hace falta un campo de prioridad/triage (ver ajuste arriba).
-- ¿Va a haber más de un quirófano/UCI si la clínica crece a otra sede (pregunta ya abierta en la sección 6, sobre sucursales)?
+8. **`citas.origen` / `citas.prioridad`** (columnas nuevas en la tabla ya existente, no una tabla nueva): cubren "Emergencias" — una emergencia que no requiere internamiento queda registrada como una Cita normal con `origen = emergencia` y su `prioridad` ESI, en vez de necesitar un modelo propio. Se agregaron también a `CitaForm`/`CitasTable` (selector condicional de prioridad solo visible si origen es emergencia, badge rojo en la tabla, filtro rápido "Emergencias").
 
-**Qué NO se hizo**: ningún modelo, migración, Resource ni seeder — esto es puramente una propuesta de arquitectura para discutir, análoga a como quedó documentada la sección 6.1. El sistema actual (Áreas/Médicos/Pacientes/Citas/HistoriaClinicas/Facturas) sigue siendo la única parte construida y no se ve afectado por esta propuesta.
+**6 Resources completos de Filament** (mismo patrón de carpetas que los módulos existentes), todos agrupados bajo el grupo de navegación "Infraestructura": `Camas`, `Quirofanos`, `Internamientos`, `Cirugias`, `OrdenesEstudio`, `ServiciosAmbulancia`.
+
+**Permisos aplicados**:
+- Camas, Quirófanos (catálogo de recurso físico, mismo criterio que Áreas/Médicos): cualquier usuario logueado ve; admin y recepción editan (recepción necesita asignar camas/quirófanos en el día a día); solo admin crea/borra.
+- Internamientos, Cirugías (operación clínica, mismo criterio que Citas): admin y recepción crean/administran; cualquier usuario logueado edita, pero un médico vinculado (`users.medico_id`) solo ve/edita los suyos (filtrado por `medico_id`/`medico_principal_id`, igual patrón que `CitaResource::getEloquentQuery()`); solo admin borra.
+- Órdenes de estudio: igual que arriba, pero el médico **también puede crear** (es quien solicita el estudio), filtrado por `medico_solicitante_id`.
+- Servicios de ambulancia: admin y recepción crean/editan/borran (admin); médico solo ve (no participa directamente del transporte).
+
+**Las 5 decisiones que estaban pendientes — resueltas con supuestos razonables, editables después**:
+
+| Decisión pendiente | Supuesto aplicado | Qué implica si la clínica responde distinto |
+|---|---|---|
+| ¿Estado de camas/quirófanos en tiempo real o histórico alcanza? | **Tiempo real** — camas derivado en vivo (`ocupada()`), quirófanos con columna editable de estado granular. | Ya cubierto en ambos escenarios, igual criterio que el stock de 6.3. |
+| ¿Una cirugía siempre nace de una `Cita` ya agendada? | **No** — `cita_id` nullable, una cirugía puede agendarse directo, igual que `Factura`/`HistoriaClinica` ya tratan `cita_id` como opcional. | Si la clínica confirma que siempre pasa por Citas, se podría hacer `cita_id` obligatorio más adelante sin romper lo ya guardado (solo agregaría una validación). |
+| ¿Resultados de estudios con archivo adjunto desde el día uno? | **Sí** — `FileUpload` opcional en `OrdenEstudioForm`, disco local de Sail (`disk('public')`), además del texto libre. No se evaluó storage externo tipo S3. | Migrar a S3 más adelante es un cambio de configuración del disco, no de la columna (`resultado_archivo` solo guarda la ruta). |
+| ¿"Emergencias" necesita triage/prioridad, no solo `origen`? | **Sí** — se implementó `prioridad` con escala ESI (5 niveles) en `citas` e `internamientos`, además de `origen`, tal como se validó con la investigación externa de la entrada anterior. | N/A, ya resuelta con la investigación previa. |
+| ¿Más de un quirófano/UCI si la clínica crece a otra sede? | **No se modela sede/sucursal todavía** — el sistema sigue asumiendo una sola ubicación (igual que el resto del proyecto, ver sección 5 sobre timezone). | Si la clínica confirma expansión, hace falta agregar una tabla `sedes` y `sede_id` en `camas`/`quirofanos` (y probablemente en `areas`) — cambio más grande, no solo de este módulo. |
+
+**Qué NO se hizo todavía**:
+- No se corrió la migración ni se probó en el entorno real (a diferencia de 6.3, que sí se confirmó en vivo) — falta que el usuario corra `sail artisan migrate` y pruebe el flujo completo.
+- No se cargó ningún dato real (camas/quirófanos existentes de la clínica) — no hay seeder, la clínica no ha dado esa información.
+- No se conectó con el módulo de inventario (sección 6.3) — la `MovimientoInventario` sigue sin `cirugia_id`, tal como quedó documentado como pendiente en 6.3 punto 6 de la tabla de decisiones. Se puede agregar sin romper nada de lo actual.
+- No se validó a nivel de formulario que una cama/quirófano esté libre antes de asignarla a un internamiento/cirugía nuevo — el formulario solo muestra un mensaje de ayuda pidiendo verificar en el listado correspondiente. Si la clínica confirma que hace falta bloquear la selección de recursos ocupados, es un ajuste puntual en `InternamientoForm`/`CirugiaForm`.
+- No se filtra por médicos adicionales de una cirugía (`medicosAdicionales`) al mostrar la lista a un médico logueado — solo ve las cirugías donde es el responsable principal, no las que le asignaron como anestesiólogo/ayudante. Simplificación documentada en `CirugiaResource::getEloquentQuery()`.
 
 **Validación externa (24 ago 2026)**: se investigó cómo modelan esto sistemas hospitalarios reales y estándares del sector (HL7 FHIR, sistemas open source como OpenMRS/OpenHospital/Bahmni, literatura de gestión hospitalaria). Conclusión general: la estructura propuesta arriba (separar "ubicación/recurso físico" de "ocupación en el tiempo", que es la base de los puntos 1 y 2) coincide con el patrón estándar de la industria, conocido como **ADT** (Admission-Discharge-Transfer) — el módulo que virtualmente todo sistema hospitalario tiene para esto. No hay que rediseñar nada, solo se incorporaron los 2 ajustes marcados arriba (estado de quirófano más granular, prioridad/triage en emergencias).
 

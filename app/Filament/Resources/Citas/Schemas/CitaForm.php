@@ -74,6 +74,30 @@ class CitaForm
                     ])
                     ->required()
                     ->default('pendiente'),
+                // Origen/prioridad (sección 6.2 de MEMORIA.md, grupo 4 —
+                // Emergencias): en vez de un modelo nuevo, una emergencia
+                // que no requiere internamiento queda registrada acá mismo,
+                // como una Cita con origen "emergencia" y su prioridad ESI.
+                Select::make('origen')
+                    ->label('Origen')
+                    ->options([
+                        'programada' => 'Programada',
+                        'emergencia' => 'Emergencia',
+                    ])
+                    ->required()
+                    ->default('programada')
+                    ->live(),
+                Select::make('prioridad')
+                    ->label('Prioridad (triage)')
+                    ->helperText('Escala ESI: 1 = reanimación inmediata, 5 = no urgente')
+                    ->options([
+                        'esi_1' => 'ESI 1 — Reanimación',
+                        'esi_2' => 'ESI 2 — Emergencia',
+                        'esi_3' => 'ESI 3 — Urgente',
+                        'esi_4' => 'ESI 4 — Menos urgente',
+                        'esi_5' => 'ESI 5 — No urgente',
+                    ])
+                    ->visible(fn ($get): bool => $get('origen') === 'emergencia'),
                 Textarea::make('notas')
                     ->columnSpanFull(),
             ]);

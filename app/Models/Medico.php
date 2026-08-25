@@ -30,4 +30,20 @@ class Medico extends Model
     {
         return $this->hasMany(HistoriaClinica::class);
     }
+
+    // Relaciones de la infraestructura física (sección 6.2 de MEMORIA.md).
+    public function internamientos(): HasMany
+    {
+        return $this->hasMany(Internamiento::class);
+    }
+
+    public function cirugiasComoResponsable(): HasMany
+    {
+        return $this->hasMany(Cirugia::class, 'medico_principal_id');
+    }
+
+    public function ordenesEstudioSolicitadas(): HasMany
+    {
+        return $this->hasMany(OrdenEstudio::class, 'medico_solicitante_id');
+    }
 }

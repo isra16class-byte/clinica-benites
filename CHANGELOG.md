@@ -8,6 +8,28 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Segundo módulo construido: Infraestructura física (camas, quirófanos, cirugías, estudios, ambulancia)
+
+- A pedido del usuario, se **construyó** (mismo criterio que el módulo de Medicamentos e Insumos) la propuesta de la sección 6.2 de `MEMORIA.md` — infraestructura física: Hospitalización/UCI/UCIN, Quirófanos/Cirugías, Procedimientos/Estudios, Emergencias, Ambulancia. Se avanzó con **supuestos razonables** sobre las 5 decisiones que seguían sin confirmar con la clínica, documentándolos en la sección 6.2 actualizada para poder ajustarlos después.
+- **7 tablas nuevas** (migraciones `2026_08_24_130000` a `2026_08_24_130006`):
+  - `camas` — número, tipo (hospitalización/UCI/UCIN), piso opcional. Sin columna de estado — se deriva de si tiene un internamiento activo, mismo criterio que el stock del módulo de inventario.
+  - `quirofanos` — número, nombre opcional, y sí con columna de estado editable (libre/preparación/en cirugía/limpieza), a diferencia de camas.
+  - `internamientos` — paciente, cama, médico responsable, cita opcional, fecha de ingreso/alta (alta nullable mientras sigue internado), motivo, origen (programado/emergencia) y prioridad ESI de triage.
+  - `cirugias` — paciente, quirófano, cirujano principal, cita opcional, fecha/hora, tipo de cirugía, estado, notas.
+  - `cirugia_medico` — pivote para médicos adicionales de una cirugía (anestesiólogo, ayudantes), gestionado con un `Repeater` en el formulario en vez de un Resource propio.
+  - `ordenes_estudio` — modelo unificado para laboratorio, rayos X, ecografía, centro de imagen, endoscopía alta/baja, gastroenterología y procedimientos ambulatorios, con resultado en texto y/o archivo adjunto opcional.
+  - `servicios_ambulancia` — la más simple: origen, destino, fecha/hora, paciente opcional (puede no estar registrado todavía).
+- **2 columnas nuevas en `citas`** (`origen`, `prioridad`, migración `2026_08_24_130007`) — cubren "Emergencias" sin necesitar una tabla propia: una emergencia que no requiere internamiento queda como una Cita normal con esos campos. Se agregaron también al formulario y tabla de Citas existentes (selector de prioridad condicional, badge de emergencia, filtro rápido).
+- **6 modelos nuevos**: `Cama` (con `ocupada()` derivado), `Quirofano`, `Internamiento`, `Cirugia` (con `medicosAdicionales()` BelongsToMany), `OrdenEstudio`, `ServicioAmbulancia`. Se agregaron también las relaciones inversas correspondientes a `Paciente`, `Medico` y `Cita`.
+- **6 Resources completos de Filament**, agrupados bajo "Infraestructura" en el menú: `Camas`, `Quirofanos`, `Internamientos`, `Cirugias`, `OrdenesEstudio`, `ServiciosAmbulancia`.
+  - Camas/Quirófanos: criterio de catálogo (admin todo, recepción edita, médico solo ve).
+  - Internamientos/Cirugías: criterio operativo tipo Citas (admin y recepción crean, médico ve/edita solo lo suyo filtrado por `medico_id`/`medico_principal_id`, nadie salvo admin borra).
+  - Órdenes de estudio: igual, pero el médico también puede crear (es quien solicita el estudio).
+  - Servicios de ambulancia: admin/recepción gestionan, médico solo ve.
+- **Supuestos documentados en esta entrada** (ver detalle ampliado con tabla en la sección 6.2 actualizada de `MEMORIA.md`): estado en tiempo real (sí, igual que inventario); cirugía puede agendarse sin pasar por Cita (sí, `cita_id` nullable); resultados de estudio con adjunto desde el día uno (sí, disco local de Sail, sin evaluar S3 todavía); triage con escala ESI (sí, ya validado con investigación externa en una entrada previa); sedes/sucursales múltiples (no, sigue asumiendo una sola ubicación).
+- **Validado con `php -l`** (se instaló PHP CLI temporalmente en el contenedor de trabajo para poder chequear sintaxis) — **pero, a diferencia del módulo de inventario, no se corrió la migración ni se probó en el entorno real todavía**, esta entrada se escribió sin acceso a Sail/MySQL.
+- Entregado como patch (`git am`).
+
 ## [2026-08-24] Documentación: pregunta pendiente sobre si faltan roles (farmacia)
 
 - Se le explicó al usuario, en un documento Word aparte, qué es cada módulo del sistema (con sus campos/opciones) y cómo se relacionan entre sí, incluyendo qué módulos no tienen relación directa.

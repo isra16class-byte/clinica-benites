@@ -48,6 +48,12 @@ class CitasTable
                     ->badge()
                     ->color(fn (string $state): string => self::colorEstado($state))
                     ->searchable(),
+                TextColumn::make('origen')
+                    ->label('Origen')
+                    ->badge()
+                    ->color(fn (string $state): string => $state === 'emergencia' ? 'danger' : 'gray')
+                    ->formatStateUsing(fn (string $state): string => ucfirst($state))
+                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -70,6 +76,10 @@ class CitasTable
                     ->label('Confirmadas')
                     ->toggle()
                     ->query(fn (Builder $query): Builder => $query->where('estado', 'confirmada')),
+                Filter::make('emergencias')
+                    ->label('Emergencias')
+                    ->toggle()
+                    ->query(fn (Builder $query): Builder => $query->where('origen', 'emergencia')),
             ])
             ->recordActions([
                 ActionGroup::make(self::accionesCambiarEstado())
