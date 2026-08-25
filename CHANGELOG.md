@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Orden de Estudio: nombre del adjunto usa paciente + tipo de estudio
+
+- Segundo cambio de criterio en el nombre de archivo del adjunto (`resultado_archivo`), a pedido del usuario, después de confirmar que el criterio anterior (ULID + nombre original del archivo subido, ver entrada anterior) funcionaba. El nombre original que trae el archivo del navegador no dice nada sobre a quién pertenece el resultado, así que se cambió a **`ULID-nombre-del-paciente-tipo-de-estudio.ext`** (ej. `01jz3k9x8h2m4n6p8q0r2s4t-paul-guerrero-laboratorio.pdf`).
+- `getUploadedFileNameForStorageUsing()` ahora recibe `Get $get` además de `TemporaryUploadedFile $file`, para leer `paciente_id` y `tipo` de otros campos del mismo formulario en el momento exacto del upload — mismo patrón que ya usaba `UserForm.php` (`->visible(fn (Get $get) => $get('rol') === 'medico')`).
+- Se extrajo la lista de tipos de estudio a un método privado `tiposEstudio()` en `OrdenEstudioForm`, reusado tanto por el `Select::make('tipo')` como por el nombre de archivo, para no repetir el arreglo en dos lugares.
+- **Importante para el flujo de trabajo**: el paciente y el tipo deben estar seleccionados en el formulario *antes* de subir el archivo — si se sube primero, el nombre cae a un texto genérico (`...-paciente-estudio.pdf`) en vez de fallar, ya que el orden de llenado de los campos no está forzado en el formulario.
+- **Confirmado funcionando por el usuario en el entorno real.**
+
+---
+
 ## [2026-08-24] Fix: Orden de Estudio — adjunto sin ver/descargar, sin restricción de tipo, y nombre de archivo ilegible
 
 - **Bug 1 — sin botones de ver/descargar**: el campo `FileUpload::make('resultado_archivo')` en `OrdenEstudioForm.php` no tenía `->openable()`/`->downloadable()`, así que no aparecía ninguna forma de abrir o descargar el archivo ya subido desde el formulario de edición.
