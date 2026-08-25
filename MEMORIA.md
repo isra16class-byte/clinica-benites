@@ -2,7 +2,9 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 24 de agosto de 2026 — decimocuarta entrada del día (a pedido del usuario, se cambió otra vez el criterio del nombre de archivo del adjunto de Orden de Estudio — de "ULID + nombre original subido" (decimotercera entrada) a **"ULID + nombre del paciente + tipo de estudio"** (ej. `01jz3k9x...-paul-guerrero-laboratorio.pdf`), para que el nombre en el disco identifique a quién pertenece el resultado en vez de depender del nombre que traía el archivo del navegador. Usa `Get $get` dentro de `getUploadedFileNameForStorageUsing()` para leer `paciente_id`/`tipo` del propio formulario en el momento del upload (mismo patrón que ya usaba `UserForm.php` para mostrar/ocultar el campo `medico_id` según el rol) — si el usuario sube el archivo antes de seleccionar paciente/tipo, cae a un texto genérico en vez de fallar. **Confirmado funcionando por el usuario en el entorno real.**)
+Última actualización: 25 de agosto de 2026 (se sincronizó el repo con `git pull` (traía el patch de la sección 6.2 aplicado en la sesión anterior) y se reemplazó el logo provisorio dibujado a mano por el **logo real de la clínica**, que el usuario compartió (imagen suelta + embebido en un PDF de servicios). Ver la nueva entrada "Logo real recibido y aplicado (25 ago 2026)" dentro de la sección 8.1 para el detalle completo. De paso, y en una conversación aparte sobre cómo mostrar el sistema en la entrevista sin llevar la laptop pesada, se agregó `URL::forceScheme('https')` condicional en `AppServiceProvider.php` — soluciona un problema de "mixed content" (CSS/JS bloqueados) al exponer el sistema local por un túnel HTTPS (Cloudflare Tunnel); no afecta nada en local porque solo se activa si `APP_URL` empieza con `https://`.)
+
+Última actualización anterior: 24 de agosto de 2026 — decimocuarta entrada del día (a pedido del usuario, se cambió otra vez el criterio del nombre de archivo del adjunto de Orden de Estudio — de "ULID + nombre original subido" (decimotercera entrada) a **"ULID + nombre del paciente + tipo de estudio"** (ej. `01jz3k9x...-paul-guerrero-laboratorio.pdf`), para que el nombre en el disco identifique a quién pertenece el resultado en vez de depender del nombre que traía el archivo del navegador. Usa `Get $get` dentro de `getUploadedFileNameForStorageUsing()` para leer `paciente_id`/`tipo` del propio formulario en el momento del upload (mismo patrón que ya usaba `UserForm.php` para mostrar/ocultar el campo `medico_id` según el rol) — si el usuario sube el archivo antes de seleccionar paciente/tipo, cae a un texto genérico en vez de fallar. **Confirmado funcionando por el usuario en el entorno real.**)
 
 Última actualización anterior: 24 de agosto de 2026 — decimotercera entrada del día (dos bugs más encontrados y corregidos al probar **Órdenes de Estudio** en el entorno real: (1) el adjunto (`resultado_archivo`) no tenía botones de ver/descargar — se agregó `->openable()`/`->downloadable()` — y no tenía restricción de tipo de archivo — se limitó a PDF/JPG/PNG/WEBP; (2) al usarlos, el botón "ver" daba `ERR_CONNECTION_REFUSED` en `localhost:8000` — causa real: el `.env` del usuario tenía `APP_URL=http://localhost:8000` pero Sail expone la app en el puerto 80 (`http://localhost`, sin puerto) según `compose.yaml` — se corrigió cambiando `APP_URL` en su `.env` local, no fue necesario tocar código. **Ambos confirmados funcionando por el usuario en el entorno real.** Además, a pedido del usuario, se cambió el nombre generado para el archivo guardado: en vez del nombre aleatorio de 26 caracteres por defecto de Filament (ilegible), ahora usa un ULID corto + el nombre original slugificado + extensión (`->getUploadedFileNameForStorageUsing()`), para que sea identificable sin arriesgar colisión entre archivos con el mismo nombre.)
 
@@ -125,9 +127,12 @@ clinica-benites/
         factura.blade.php       # Plantilla del comprobante de factura (CSS simple, para dompdf)
   public/
     images/
-      icon.svg                 # Monograma "CB" (favicon del panel /admin)
-      logo.svg                  # Ícono + "Clínica Benites" (logo del header del panel)
-    favicon.ico                 # Favicon del sitio en general (regenerado, antes vacío)
+      logo.png                   # Logo real (vertical, ícono + texto), navy — de la marca oficial, extraído de PDF del cliente
+      logo-white.png              # Misma versión, en blanco (para fondos oscuros)
+      logo-horizontal.png         # Recomposición horizontal (ícono izq. + texto der.) navy — usada en el header del panel (2.5rem de alto)
+      logo-horizontal-white.png   # Misma versión horizontal, en blanco
+      _legacy/                    # Logo placeholder (SVG dibujado a mano) anterior a tener el logo real; se conserva por si acaso
+    favicon.ico                 # Favicon regenerado desde el monograma real del logo
   routes/
     web.php                    # Ruta GET /facturas/{factura}/pdf, protegida con middleware auth
   docker-compose.yml         # Generado por Sail
@@ -399,11 +404,27 @@ A pedido del usuario, se personalizó el panel de Filament (antes con los defaul
 - **Si más adelante se consigue el logo real** (archivo vectorial/de alta resolución oficial de la clínica, o el dueño define una identidad de marca distinta): reemplazar directamente `public/images/logo.svg` e `icon.svg` (y regenerar `favicon.ico` con `cairosvg` siguiendo el mismo comando documentado arriba) — el resto de la configuración (`brandLogo()`, `favicon()`, color primario) no necesita cambiar, solo los archivos y, si el color de marca real es distinto, el valor de `Color::Teal`.
 - **No se tocó** la página web pública (`resources/views/welcome.blade.php`) — sigue siendo la de bienvenida por defecto de Laravel (solo cambia el `<title>` por el efecto indirecto de `APP_NAME`). La construcción real del sitio público sigue como pendiente de fondo (ver abajo).
 
+### Logo real recibido y aplicado (25 ago 2026, previo a la entrevista formal)
+
+El usuario compartió el logo oficial de la clínica (imagen suelta + embebido en dos páginas de un PDF de servicios, `Servicios_CB_2026.pdf`). Reemplaza al logo provisorio diseñado a mano (triángulo/hoja) descrito arriba.
+
+- **Origen del archivo**: no hay vectorial disponible, solo raster de baja resolución (184×185px, extraído del PDF recuperando su máscara de transparencia real — la primera extracción directa vino sin alpha, con fondo blanco sólido, así que se reconstruyó combinando la imagen de color con su `SMask` del PDF). Es un lockup **vertical**: monograma (ícono estilizado, parece una "F"/"B" entrelazadas o similar abstracción — no un texto literal) arriba, "CLÍNICA BENITES" + "EXCELENCIA QUIRÚRGICA" abajo, en dos líneas.
+- **Archivos nuevos en `public/images/`** (reemplazan a `logo.svg`/`icon.svg`, que se archivaron sin borrar en `public/images/_legacy/` por las dudas):
+  - `logo.png` — el lockup vertical completo, recoloreado a navy (`#12395c`, mismo tono que se venía usando) preservando la transparencia real. Usado en el encabezado de la factura PDF (ahí sí hay espacio vertical de sobra).
+  - `logo-white.png` — misma pieza, recoloreada a blanco, para fondos oscuros (no está en uso todavía, queda lista por si se necesita).
+  - `logo-horizontal.png` / `logo-horizontal-white.png` — **recomposición horizontal** (ícono a la izquierda + las dos líneas de texto a la derecha), armada recortando y reacomodando las mismas piezas del logo real (sin redibujar ni usar una tipografía nueva). Fue necesaria porque el lockup vertical, escalado a la altura chica del header del panel (`brandLogoHeight('2.5rem')` ≈ 40px), dejaba el texto ilegible — a esa altura el ancho resultante es demasiado angosto. La versión horizontal sí es legible a ese tamaño (probado con un render simulado a 40px de alto antes de aplicar).
+  - `public/favicon.ico` regenerado desde el monograma (recortado del logo real, con margen y fondo blanco para que se vea bien en pestañas claras u oscuras del navegador).
+- **Código actualizado**: `AdminPanelProvider.php` → `->brandLogo(asset('images/logo-horizontal.png'))` y `->favicon(asset('favicon.ico'))`. `resources/views/pdf/factura.blade.php` → se agregó el logo (`logo.png`, 50px de alto) en el encabezado, que antes solo tenía el nombre en texto.
+- **Color primario Teal sin cambios** — el navy del logo real es distinto al azul/turquesa del logo provisorio anterior, pero no se tocó `Color::Teal` en esta vuelta porque el usuario no lo pidió; queda como posible ajuste futuro si al verlo en el entorno real no combina bien.
+- **Limitación conocida**: la resolución fuente es baja (184×185px) porque no hay un archivo vectorial ni de alta resolución disponible — se ve bien a los tamaños actuales (favicon, header 2.5rem, factura 50px), pero si en el futuro se necesita el logo grande (ej. para imprimir, o un hero en la página web pública), conviene pedirle al dueño el archivo original en alta resolución o vectorial en la entrevista.
+- **Pendiente probar en el entorno real**: cómo se ve el logo horizontal en el header del panel y en el login, y el logo vertical en una factura generada de verdad (hasta ahora solo se verificó con renders simulados fuera de la app).
+
 **Otros pendientes de fondo, sin definir aún**:
 - Construir la página web pública (diseño, contenido) — sigue sin arrancar.
 - Sigue pendiente la respuesta del contacto interno de la clínica sobre cuántas áreas/especialidades tiene — no bloquea el desarrollo (el sistema ya soporta cualquier número de áreas dinámicamente), pero sería bueno tenerla para cargar datos reales en vez de datos de prueba.
 - No se ha hecho la entrevista formal con el dueño de la clínica.
-- Si se consigue el logo real de la clínica (archivo original), reemplazar el diseño provisorio de branding (ver sección 8.1).
+- ~~Si se consigue el logo real de la clínica (archivo original), reemplazar el diseño provisorio de branding~~ — hecho, ver entrada de arriba (25 ago 2026).
+
 
 ## 8.2 Theme propio del panel — encabezado de tablas (título + buscador en una sola fila)
 

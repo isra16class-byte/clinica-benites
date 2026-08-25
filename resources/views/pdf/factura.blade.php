@@ -19,6 +19,11 @@
             margin-bottom: 20px;
         }
 
+        .encabezado img.logo {
+            height: 50px;
+            margin-bottom: 6px;
+        }
+
         .encabezado h1 {
             font-size: 18px;
             margin: 0 0 4px 0;
@@ -102,6 +107,7 @@
 </head>
 <body>
     <div class="encabezado">
+        <img class="logo" src="{{ public_path('images/logo.png') }}" alt="Clínica Benites">
         <h1>{{ config('app.name', 'Clínica Benites') }}</h1>
         <p>Comprobante de factura</p>
     </div>

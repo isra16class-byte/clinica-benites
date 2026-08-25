@@ -8,6 +8,20 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Logo real de la clínica + fix de mixed content para túneles HTTPS
+
+- **Reemplazo del logo**: el usuario compartió el logo oficial de la clínica (imagen suelta + embebido en `Servicios_CB_2026.pdf`). Se reemplazó el logo provisorio (triángulo/hoja dibujado a mano en SVG, ver entrada `[2026-08-23]`) por el real.
+- Fuente: raster 184×185px (no hay vectorial disponible), reconstruido con su transparencia real combinando la imagen de color del PDF con su `SMask` — la primera extracción directa venía sin alpha (fondo blanco sólido horneado).
+- Archivos nuevos en `public/images/`: `logo.png` y `logo-white.png` (lockup vertical completo, navy y blanco), `logo-horizontal.png` y `logo-horizontal-white.png` (recomposición horizontal armada recortando/reacomodando las mismas piezas del logo real — necesaria porque el lockup vertical original, a la altura chica del header del panel, dejaba el texto ilegible). `public/favicon.ico` regenerado desde el monograma real. El logo placeholder anterior (`logo.svg`, `icon.svg`) se archivó en `public/images/_legacy/`, no se borró.
+- `AdminPanelProvider.php`: `->brandLogo()` ahora apunta a `logo-horizontal.png`, `->favicon()` a `favicon.ico`.
+- `resources/views/pdf/factura.blade.php`: se agregó el logo (`logo.png`, 50px alto) al encabezado de la factura, que antes solo mostraba el nombre en texto.
+- **Pendiente probar en el entorno real** (no se pudo correr la app en este entorno de trabajo, solo se validó con renders simulados fuera de Laravel).
+
+- **Fix de "mixed content" con túneles HTTPS**: al exponer el sistema local con Cloudflare Tunnel (para mostrarlo en la entrevista sin llevar la laptop pesada — la app corre en la laptop de casa y se accede por un link temporal), el navegador bloqueaba todo el CSS/JS del panel por "mixed content": la página cargaba por HTTPS (vía túnel) pero Laravel generaba los links a los assets con `http://`, porque no detecta que la petición original llegó por HTTPS detrás del proxy.
+- `AppServiceProvider.php`: se agregó `URL::forceScheme('https')` dentro de `boot()`, condicionado a que `config('app.url')` empiece con `https://`. En local (`APP_URL=http://localhost`) no se activa, así que no cambia nada del comportamiento normal de desarrollo.
+
+---
+
 ## [2026-08-24] Orden de Estudio: nombre del adjunto usa paciente + tipo de estudio
 
 - Segundo cambio de criterio en el nombre de archivo del adjunto (`resultado_archivo`), a pedido del usuario, después de confirmar que el criterio anterior (ULID + nombre original del archivo subido, ver entrada anterior) funcionaba. El nombre original que trae el archivo del navegador no dice nada sobre a quién pertenece el resultado, así que se cambió a **`ULID-nombre-del-paciente-tipo-de-estudio.ext`** (ej. `01jz3k9x8h2m4n6p8q0r2s4t-paul-guerrero-laboratorio.pdf`).
