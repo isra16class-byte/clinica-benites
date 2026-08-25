@@ -8,6 +8,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Confirmación final: Dashboard gerencial probado con datos históricos reales
+
+- El usuario confirmó por captura que, tras el fix de Carbon 3, "Alertas operativas" muestra días enteros y positivos en sus 3 secciones, y el resto del Dashboard gerencial (indicadores, ambos gráficos) se ve correcto.
+- Con esto se cierra el ciclo completo de esta sesión: `DemoHistoricoSeeder` generó datos históricos de prueba, y los 2 bugs que destapó (`translatedFormat()` sin cast, `diffInDays()` con signo/decimales de Carbon 3) quedan corregidos y confirmados.
+- Solo actualización de estado en `MEMORIA.md`/`CHANGELOG.md` — no se tocó código en esta entrada.
+
+---
+
 ## [2026-08-25] Fix: días con decimales y en negativo en Alertas operativas (Carbon 3)
 
 - Tras el fix del error 500 anterior, el usuario confirmó por captura de pantalla que el widget cargaba, pero mostraba días con decimales larguísimos y **en negativo** en Facturas vencidas (`-315.675032824 días`) y Camas ocupadas (`-22.002572832199 días internado`).
