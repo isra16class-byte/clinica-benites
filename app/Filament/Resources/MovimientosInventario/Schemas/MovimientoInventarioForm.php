@@ -68,12 +68,14 @@ class MovimientoInventarioForm
                     ->relationship('paciente', 'nombres')
                     ->label('Paciente (si es consumo en atención)')
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->visible(fn ($get): bool => $get('tipo_movimiento') === 'salida'),
                 Select::make('cita_id')
                     ->relationship('cita', 'id')
                     ->label('Cita relacionada')
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->visible(fn ($get): bool => $get('tipo_movimiento') === 'salida'),
                 Textarea::make('notas')
                     ->columnSpanFull(),
             ]);
