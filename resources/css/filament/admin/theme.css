@@ -25,6 +25,18 @@
  * documentadas como estables entre versiones de Filament, pero no se
  * pudo confirmar visualmente en esta sesión por falta de acceso a
  * Sail/npm — ver MEMORIA.md.
+ *
+ * FIX (25 ago 2026, confirmado por el usuario en el entorno real): (1) y
+ * (2) sí se vieron aplicados a la primera, pero (3) no tuvo ningún
+ * efecto — el ítem activo del menú seguía con el estilo tenue por
+ * defecto de Filament (fondo primary-50, texto primary-600, ya
+ * reaccionando solo al cambio de color primario de AdminPanelProvider,
+ * no a esta regla). Causa: el combinador de hijo directo (`>`) no
+ * coincidía con la estructura real del DOM de Filament, y sin
+ * `!important` esta regla tampoco ganaba contra el CSS propio del
+ * framework. Corregido usando anidamiento CSS con combinador
+ * descendiente (mismo patrón documentado oficialmente por Filament para
+ * este hook) + `!important`.
  */
 .fi-main {
     background-color: rgb(241 245 249);
@@ -39,13 +51,15 @@
     box-shadow: 0 1px 2px rgb(15 23 42 / 0.06), 0 1px 3px rgb(15 23 42 / 0.05);
 }
 
-.fi-sidebar-item-active > .fi-sidebar-item-button {
-    background-color: rgb(12 68 124);
-}
+.fi-sidebar-item-active {
+    .fi-sidebar-item-button {
+        background-color: rgb(12 68 124) !important;
 
-.fi-sidebar-item-active > .fi-sidebar-item-button .fi-sidebar-item-label,
-.fi-sidebar-item-active > .fi-sidebar-item-button .fi-sidebar-item-icon {
-    color: rgb(255 255 255);
+        .fi-sidebar-item-label,
+        .fi-sidebar-item-icon {
+            color: rgb(255 255 255) !important;
+        }
+    }
 }
 
 /*

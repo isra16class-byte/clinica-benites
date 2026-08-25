@@ -8,6 +8,15 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Fix 2: ítem activo del menú lateral seguía sin fondo sólido
+
+- El usuario confirmó por captura de pantalla, tras aplicar el patch anterior y recompilar, que (1) el fondo de página y (2) las sombras en tarjetas sí se veían — buena separación entre página y tarjetas. Pero (3) el ítem activo del menú lateral ("Escritorio") seguía con el pill tenue por defecto de Filament, no el fondo sólido azul marino esperado.
+- Causa: la regla usaba combinador de hijo directo (`.fi-sidebar-item-active > .fi-sidebar-item-button`), que no coincidía con la estructura real del DOM, y sin `!important` tampoco ganaba contra el CSS propio de Filament.
+- Fix: reescrito con anidamiento CSS y combinador descendiente (mismo patrón que usa la documentación oficial de Filament para este hook exacto) + `!important` en los 3 valores.
+- **Aún sin confirmar por el usuario en el entorno real** — corregido sin acceso a Sail/npm en esta sesión, pendiente que el usuario aplique el patch y recompile.
+
+---
+
 ## [2026-08-25] Fix: falta de contraste entre superficies (fondo, sidebar, tarjetas)
 
 - El usuario, tras ver el cambio de paleta anterior aplicado en el entorno real (captura de pantalla), señaló que "el sistema no tiene contraste con nada" — el color de marca ya se veía bien en los gráficos, pero el fondo de página, la barra lateral y las tarjetas usaban tonos casi idénticos entre sí, así que nada se separaba visualmente (ítem activo del menú apenas se distinguía, tarjetas "fundidas" con el fondo).
