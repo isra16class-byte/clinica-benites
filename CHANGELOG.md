@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Fix: `Call to a member function translatedFormat() on string` en Facturas vencidas
+
+- Al recargar el panel con datos del `DemoHistoricoSeeder` ya cargados, el widget "Alertas operativas" tiraba un error 500 al renderizar la sección de Facturas vencidas.
+- Causa (preexistente, no introducida por el seeder — solo nunca se había disparado antes por falta de datos de prueba con esa condición): `Factura.fecha` no tiene cast a `Carbon` en el modelo, pero `resources/views/filament/widgets/alertas-operativas-widget.blade.php` llamaba `$factura->fecha->translatedFormat(...)` asumiendo que sí lo era.
+- Fix: se envolvió `$factura->fecha` en `Carbon::parse(...)` en las 2 líneas afectadas de esa vista, mismo patrón ya usado en `FacturaResource`/`CitaResource`. No se tocó el modelo ni ningún otro archivo.
+- Ver `MEMORIA.md` (decimosexta entrada del día) para el detalle completo.
+- **Aún sin confirmar por el usuario en el entorno real** — corregido sin acceso a Sail/MySQL.
+
+---
+
 ## [2026-08-25] Confirmación: DemoHistoricoSeeder corrió sin errores en el entorno real
 
 - El usuario corrió `./vendor/bin/sail artisan db:seed --class=DemoHistoricoSeeder` y terminó con "Datos de demostración cargados." en ~1.8s, sin errores de foreign key ni de tipo.

@@ -80,8 +80,8 @@
                                 </span>
                                 <span class="text-gray-500 dark:text-gray-400">
                                     — ${{ number_format($factura->monto, 2) }},
-                                    emitida {{ $factura->fecha->translatedFormat('d M Y') }}
-                                    ({{ now()->diffInDays($factura->fecha) }} días)
+                                    emitida {{ \Illuminate\Support\Carbon::parse($factura->fecha)->translatedFormat('d M Y') }}
+                                    ({{ now()->diffInDays(\Illuminate\Support\Carbon::parse($factura->fecha)) }} días)
                                 </span>
                             </li>
                         @endforeach
