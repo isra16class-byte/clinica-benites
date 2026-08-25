@@ -8,6 +8,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Confirmación: Sesión 2 del Dashboard gerencial, completa en el entorno real
+
+- El usuario confirmó que el fix del gráfico "Por área" (entrada anterior) funcionó — ahora muestra las barras correctamente en ambas métricas ("Cantidad de citas" y "Monto facturado").
+- Con esto, la Sesión 2 completa (2 gráficos, sus selectores, el formato `$`, y la limitación de facturas sin `cita_id`) queda **confirmada de punta a punta en el entorno real**.
+- Solo actualización de estado en `MEMORIA.md` (secciones 6.6.2 y 7) y `CHANGELOG.md` — no se tocó código en esta entrada.
+
+---
+
 ## [2026-08-25] Fix: gráfico "Por área" en blanco con métrica "Cantidad de citas"
 
 - Bug reportado por el usuario al probar en el entorno real el ajuste de formato `$` de la entrada anterior: el gráfico "Por área" quedaba completamente vacío (sin barras, sin ejes) con "Cantidad de citas" seleccionado; solo funcionaba con "Monto facturado".
