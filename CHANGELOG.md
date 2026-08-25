@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Fix: días con decimales y en negativo en Alertas operativas (Carbon 3)
+
+- Tras el fix del error 500 anterior, el usuario confirmó por captura de pantalla que el widget cargaba, pero mostraba días con decimales larguísimos y **en negativo** en Facturas vencidas (`-315.675032824 días`) y Camas ocupadas (`-22.002572832199 días internado`).
+- Causa: Carbon 3 (usado en este proyecto sobre Laravel 13) cambió el comportamiento por defecto de `diffInDays()` — ahora devuelve una diferencia con signo y con decimales, en vez del entero absoluto de Carbon 2.
+- Fix: las 3 llamadas a `now()->diffInDays(...)` en `alertas-operativas-widget.blade.php` (lotes, facturas, camas) ahora pasan `true` como segundo argumento (valor absoluto) y se envuelven en `(int) round(...)`.
+- Ver `MEMORIA.md` (decimoséptima entrada del día) para el detalle completo.
+- **Aún sin confirmar por el usuario en el entorno real** — corregido sin acceso a Sail/MySQL.
+
+---
+
 ## [2026-08-25] Fix: `Call to a member function translatedFormat() on string` en Facturas vencidas
 
 - Al recargar el panel con datos del `DemoHistoricoSeeder` ya cargados, el widget "Alertas operativas" tiraba un error 500 al renderizar la sección de Facturas vencidas.

@@ -34,7 +34,7 @@
                                 <span class="text-gray-500 dark:text-gray-400">
                                     — lote {{ $lote->numero_lote }},
                                     vence {{ $lote->fecha_vencimiento->translatedFormat('d M Y') }}
-                                    ({{ $lote->fecha_vencimiento->isPast() ? 'vencido' : 'en ' . now()->diffInDays($lote->fecha_vencimiento) . ' días' }})
+                                    ({{ $lote->fecha_vencimiento->isPast() ? 'vencido' : 'en ' . (int) round(now()->diffInDays($lote->fecha_vencimiento, true)) . ' días' }})
                                 </span>
                             </li>
                         @endforeach
@@ -81,7 +81,7 @@
                                 <span class="text-gray-500 dark:text-gray-400">
                                     — ${{ number_format($factura->monto, 2) }},
                                     emitida {{ \Illuminate\Support\Carbon::parse($factura->fecha)->translatedFormat('d M Y') }}
-                                    ({{ now()->diffInDays(\Illuminate\Support\Carbon::parse($factura->fecha)) }} días)
+                                    ({{ (int) round(now()->diffInDays(\Illuminate\Support\Carbon::parse($factura->fecha), true)) }} días)
                                 </span>
                             </li>
                         @endforeach
@@ -124,7 +124,7 @@
                                 </span>
                                 <span class="text-gray-500 dark:text-gray-400">
                                     — {{ $internamiento?->paciente?->nombres ?? 'paciente sin datos' }},
-                                    {{ $internamiento ? now()->diffInDays($internamiento->fecha_ingreso) : '?' }} días internado
+                                    {{ $internamiento ? (int) round(now()->diffInDays($internamiento->fecha_ingreso, true)) : '?' }} días internado
                                 </span>
                             </li>
                         @endforeach
