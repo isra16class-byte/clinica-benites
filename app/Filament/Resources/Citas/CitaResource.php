@@ -17,12 +17,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 class CitaResource extends Resource
 {
     protected static ?string $model = Cita::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Atención al paciente';
 
     // Cita no tiene un único campo de texto representativo (es una relación
     // entre paciente/médico/horario), así que se fija un atributo real solo

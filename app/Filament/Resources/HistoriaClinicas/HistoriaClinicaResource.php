@@ -19,12 +19,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 class HistoriaClinicaResource extends Resource
 {
     protected static ?string $model = HistoriaClinica::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Atención al paciente';
 
     // Igual que en Cita: no hay un único campo representativo, se fija uno
     // real solo para habilitar la búsqueda global (el título se personaliza

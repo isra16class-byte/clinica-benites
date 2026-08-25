@@ -14,6 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 /**
  * Catálogo de medicamentos e insumos (sección 6.3 de MEMORIA.md).
@@ -31,6 +32,8 @@ class ItemInventarioResource extends Resource
     protected static ?string $model = ItemInventario::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBeaker;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Inventario';
 
     protected static ?string $recordTitleAttribute = 'nombre';
 

@@ -14,6 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 /**
  * Lotes de cada ítem del catálogo (trazabilidad FEFO, sección 6.3 de
@@ -25,6 +26,8 @@ class LoteInventarioResource extends Resource
     protected static ?string $model = LoteInventario::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArchiveBox;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Inventario';
 
     protected static ?string $recordTitleAttribute = 'numero_lote';
 

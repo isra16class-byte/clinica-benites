@@ -14,6 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 /**
  * Movimientos de inventario — entradas, salidas, traslados y ajustes
@@ -27,6 +28,8 @@ class MovimientoInventarioResource extends Resource
     protected static ?string $model = MovimientoInventario::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowsRightLeft;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Inventario';
 
     protected static ?string $recordTitleAttribute = 'tipo_movimiento';
 

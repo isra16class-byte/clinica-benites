@@ -2,7 +2,9 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 25 de agosto de 2026 (se sincronizó el repo con `git pull` (traía el patch de la sección 6.2 aplicado en la sesión anterior) y se reemplazó el logo provisorio dibujado a mano por el **logo real de la clínica**, que el usuario compartió (imagen suelta + embebido en un PDF de servicios). Ver la nueva entrada "Logo real recibido y aplicado (25 ago 2026)" dentro de la sección 8.1 para el detalle completo. De paso, y en una conversación aparte sobre cómo mostrar el sistema en la entrevista sin llevar la laptop pesada, se agregó `URL::forceScheme('https')` condicional en `AppServiceProvider.php` — soluciona un problema de "mixed content" (CSS/JS bloqueados) al exponer el sistema local por un túnel HTTPS (Cloudflare Tunnel); no afecta nada en local porque solo se activa si `APP_URL` empieza con `https://`.)
+Última actualización: 25 de agosto de 2026 — segunda entrada del día (a pedido del usuario, se organizó el menú lateral del panel en grupos de navegación (`$navigationGroup`), ya que solo el módulo de Infraestructura tenía grupo propio y los otros 10 Resources aparecían todos sueltos y mezclados. Ver el detalle completo en la sección 8.4 (nueva) más abajo — no se tocaron íconos ni ningún otro comportamiento, solo la agrupación del menú.)
+
+Última actualización anterior: 25 de agosto de 2026 (se sincronizó el repo con `git pull` (traía el patch de la sección 6.2 aplicado en la sesión anterior) y se reemplazó el logo provisorio dibujado a mano por el **logo real de la clínica**, que el usuario compartió (imagen suelta + embebido en un PDF de servicios). Ver la nueva entrada "Logo real recibido y aplicado (25 ago 2026)" dentro de la sección 8.1 para el detalle completo. De paso, y en una conversación aparte sobre cómo mostrar el sistema en la entrevista sin llevar la laptop pesada, se agregó `URL::forceScheme('https')` condicional en `AppServiceProvider.php` — soluciona un problema de "mixed content" (CSS/JS bloqueados) al exponer el sistema local por un túnel HTTPS (Cloudflare Tunnel); no afecta nada en local porque solo se activa si `APP_URL` empieza con `https://`.)
 
 Última actualización anterior: 24 de agosto de 2026 — decimocuarta entrada del día (a pedido del usuario, se cambió otra vez el criterio del nombre de archivo del adjunto de Orden de Estudio — de "ULID + nombre original subido" (decimotercera entrada) a **"ULID + nombre del paciente + tipo de estudio"** (ej. `01jz3k9x...-paul-guerrero-laboratorio.pdf`), para que el nombre en el disco identifique a quién pertenece el resultado en vez de depender del nombre que traía el archivo del navegador. Usa `Get $get` dentro de `getUploadedFileNameForStorageUsing()` para leer `paciente_id`/`tipo` del propio formulario en el momento del upload (mismo patrón que ya usaba `UserForm.php` para mostrar/ocultar el campo `medico_id` según el rol) — si el usuario sube el archivo antes de seleccionar paciente/tipo, cae a un texto genérico en vez de fallar. **Confirmado funcionando por el usuario en el entorno real.**)
 
@@ -463,6 +465,26 @@ El usuario compartió el logo oficial de la clínica (imagen suelta + embebido e
 - Archivo nuevo: `app/Filament/Concerns/HasBackFormAction.php` (carpeta `Concerns/` nueva dentro de `app/Filament/`, para código compartido entre Resources que no es un Resource en sí mismo).
 
 **Confirmado funcionando por el usuario en el entorno real**, en las 7 pantallas de Editar.
+
+## 8.4 Agrupar el menú lateral en categorías (navigationGroup)
+
+**Motivo**: solo el módulo de Infraestructura (Camas, Quirófanos, Cirugías, Internamientos, Órdenes de Estudio, Servicios Ambulancia) tenía `$navigationGroup` asignado. Los otros 10 Resources (Pacientes, Citas, Facturas, Historia Clínicas, Áreas, Médicos, Usuarios, Item/Lote/Movimiento Inventarios) aparecían todos sueltos en el sidebar, sin ningún criterio de orden — el usuario lo notó al ver la captura del listado de Facturas y pidió aplicar el mismo criterio de agrupación que ya existía para Infraestructura.
+
+**Grupos definidos** (criterio: frecuencia de uso del día a día primero, catálogos/administración al final):
+- **Atención al paciente**: Pacientes, Citas, Historia Clínicas.
+- **Facturación**: Facturas.
+- **Infraestructura** (ya existía, sin cambios): Camas, Quirófanos, Cirugías, Internamientos, Órdenes de Estudio, Servicios Ambulancia.
+- **Inventario**: Item Inventarios, Lote Inventarios, Movimiento Inventarios.
+- **Administración**: Áreas, Médicos, Usuarios.
+- **Escritorio** (Dashboard) queda sin grupo, como está ahora — es una Page, no un Resource, y va arriba de todo.
+
+**Qué se hizo**: en cada uno de los 10 Resources, se agregó `use UnitEnum;` (import) y la propiedad `protected static string|UnitEnum|null $navigationGroup = '...';`, mismo patrón ya usado en Infraestructura. Cambio puramente de organización del menú — no se tocaron permisos, íconos, ni ningún otro comportamiento.
+
+**Nota sobre permisos y grupos**: Filament oculta automáticamente un grupo entero del sidebar si el usuario logueado no tiene acceso a ningún Resource de ese grupo (según los `canViewAny()` ya existentes en cada Resource) — no hizo falta ningún ajuste extra para que, por ejemplo, un médico no vea el grupo "Administración".
+
+**Pendiente, no incluido en este cambio**: diferenciar los íconos del sidebar — hoy varios Resources comparten el mismo ícono genérico (`Heroicon::OutlinedRectangleStack`): Áreas, Citas, Facturas, Historia Clínicas, Médicos y Pacientes lo usan los seis. Ayudaría a distinguirlos de un vistazo dentro de cada grupo, pero no se aplicó en esta vuelta porque este entorno de trabajo no tiene `vendor/` instalado (no se pudo verificar contra el enum real `Filament\Support\Icons\Heroicon` qué nombres de ícono son válidos en la versión de Filament instalada, y poner un nombre inválido rompería el panel). Si se quiere hacer, conviene definir los íconos junto al usuario con el entorno real corriendo para poder probar cada uno antes de commitear.
+
+**Pendiente probar en el entorno real**: cómo queda el sidebar con los 5 grupos, y si el orden entre grupos (Atención al paciente → Facturación → Infraestructura → Inventario → Administración) es el orden en que realmente aparecen — Filament los muestra por orden de aparición/registro de los Resources salvo que se use `navigationGroups()` explícito en el `AdminPanelProvider` para forzar un orden; no se tocó eso en esta vuelta, así que el orden final depende del orden de descubrimiento de Filament (alfabético por defecto salvo indicación contraria).
 
 ## 9. Propuesta de funciones futuras (investigadas, no priorizadas aún)
 

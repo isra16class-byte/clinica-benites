@@ -17,12 +17,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 class FacturaResource extends Resource
 {
     protected static ?string $model = Factura::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Facturación';
 
     // Igual que en Cita e HistoriaClinica: solo para habilitar la búsqueda
     // global, el título real se arma en getGlobalSearchResultTitle().

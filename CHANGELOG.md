@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Agrupar el menú lateral del panel en categorías
+
+- Solo el módulo de Infraestructura tenía `$navigationGroup` asignado; los otros 10 Resources aparecían sueltos y mezclados en el sidebar. El usuario lo notó al ver el listado de Facturas y pidió aplicar el mismo criterio de agrupación al resto.
+- Se definieron 5 grupos: **Atención al paciente** (Pacientes, Citas, Historia Clínicas), **Facturación** (Facturas), **Infraestructura** (sin cambios), **Inventario** (Item/Lote/Movimiento Inventarios), **Administración** (Áreas, Médicos, Usuarios).
+- En cada uno de los 10 Resources: se agregó `use UnitEnum;` y `protected static string|UnitEnum|null $navigationGroup = '...';`, mismo patrón que ya usaba Infraestructura.
+- Cambio puramente organizativo — no se tocaron permisos ni íconos. Ver sección 8.4 de `MEMORIA.md` para el detalle completo, incluyendo por qué no se tocaron los íconos repetidos en esta vuelta.
+- **Pendiente probar en el entorno real** (no se pudo correr la app en este entorno de trabajo).
+
+---
+
 ## [2026-08-25] Logo real de la clínica + fix de mixed content para túneles HTTPS
 
 - **Reemplazo del logo**: el usuario compartió el logo oficial de la clínica (imagen suelta + embebido en `Servicios_CB_2026.pdf`). Se reemplazó el logo provisorio (triángulo/hoja dibujado a mano en SVG, ver entrada `[2026-08-23]`) por el real.
