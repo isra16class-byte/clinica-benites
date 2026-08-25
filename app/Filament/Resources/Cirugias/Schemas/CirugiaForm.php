@@ -66,7 +66,6 @@ class CirugiaForm
                 // original (sección 6.2 de MEMORIA.md, grupo 2): una
                 // cirugía suele involucrar más de un médico.
                 Repeater::make('medicosAdicionales')
-                    ->relationship()
                     ->label('Médicos adicionales')
                     ->addActionLabel('Agregar médico')
                     ->schema([
