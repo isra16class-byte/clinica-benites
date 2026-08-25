@@ -4,6 +4,51 @@
 @source '../../../../resources/views/filament';
 
 /*
+ * Refuerzo de contraste entre superficies (25 ago 2026, a pedido del
+ * usuario al ver el panel real tras el cambio de paleta: "el sistema no
+ * tiene contraste con nada"). Diagnóstico: por defecto Filament usa el
+ * fondo de página, la barra lateral y las tarjetas/widgets en tonos
+ * blanco/gris casi idénticos entre sí — el color de marca ya aplicado
+ * (ver más abajo en este archivo y en AdminPanelProvider) no alcanza
+ * para separar visualmente los bloques si todos "flotan" sobre el mismo
+ * fondo. Se agregan 3 ajustes puntuales, sin tocar ningún layout:
+ *   1. Fondo de página (.fi-main) un tono gris-azulado, más oscuro que
+ *      el blanco de las tarjetas, para que estas se noten como bloques
+ *      separados en vez de fundirse con el fondo.
+ *   2. Sombra sutil en tarjetas/secciones (.fi-section) y en las 4
+ *      tarjetas de indicadores (.fi-wi-stats-overview-stat), que además
+ *      de la separación de color ya lograda con (1) suma profundidad.
+ *   3. Ítem activo del menú lateral con fondo sólido de marca (azul
+ *      marino) en vez de solo texto azul sobre blanco, que se perdía a
+ *      simple vista (ver captura compartida por el usuario).
+ * Hook classes (.fi-main, .fi-section, .fi-sidebar-item-active, etc.)
+ * documentadas como estables entre versiones de Filament, pero no se
+ * pudo confirmar visualmente en esta sesión por falta de acceso a
+ * Sail/npm — ver MEMORIA.md.
+ */
+.fi-main {
+    background-color: rgb(241 245 249);
+}
+
+.dark .fi-main {
+    background-color: rgb(15 23 42);
+}
+
+.fi-section,
+.fi-wi-stats-overview-stat {
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.06), 0 1px 3px rgb(15 23 42 / 0.05);
+}
+
+.fi-sidebar-item-active > .fi-sidebar-item-button {
+    background-color: rgb(12 68 124);
+}
+
+.fi-sidebar-item-active > .fi-sidebar-item-button .fi-sidebar-item-label,
+.fi-sidebar-item-active > .fi-sidebar-item-button .fi-sidebar-item-icon {
+    color: rgb(255 255 255);
+}
+
+/*
  * Junta, en todas las tablas del panel (Resources y widgets como
  * "Citas de hoy"), el encabezado con el título/acciones (.fi-ta-header)
  * y la barra de herramientas con el buscador/filtros (.fi-ta-header-toolbar)

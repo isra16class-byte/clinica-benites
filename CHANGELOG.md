@@ -8,6 +8,15 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Fix: falta de contraste entre superficies (fondo, sidebar, tarjetas)
+
+- El usuario, tras ver el cambio de paleta anterior aplicado en el entorno real (captura de pantalla), señaló que "el sistema no tiene contraste con nada" — el color de marca ya se veía bien en los gráficos, pero el fondo de página, la barra lateral y las tarjetas usaban tonos casi idénticos entre sí, así que nada se separaba visualmente (ítem activo del menú apenas se distinguía, tarjetas "fundidas" con el fondo).
+- `theme.css`: se agregaron 3 reglas puntuales, sin tocar layout — fondo de página (`.fi-main`) gris-azulado en vez de casi blanco; sombra sutil en tarjetas/secciones (`.fi-section`) y en los 4 indicadores (`.fi-wi-stats-overview-stat`); ítem activo del menú lateral con fondo sólido azul marino y texto blanco en vez de solo texto azul.
+- Se usaron hook classes documentadas como estables de Filament (`.fi-main`, `.fi-section`, `.fi-sidebar-item-active`, etc.), pero no se pudieron confirmar contra el HTML real del proyecto (sin acceso a Sail/inspector en esta sesión) — si alguna clase no coincide exactamente con la versión instalada (Filament 5.7.6), la regla correspondiente simplemente no tendría efecto, sin romper nada.
+- **Aún sin confirmar por el usuario en el entorno real.**
+
+---
+
 ## [2026-08-25] Rediseño visual: paleta de marca (azul marino + verde azulado) en panel y gráficos
 
 - A pedido del usuario, que compartió una captura del Dashboard gerencial pidiendo ideas de color/organización, se propuso una paleta de 3 colores con significado (no decorativa) y se aplicó directo al panel.
