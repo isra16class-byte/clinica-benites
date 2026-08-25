@@ -9,6 +9,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class OrdenEstudioForm
 {
@@ -75,6 +77,14 @@ class OrdenEstudioForm
                     ->disk('public')
                     ->directory('estudios')
                     ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
+                    // Conserva el nombre original (legible) con un prefijo
+                    // corto único adelante, para que dos archivos con el
+                    // mismo nombre nunca se sobreescriban entre sí.
+                    ->getUploadedFileNameForStorageUsing(
+                        fn (TemporaryUploadedFile $file): string => Str::ulid().'-'.Str::slug(
+                            pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
+                        ).'.'.$file->getClientOriginalExtension()
+                    )
                     ->openable()
                     ->downloadable()
                     ->columnSpanFull(),
