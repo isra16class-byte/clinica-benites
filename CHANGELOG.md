@@ -8,6 +8,20 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-24] Fix: Cirugía — Repeater de médicos adicionales insertaba médicos vacíos
+
+- **Bug reportado por el usuario** al probar el módulo de Infraestructura física (sección 6.2) en el entorno real por primera vez: al crear una Cirugía agregando al menos un "médico adicional" (anestesiólogo/ayudante), Filament tiraba `SQLSTATE[HY000]: General error: 1364 Field 'nombres' doesn't have a default value` al intentar `insert into medicos (updated_at, created_at) values (...)`.
+- **Causa**: `Repeater::make('medicosAdicionales')->relationship()` en `CirugiaForm.php`, sobre la relación `Cirugia::medicosAdicionales()` (un `belongsToMany` con pivote `cirugia_medico`, columna extra `rol`). Filament interpreta `Repeater::relationship()` como "crear un registro **nuevo** en la tabla relacionada (`medicos`) por cada fila del repeater" — no como "seleccionar un médico **ya existente** y guardar su rol en la tabla pivote". Como el schema del repeater solo tenía `medico_id` y `rol` (campos que no existen en `medicos`), el insert quedaba vacío salvo los timestamps.
+- **Efecto secundario detectado por el usuario**: mientras el error no daba feedback visual claro, dio clic varias veces al botón "Crear cirugía" — cada clic sí llegó a insertar la fila en `cirugias` antes de fallar en el paso del repeater, dejando 4 registros duplicados en el listado. Se le indicó borrarlos a mano desde `/admin/cirugias` (selección múltiple + Eliminar) — no era necesario ni posible corregir eso con código, ya estaban en la base de datos del usuario.
+- **Solución aplicada**:
+  - `CirugiaForm.php`: se quitó `->relationship()` del `Repeater('medicosAdicionales')` — ahora es un campo de estado normal, sin auto-guardado hacia el modelo relacionado.
+  - `CreateCirugia.php`: nuevo `mutateFormDataBeforeCreate()` que extrae los datos del repeater antes de crear la Cirugía (no son un campo de `cirugias`, se descartarían igual por `$fillable`, pero se sacan explícito para claridad), y nuevo `afterCreate()` que hace `sync()` manual de `medicosAdicionales()` con el `rol` de cada médico en la tabla pivote.
+  - `EditCirugia.php`: nuevo `mutateFormDataBeforeFill()` que carga los médicos adicionales ya guardados (con su `rol`) al abrir el formulario de edición, para que se vean en el Repeater; `mutateFormDataBeforeSave()` + `afterSave()` con el mismo patrón de `sync()` que en Create.
+- **Alcance del bug**: solo afectaba a Cirugía — es el único Resource del módulo 6.2 (o de todo el sistema) con un Repeater manejando una relación `belongsToMany` con datos extra de pivote. El resto de Resources de 6.2 (Camas, Quirófanos, Internamientos, Órdenes de Estudio, Servicios de Ambulancia) no usa este patrón y no se vio afectado.
+- **Confirmado funcionando por el usuario en el entorno real** (creación de cirugía con médico adicional y su rol, guardado correctamente en la tabla pivote).
+
+---
+
 ## [2026-08-24] Segundo módulo construido: Infraestructura física (camas, quirófanos, cirugías, estudios, ambulancia)
 
 - A pedido del usuario, se **construyó** (mismo criterio que el módulo de Medicamentos e Insumos) la propuesta de la sección 6.2 de `MEMORIA.md` — infraestructura física: Hospitalización/UCI/UCIN, Quirófanos/Cirugías, Procedimientos/Estudios, Emergencias, Ambulancia. Se avanzó con **supuestos razonables** sobre las 5 decisiones que seguían sin confirmar con la clínica, documentándolos en la sección 6.2 actualizada para poder ajustarlos después.
