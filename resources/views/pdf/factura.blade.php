@@ -108,7 +108,7 @@
 <body>
     <div class="encabezado">
         <img class="logo" src="{{ public_path('images/logo.png') }}" alt="Clínica Benites">
-        <h1>{{ config('app.name', 'Clínica Benites') }}</h1>
+        <h1>Clínica Benites</h1>
         <p>Comprobante de factura</p>
     </div>
 
@@ -180,7 +180,7 @@
     </div>
 
     <div class="pie">
-        Generado el {{ \Illuminate\Support\Carbon::now()->format('d/m/Y H:i') }} desde el sistema interno de {{ config('app.name', 'Clínica Benites') }}.
+        Generado el {{ \Illuminate\Support\Carbon::now()->format('d/m/Y H:i') }} desde el sistema interno de Clínica Benites.
     </div>
 </body>
 </html>
