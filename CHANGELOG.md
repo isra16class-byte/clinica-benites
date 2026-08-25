@@ -8,6 +8,21 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Sesión 3 del Dashboard gerencial — Alertas operativas (última de las 3 sesiones)
+
+- Se construyó `app/Filament/Widgets/AlertasOperativasWidget.php` + su vista `resources/views/filament/widgets/alertas-operativas-widget.blade.php`, un widget custom (`Filament\Widgets\Widget`, no `StatsOverviewWidget`/`ChartWidget`) con 3 alertas operativas, cada una con contador, hasta 5 ítems concretos y link al listado completo del recurso:
+  - **Lotes por vencer**: `LoteInventario` con `fecha_vencimiento` dentro de 90 días y stock actual > 0.
+  - **Facturas vencidas**: `Factura` con `estado_pago = pendiente` y más de 30 días desde su `fecha` de emisión.
+  - **Camas ocupadas hace mucho**: `Cama` con internamiento activo (`fecha_alta` nula) con más de 14 días desde `fecha_ingreso`.
+- Los 2 umbrales sin confirmar (cama ocupada, factura vencida) se le preguntaron al usuario, que pidió que se decidiera un valor razonable en su lugar — quedaron en 14 y 30 días respectivamente, documentados como constantes editables en la clase. El umbral de lotes (90 días) se mantuvo igual al default ya existente en `LoteInventario::porVencer()`.
+- `CitasDeHoyWidget` se corrió de `$sort = 3` a `4` para dejarle lugar al widget nuevo en `$sort = 3`.
+- No se creó ninguna tabla, migración ni modelo nuevo — 100% queries sobre `LoteInventario`, `Factura` y `Cama`/`Internamiento` ya existentes.
+- Con esto, el Dashboard gerencial completo (las 3 sesiones planificadas en `MEMORIA.md` sección 6.6) queda construido.
+- Ver `MEMORIA.md` sección 6.6.3 para el detalle completo.
+- **Aún sin confirmar por el usuario en el entorno real** — escrito sin acceso directo a Sail, se validó sintaxis instalando `php-cli` en el entorno de trabajo y corriendo `php -l`.
+
+---
+
 ## [2026-08-25] Confirmación: Sesión 2 del Dashboard gerencial, completa en el entorno real
 
 - El usuario confirmó que el fix del gráfico "Por área" (entrada anterior) funcionó — ahora muestra las barras correctamente en ambas métricas ("Cantidad de citas" y "Monto facturado").
