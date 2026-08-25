@@ -13,7 +13,10 @@ use Illuminate\Support\Facades\Auth;
 
 class CitasDeHoyWidget extends BaseWidget
 {
-    protected static ?int $sort = 1;
+    // Sesión 2 del Dashboard gerencial (MEMORIA.md sección 6.6.2) agregó 2
+    // widgets de gráficos (sort 1 y 2) arriba de este — se corre este de
+    // 1 a 3 para dejarlos siempre debajo de los indicadores/gráficos.
+    protected static ?int $sort = 3;
 
     protected int|string|array $columnSpan = 'full';
 

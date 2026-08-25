@@ -8,6 +8,18 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Feature: Sesión 2 del Dashboard gerencial — gráficos
+
+- Se construyeron los 2 `ChartWidget` de la Sesión 2: `app/Filament/Widgets/IngresosPorMesChartWidget.php` y `app/Filament/Widgets/FacturacionPorAreaChartWidget.php`, ubicados entre `IndicadoresGerencialesWidget` (`$sort = 0`) y `CitasDeHoyWidget` (corrido de `$sort = 1` a `3`). Visibles solo para el rol `admin`, mismo patrón `canView()` que el resto del Dashboard gerencial.
+- **Ingresos por mes** (`$sort = 1`, gráfico de barras): 2 series por mes — "Facturado" (total) y "Cobrado" (`estado_pago = pagado`) — con un selector de rango (`getFilters()`): últimos 6 meses (default), últimos 12 meses, año actual, año anterior. Resuelve la pregunta pendiente de "rango de fechas seleccionable", respondida por el usuario.
+- **Por área** (`$sort = 2`, gráfico de barras): cantidad de citas o monto facturado por área/especialidad, con un selector de métrica (`getFilters()`: "Cantidad de citas" / "Monto facturado"), también respondida por el usuario. Alcance fijo al año en curso — no se agregó un segundo selector de rango en este widget para no depender del mecanismo de filtros por schema de Filament (más nuevo, sin validar en este proyecto); queda documentado como supuesto editable en MEMORIA.md 6.6.2.
+- Limitación conocida documentada: el monto facturado por área solo cuenta facturas con `cita_id` asociado (una factura sin cita no se puede atribuir a ningún área con el modelo actual).
+- No se creó ninguna tabla ni migración — solo queries sobre `Factura`, `Cita` y `Area`, ya existentes.
+- Sintaxis validada con `php -l`. **Pendiente confirmar en el entorno real.**
+- Detalle completo en la sección **6.6.2** de `MEMORIA.md`.
+
+---
+
 ## [2026-08-25] Feature: Sesión 1 del Dashboard gerencial — indicadores clave
 
 - Se construyó `app/Filament/Widgets/IndicadoresGerencialesWidget.php` (`StatsOverviewWidget`), la Sesión 1 del plan documentado en la entrada anterior.
