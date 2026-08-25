@@ -71,9 +71,12 @@ class OrdenEstudioForm
                 // storage externo tipo S3, por ahora disco local de Sail).
                 FileUpload::make('resultado_archivo')
                     ->label('Resultado (archivo adjunto)')
-                    ->helperText('Opcional — ej. radiografía escaneada, PDF de laboratorio')
+                    ->helperText('Opcional — ej. radiografía escaneada, PDF de laboratorio. Acepta PDF e imágenes (JPG/PNG/WEBP).')
                     ->disk('public')
                     ->directory('estudios')
+                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
+                    ->openable()
+                    ->downloadable()
                     ->columnSpanFull(),
                 Textarea::make('notas')
                     ->columnSpanFull(),
