@@ -8,6 +8,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Confirmación: Dashboard gerencial completo, de punta a punta en el entorno real
+
+- El usuario confirmó que, tras aplicar el patch del `@source` faltante y recompilar con `npm run build`, las 3 tarjetas de "Alertas operativas" ya se ven lado a lado en 3 columnas.
+- Con esto, el Dashboard gerencial completo — las 3 sesiones planificadas en `MEMORIA.md` sección 6.6 (indicadores clave, gráficos, alertas operativas) — queda **construido y confirmado de punta a punta en el entorno real**.
+- Solo actualización de estado en `MEMORIA.md` (secciones 6.6, 6.6.3) y `CHANGELOG.md` — no se tocó código en esta entrada.
+
+---
+
 ## [2026-08-25] Fix: layout de 3 columnas roto en AlertasOperativasWidget — faltaba `@source` en theme.css
 
 - Tras el fix de `$view`, el panel volvía a cargar, pero el usuario reportó que las 3 secciones de "Alertas operativas" salían apiladas en una sola columna en vez de lado a lado.
