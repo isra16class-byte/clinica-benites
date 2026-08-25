@@ -14,6 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 /**
  * Camas de Hospitalización, UCI y UCIN (sección 6.2 de MEMORIA.md, grupo 1).
@@ -30,7 +31,7 @@ class CamaResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleGroup;
 
-    protected static ?string $navigationGroup = 'Infraestructura';
+    protected static string|UnitEnum|null $navigationGroup = 'Infraestructura';
 
     protected static ?string $recordTitleAttribute = 'numero';
 

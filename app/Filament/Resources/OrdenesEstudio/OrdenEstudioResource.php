@@ -16,6 +16,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 /**
  * Órdenes de estudio — Laboratorio, Rayos X, Ecografía, Centro de Imagen,
@@ -30,7 +31,7 @@ class OrdenEstudioResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBeaker;
 
-    protected static ?string $navigationGroup = 'Infraestructura';
+    protected static string|UnitEnum|null $navigationGroup = 'Infraestructura';
 
     protected static ?string $recordTitleAttribute = 'tipo';
 

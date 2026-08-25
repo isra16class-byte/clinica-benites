@@ -14,6 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 /**
  * Quirófanos — Central de Quirófanos (sección 6.2 de MEMORIA.md, grupo 2).
@@ -28,7 +29,7 @@ class QuirofanoResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
 
-    protected static ?string $navigationGroup = 'Infraestructura';
+    protected static string|UnitEnum|null $navigationGroup = 'Infraestructura';
 
     protected static ?string $recordTitleAttribute = 'numero';
 

@@ -16,6 +16,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 /**
  * Cirugías — Central de Quirófanos (sección 6.2 de MEMORIA.md, grupo 2).
@@ -29,7 +30,7 @@ class CirugiaResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedScissors;
 
-    protected static ?string $navigationGroup = 'Infraestructura';
+    protected static string|UnitEnum|null $navigationGroup = 'Infraestructura';
 
     protected static ?string $recordTitleAttribute = 'tipo_cirugia';
 

@@ -14,6 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 /**
  * Servicios de ambulancia (sección 6.2 de MEMORIA.md, grupo 5) — el grupo
@@ -27,7 +28,7 @@ class ServicioAmbulanciaResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;
 
-    protected static ?string $navigationGroup = 'Infraestructura';
+    protected static string|UnitEnum|null $navigationGroup = 'Infraestructura';
 
     protected static ?string $recordTitleAttribute = 'destino';
 

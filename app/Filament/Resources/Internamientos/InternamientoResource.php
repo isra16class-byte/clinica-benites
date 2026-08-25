@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 /**
  * Internamientos — Hospitalización/UCI/UCIN (sección 6.2 de MEMORIA.md,
@@ -30,7 +31,7 @@ class InternamientoResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $navigationGroup = 'Infraestructura';
+    protected static string|UnitEnum|null $navigationGroup = 'Infraestructura';
 
     // Igual que Cita: no hay un único campo representativo, se fija uno
     // real solo para habilitar la búsqueda global.
