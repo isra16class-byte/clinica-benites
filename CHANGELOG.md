@@ -8,6 +8,15 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Documentación: propuesta de Dashboard gerencial para el admin
+
+- El usuario preguntó cómo puede el administrador saber si la clínica "está ganando o no" — el Dashboard actual solo tiene el widget de Citas de hoy, sin ningún indicador financiero, gráfico ni resumen operativo.
+- Se documentó una propuesta (sin tocar código, a pedido explícito del usuario): Widgets nuevos visibles solo para `admin` — indicadores clave (ingresos del mes vs. mes anterior, por cobrar, citas atendidas, ocupación de camas), gráfico de ingresos por mes, gráfico por área/especialidad, y alertas operativas (inventario por vencer, facturas vencidas, camas ocupadas hace demasiado tiempo).
+- Confirmado que no hace falta ninguna tabla ni migración nueva — todo se puede construir con `facturas`, `citas`, `camas`/`internamientos` y `lotes_inventario`, que ya existen.
+- Detalle completo en la sección **6.6** de `MEMORIA.md`.
+
+---
+
 ## [2026-08-25] Fix: Paciente/Cita relacionada ya no se muestran en traslados/ajustes de inventario
 
 - El usuario, revisando el formulario de **Movimientos de Inventario**, notó dos cosas: (1) al registrar un traslado entre áreas seguían apareciendo los campos "Paciente" y "Cita relacionada", que no tienen sentido ahí porque un traslado no es consumo de un paciente; y (2) confirmó que la ausencia del campo "Usuario" en el formulario es intencional (se completa solo con `Auth::id()` al crear, ver `CreateMovimientoInventario.php`) y que el registro queda visible después en la columna "Registrado por" del listado.

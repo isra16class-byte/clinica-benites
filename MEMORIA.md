@@ -2,7 +2,9 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 25 de agosto de 2026 — tercera entrada del día (el usuario, revisando el formulario de **Movimientos de Inventario** (sección 6.3), preguntó por qué en un traslado entre áreas seguían apareciendo los campos "Paciente" y "Cita relacionada" — no tenía sentido, esos campos son para dejar constancia de consumo real en la atención de un paciente, no de un traslado de stock. Se corrigió agregándoles `->visible()` condicionado a que `tipo_movimiento` sea "Salida", mismo patrón reactivo que ya usaban `area_origen`/`area_destino`. De paso se confirmó que la ausencia del campo "Usuario" en el formulario es intencional — se completa solo con el usuario logueado y queda visible después en la columna "Registrado por" del listado, no es un bug. Ver la sección 6.3 actualizada más abajo. **Confirmado funcionando por el usuario en el entorno real.**)
+Última actualización: 25 de agosto de 2026 — cuarta entrada del día (el usuario preguntó cómo puede el administrador saber si la clínica "está ganando o no", dado que el Dashboard no tiene ningún indicador financiero ni gráfico — solo la tabla de Citas de hoy. Se confirmó el problema revisando el Dashboard actual y se agregó, **solo como documentación** a pedido explícito del usuario, una propuesta de **Dashboard gerencial** para el rol admin: indicadores clave de ingresos/por cobrar/ocupación, gráfico de ingresos por mes, gráfico por área, y alertas operativas (inventario por vencer, facturas vencidas). No se tocó ningún código. Ver la sección 6.6 nueva más abajo para el detalle completo.)
+
+Última actualización anterior: 25 de agosto de 2026 — tercera entrada del día (el usuario, revisando el formulario de **Movimientos de Inventario** (sección 6.3), preguntó por qué en un traslado entre áreas seguían apareciendo los campos "Paciente" y "Cita relacionada" — no tenía sentido, esos campos son para dejar constancia de consumo real en la atención de un paciente, no de un traslado de stock. Se corrigió agregándoles `->visible()` condicionado a que `tipo_movimiento` sea "Salida", mismo patrón reactivo que ya usaban `area_origen`/`area_destino`. De paso se confirmó que la ausencia del campo "Usuario" en el formulario es intencional — se completa solo con el usuario logueado y queda visible después en la columna "Registrado por" del listado, no es un bug. Ver la sección 6.3 actualizada más abajo. **Confirmado funcionando por el usuario en el entorno real.**)
 
 Última actualización anterior: 25 de agosto de 2026 — segunda entrada del día (a pedido del usuario, se organizó el menú lateral del panel en grupos de navegación (`$navigationGroup`), ya que solo el módulo de Infraestructura tenía grupo propio y los otros 10 Resources aparecían todos sueltos y mezclados. Ver el detalle completo en la sección 8.4 (nueva) más abajo — no se tocaron íconos ni ningún otro comportamiento, solo la agrupación del menú.)
 
@@ -382,6 +384,36 @@ Orden sugerido para construirlos (por seguridad del paciente primero, y porque a
 - Si un antecedente/alergia corregido debe conservar historial de cambios o simplemente editarse.
 
 **Qué NO se hizo en esta sesión de planificación**: no se tocó ningún modelo, migración, Resource ni seeder — es 100% preparación para la entrevista, a pedido explícito del usuario de no interferir con el patch grande que se estaba aplicando en otra sesión en paralelo.
+
+### 6.6 Dashboard gerencial para el admin — propuesta, sin tocar código (25 ago 2026)
+
+**Contexto**: a raíz de una pregunta directa del usuario — *"¿cómo puede el administrador saber si está ganando o no? No hay nada en el sistema que le indique qué está pasando, ni gráfica"* — se revisó el Dashboard actual (`/admin`) y se confirmó el problema: el único widget que existe es `CitasDeHoyWidget` (una tabla de citas del día, ver sección 8 punto 1). No hay ningún indicador financiero, gráfico de tendencia, ni resumen operativo — para saber cuánto factura la clínica hoy habría que sumar facturas a mano, factura por factura, desde `/admin/facturas`.
+
+**Qué se propone construir** (todo como Widgets nuevos de Filament, visibles solo para el rol `admin` — mismo patrón `->visible()` que ya usan otros controles del panel, ver sección 10 — ubicados arriba del `CitasDeHoyWidget` existente, que no se toca):
+
+1. **Fila de indicadores clave (`StatsOverviewWidget`)**:
+   - Ingresos del mes — suma de `facturas.monto` donde `estado_pago = pagado`, mes actual — con comparación (%) contra el mes anterior.
+   - Por cobrar — suma de facturas en estado `pendiente` (dinero ya facturado que todavía no entró a caja).
+   - Citas atendidas hoy / en la semana.
+   - Ocupación de camas en tiempo real (camas ocupadas / total, usando `Cama`/`Internamiento` de la sección 6.2).
+
+2. **Gráfico de ingresos** (línea o barra, últimos 6-12 meses) — monto facturado por mes, para ver tendencia en vez de solo la foto del día.
+
+3. **Gráfico por área/especialidad** — qué áreas generan más citas o más facturación, para saber qué especialidades sostienen el negocio.
+
+4. **Alertas operativas** (hoy invisibles a menos que alguien entre a buscarlas a mano):
+   - Lotes de inventario (sección 6.3) vencidos o por vencer.
+   - Facturas vencidas sin cobrar.
+   - Camas ocupadas hace más de X días (posible dato desactualizado, a definir el umbral).
+
+**Alcance confirmado**: no hace falta ninguna tabla ni migración nueva — `facturas`, `citas`, `camas`/`internamientos` y `lotes_inventario` ya existen con todo lo necesario. Es 100% Widgets nuevos + queries sobre modelos ya construidos.
+
+**Pendiente de definir antes de construir** (no bloqueante, pero conviene decidirlo con el usuario en la próxima sesión):
+- Umbral de "cama ocupada hace demasiado tiempo" para la alerta.
+- Si el gráfico por área cuenta citas, facturación, o ambos con un selector.
+- Si conviene un rango de fechas seleccionable en el dashboard o queda fijo (mes actual + últimos 6-12 meses).
+
+**Qué NO se hizo en esta entrada**: solo documentación de la propuesta, a pedido explícito del usuario — no se creó ningún Widget, no se tocó `CitasDeHoyWidget` ni ningún modelo.
 
 ## 7. Roadmap / pendientes técnicos
 
