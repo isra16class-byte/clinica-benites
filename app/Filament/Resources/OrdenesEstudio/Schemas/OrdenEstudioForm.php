@@ -7,6 +7,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -14,6 +15,25 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class OrdenEstudioForm
 {
+    /**
+     * Compartido entre el Select de 'tipo' y el nombre de archivo del
+     * adjunto (getUploadedFileNameForStorageUsing), para no repetir la
+     * lista de tipos en dos lugares.
+     */
+    private static function tiposEstudio(): array
+    {
+        return [
+            'laboratorio' => 'Laboratorio',
+            'rayos_x' => 'Rayos X',
+            'ecografia' => 'Ecografía',
+            'centro_imagen' => 'Centro de Imagen',
+            'endoscopia_alta' => 'Endoscopía alta',
+            'endoscopia_baja' => 'Endoscopía baja',
+            'gastroenterologia' => 'Centro de Gastroenterología',
+            'procedimiento_ambulatorio' => 'Procedimiento ambulatorio',
+        ];
+    }
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -39,16 +59,7 @@ class OrdenEstudioForm
                     ->searchable()
                     ->preload(),
                 Select::make('tipo')
-                    ->options([
-                        'laboratorio' => 'Laboratorio',
-                        'rayos_x' => 'Rayos X',
-                        'ecografia' => 'Ecografía',
-                        'centro_imagen' => 'Centro de Imagen',
-                        'endoscopia_alta' => 'Endoscopía alta',
-                        'endoscopia_baja' => 'Endoscopía baja',
-                        'gastroenterologia' => 'Centro de Gastroenterología',
-                        'procedimiento_ambulatorio' => 'Procedimiento ambulatorio',
-                    ])
+                    ->options(self::tiposEstudio())
                     ->required(),
                 DateTimePicker::make('fecha_solicitud')
                     ->label('Fecha de solicitud')
@@ -77,13 +88,27 @@ class OrdenEstudioForm
                     ->disk('public')
                     ->directory('estudios')
                     ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
-                    // Conserva el nombre original (legible) con un prefijo
-                    // corto único adelante, para que dos archivos con el
-                    // mismo nombre nunca se sobreescriban entre sí.
+                    // Nombre del archivo: prefijo único (nunca colisiona) +
+                    // paciente + tipo de estudio, en vez del nombre original
+                    // subido (que no dice nada sobre a quién pertenece el
+                    // resultado) — pedido explícito del usuario tras ver que
+                    // el nombre del archivo del navegador no era útil para
+                    // identificar el estudio en el disco. Si el paciente o
+                    // el tipo todavía no están seleccionados al subir el
+                    // archivo (formulario llenado fuera de orden), cae a un
+                    // texto genérico en vez de fallar.
                     ->getUploadedFileNameForStorageUsing(
-                        fn (TemporaryUploadedFile $file): string => Str::ulid().'-'.Str::slug(
-                            pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
-                        ).'.'.$file->getClientOriginalExtension()
+                        function (TemporaryUploadedFile $file, Get $get): string {
+                            $paciente = Paciente::find($get('paciente_id'));
+
+                            $nombrePaciente = $paciente
+                                ? Str::slug("{$paciente->nombres} {$paciente->apellidos}")
+                                : 'paciente';
+
+                            $tipo = Str::slug(self::tiposEstudio()[$get('tipo')] ?? 'estudio');
+
+                            return Str::ulid()."-{$nombrePaciente}-{$tipo}.".$file->getClientOriginalExtension();
+                        }
                     )
                     ->openable()
                     ->downloadable()
