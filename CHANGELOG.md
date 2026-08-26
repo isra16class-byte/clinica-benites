@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Dashboard gerencial — dirección A: jerarquía por tamaño (Refinar tarjetas y gráficos)
+
+- Segunda de las 3 direcciones de "toque visual" del panel (ver entrada de tipografía, abajo). El usuario propuso 3 caminos para "refinar tarjetas y gráficos" del Dashboard gerencial — A (jerarquía por tamaño, mínimo riesgo), B (borde lateral de color por estado) y C (grid asimétrico) — y eligió **A**.
+- `IndicadoresGerencialesWidget.php`: la tarjeta "Por cobrar" (`statPorCobrar()`) gana la clase `cb-stat-destacado` vía `->extraAttributes()`, pero **solo si el monto pendiente es > 0** — si no hay deuda (estado "success", $0), no tiene sentido destacarla, tal como se anticipó al proponer esta dirección.
+- `IngresosPorMesChartWidget.php`: color de la serie "Facturado" corregido de `#85B7EB` (celeste genérico, sin relación con la marca) a `#6D8FB0` (el navy de marca `#0C447C` aclarado ~40% con blanco) — "Cobrado" ya usaba el verde azulado exacto (`#0F6E56`) y quedó sin tocar.
+- `theme.css`: radio propio (`border-radius: 1rem`, en vez del `rounded-xl` de Tailwind por defecto) y algo más de padding en `.fi-section`/`.fi-wi-stats-overview-stat` (cubre las 4 tarjetas de KPI y los 2 gráficos, que ya renderizan dentro de `.fi-section`). Nueva clase `.cb-stat-destacado` con padding y sombra algo mayores, y la cifra de esa tarjeta a `2.75rem` (vs. `2.25rem` del resto).
+- **No se tocó** el grid (`getColumns()`) ni la estructura de ningún widget — es 100% CSS + un `extraAttributes()` condicional, tal como se buscaba con la opción de "menor riesgo".
+- **Aún sin confirmar por el usuario en el entorno real** — no hubo acceso a PHP/Sail/npm en esta sesión (ni `php -l`, verificado solo a mano el balance de llaves de los 2 archivos PHP tocados); pendiente que el usuario aplique el patch, corra `sail npm run build` y confirme visualmente, igual patrón que otras entradas de esta sección.
+
+---
+
 ## [2026-08-26] Prompt de dirección de diseño guardado en el repo (`DISEÑO.md`)
 
 - El usuario compartió un `.md` con un prompt de dirección de diseño para el panel (técnica del cookbook de Anthropic `prompting_for_frontend_aesthetics.ipynb` — guiar tipografía/color/movimiento por separado, nombrar defaults evitados — adaptada a un panel clínico interno, priorizando claridad/confianza sobre originalidad).

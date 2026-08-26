@@ -89,6 +89,14 @@ class IndicadoresGerencialesWidget extends BaseWidget
      * todavía no entró a caja. No se limita al mes actual — es la
      * cartera pendiente completa, para que no se pierda de vista una
      * factura pendiente de meses anteriores.
+     *
+     * Jerarquía por tamaño (26 ago 2026, dirección A de MEMORIA.md /
+     * DISEÑO.md): esta tarjeta gana la clase `cb-stat-destacado` (ver
+     * theme.css) para ocupar más espacio visual que las otras 3 — pero
+     * SOLO si hay deuda real (> 0). Si "Por cobrar" da $0 (estado
+     * "success", sin deuda pendiente), destacarla pierde sentido, así
+     * que la jerarquía queda condicional al monto, tal como se anticipó
+     * como riesgo al proponer esta dirección.
      */
     private function statPorCobrar(): Stat
     {
@@ -98,7 +106,8 @@ class IndicadoresGerencialesWidget extends BaseWidget
 
         return Stat::make('Por cobrar', '$'.number_format($porCobrar, 2))
             ->description('Facturado y aún sin pagar')
-            ->color($porCobrar > 0 ? 'warning' : 'success');
+            ->color($porCobrar > 0 ? 'warning' : 'success')
+            ->extraAttributes($porCobrar > 0 ? ['class' => 'cb-stat-destacado'] : []);
     }
 
     /**

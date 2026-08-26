@@ -72,6 +72,44 @@
     box-shadow: 0 1px 2px rgb(15 23 42 / 0.06), 0 1px 3px rgb(15 23 42 / 0.05);
 }
 
+/*
+ * Refinar tarjetas y gráficos — dirección A (26 ago 2026, MEMORIA.md /
+ * DISEÑO.md): los 4 KPIs y los 2 gráficos usaban el radio/sombra por
+ * defecto de Filament (idéntico al de cualquier panel sin personalizar).
+ * Se les da un radio propio, algo más generoso que el default de
+ * Tailwind (`rounded-xl`, 0.75rem) y más aire interno, para que "respiren"
+ * más — sin tocar estructura ni el grid (`getColumns()`), solo CSS, tal
+ * como se acordó al elegir esta dirección sobre la B/C propuestas.
+ *
+ * `.fi-wi-stats-overview-stat` cubre las 4 tarjetas de KPI; los 2
+ * gráficos (ChartWidget) ya renderizan dentro de `.fi-section` por
+ * defecto en Filament 5.7.6, así que quedan cubiertos por el mismo
+ * selector sin necesidad de una clase de gráfico aparte.
+ */
+.fi-section,
+.fi-wi-stats-overview-stat {
+    border-radius: 1rem;
+    padding-block: 0.25rem;
+}
+
+/*
+ * "Por cobrar" destacado (solo cuando hay deuda > 0, ver
+ * `extraAttributes()` condicional en IndicadoresGerencialesWidget.php):
+ * ocupa más espacio visual que las otras 3 tarjetas de KPI — padding y
+ * tipografía de la cifra algo mayores, más una sombra levemente más
+ * marcada para que se note sin competir en color con el resto del
+ * Dashboard (mismo objetivo de "confianza, no sorpresa" de DISEÑO.md).
+ */
+.cb-stat-destacado {
+    padding: 1.5rem !important;
+    box-shadow: 0 4px 6px rgb(15 23 42 / 0.07), 0 2px 4px rgb(15 23 42 / 0.06) !important;
+}
+
+.cb-stat-destacado .fi-wi-stats-overview-stat-value {
+    font-size: 2.75rem;
+    line-height: 3rem;
+}
+
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
     background-color: rgb(12 68 124) !important;
 }

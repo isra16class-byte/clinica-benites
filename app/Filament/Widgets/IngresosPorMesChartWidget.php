@@ -106,9 +106,16 @@ class IngresosPorMesChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
+                    // Jerarquía por tamaño (26 ago 2026, dirección A de
+                    // MEMORIA.md/DISEÑO.md): #85B7EB era un celeste
+                    // genérico que no correspondía a ninguno de los 2
+                    // colores de marca. #6D8FB0 es el navy de marca
+                    // (#0C447C) aclarado ~40% con blanco — mismo criterio
+                    // de "derivar del navy" ya documentado en DISEÑO.md
+                    // en vez de introducir un color nuevo sin relación.
                     'label' => 'Facturado',
                     'data' => $facturado,
-                    'backgroundColor' => '#85B7EB',
+                    'backgroundColor' => '#6D8FB0',
                 ],
                 [
                     'label' => 'Cobrado',
