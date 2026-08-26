@@ -8,6 +8,15 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Scrollbar del sidebar afinada y en color de marca
+
+- El usuario notó que la scrollbar gris nativa del sidebar se sentía descuadrada con el resto del rediseño y pidió afinarla y pintarla en el azul de marca.
+- Se confirmó contra `sidebar.css` de Filament 5.7.6 que el contenedor scrolleable real es `.fi-sidebar-nav`.
+- Se agregó estilizado con las 2 sintaxis existentes (`scrollbar-width`/`scrollbar-color` estándar + `::-webkit-scrollbar*`) para cubrir Firefox y Chrome/Edge/Safari sin depender de un solo motor: barra de 6px, azul de marca al 35% de opacidad (55% en hover), con variante `.dark` en celeste claro.
+- **Aún sin confirmar por el usuario en el entorno real.**
+
+---
+
 ## [2026-08-25] Confirmado funcionando: topbar sólido en navy
 
 - El usuario aplicó el patch y confirmó por captura de pantalla que el topbar se ve navy sólido, el logo se lee correctamente en blanco (el swap por CSS funcionó), el ícono de sidebar se ve blanco, y el buscador/avatar contrastan bien.

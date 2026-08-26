@@ -260,3 +260,44 @@
     background-color: rgb(100 116 139 / 0.25);
     color: rgb(203 213 225);
 }
+
+/* Scrollbar del sidebar (.fi-sidebar-nav, contenedor con overflow-y-auto
+   real, confirmado en sidebar.css de Filament 5.7.6) más fina y en el
+   azul de marca en vez del gris nativo del navegador, que se sentía
+   fuera de lugar al lado del resto del rediseño. Doble sintaxis: la
+   moderna (scrollbar-width/scrollbar-color, Firefox y Chrome/Edge
+   recientes) y los pseudo-elementos -webkit- (Chrome/Edge/Safari más
+   viejos) para cubrir ambos casos sin depender de un solo motor. */
+.fi-sidebar-nav {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(12 68 124 / 0.35) transparent;
+}
+
+.fi-sidebar-nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.fi-sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.fi-sidebar-nav::-webkit-scrollbar-thumb {
+    background-color: rgb(12 68 124 / 0.35);
+    border-radius: 9999px;
+}
+
+.fi-sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(12 68 124 / 0.55);
+}
+
+.dark .fi-sidebar-nav {
+    scrollbar-color: rgb(147 197 253 / 0.35) transparent;
+}
+
+.dark .fi-sidebar-nav::-webkit-scrollbar-thumb {
+    background-color: rgb(147 197 253 / 0.35);
+}
+
+.dark .fi-sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(147 197 253 / 0.55);
+}
