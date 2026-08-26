@@ -8,6 +8,15 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Prompt de dirección de diseño guardado en el repo (`DISEÑO.md`)
+
+- El usuario compartió un `.md` con un prompt de dirección de diseño para el panel (técnica del cookbook de Anthropic `prompting_for_frontend_aesthetics.ipynb` — guiar tipografía/color/movimiento por separado, nombrar defaults evitados — adaptada a un panel clínico interno, priorizando claridad/confianza sobre originalidad).
+- Se pidió guardarlo versionado en el repo en vez de mantenerlo solo como algo pegado a mano cada vez. Se creó `DISEÑO.md` (archivo nuevo, standalone) con el prompt completo y su justificación, y se referenció desde `MEMORIA.md` (sección 3 y encabezado de últimas actualizaciones) para no duplicar contenido.
+- Uso previsto: pegar el bloque de `DISEÑO.md` al pedir un cambio visual **grande** del panel; para ajustes puntuales no hace falta.
+- No se tocó ningún archivo de código — es documentación de proceso, igual que `MEMORIA.md`/`CHANGELOG.md`.
+
+---
+
 ## [2026-08-26] Confirmado funcionando: tipografía Space Grotesk + jerarquía numérica
 
 - El usuario aplicó el patch, resolvió el mismo problema de PATH de WSL/npm ya visto antes (usando `sail npm install`/`sail npm run build` en vez del npm de Windows) y confirmó por captura de pantalla del Escritorio.
