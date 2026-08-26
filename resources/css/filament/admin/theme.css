@@ -1,4 +1,6 @@
 @import '/vendor/filament/filament/resources/css/theme.css';
+@import '@fontsource/space-grotesk/600.css';
+@import '@fontsource/space-grotesk/700.css';
 
 @source '../../../../app/Filament';
 @source '../../../../resources/views/filament';
@@ -300,4 +302,50 @@
 
 .dark .fi-sidebar-nav::-webkit-scrollbar-thumb:hover {
     background-color: rgb(147 197 253 / 0.55);
+}
+
+/*
+ * Tipografía + jerarquía numérica (26 ago 2026, primera de las 3
+ * direcciones propuestas para "darle más carácter" al panel — ver
+ * MEMORIA.md). El panel usaba únicamente Inter (la fuente por defecto de
+ * Filament) en todo, incluidos títulos y las cifras de los 4 KPIs del
+ * Dashboard — el mismo look que tiene cualquier panel de Filament sin
+ * personalizar. Se agrega Space Grotesk (autoalojada vía
+ * @fontsource/space-grotesk, mismo criterio que ya usa el proyecto para
+ * Inter — sin depender de Google Fonts en producción) SOLO para títulos
+ * de página, encabezados de sección/widget y las cifras de KPI. El resto
+ * del panel (texto de tablas, formularios, botones) sigue en Inter — la
+ * legibilidad de datos clínicos/financieros en tablas no debe verse
+ * afectada por un cambio de personalidad tipográfica.
+ *
+ * Selectores verificados contra el código fuente real de Filament v5.7.6
+ * (mismo criterio que el resto de este archivo):
+ *   - .fi-header-heading (título de página, ej. "Escritorio") —
+ *     packages/panels/resources/css/components/header.css
+ *   - .fi-section-header-heading (título de cada sección/widget, ej.
+ *     "Ingresos por mes") — packages/support/resources/css/components/
+ *     section.css
+ *   - .fi-wi-stats-overview-stat-value / -label (cifra y etiqueta de
+ *     cada KPI) — packages/widgets/resources/css/stats-overview-widget.css
+ */
+.fi-header-heading,
+.fi-section-header-heading,
+.fi-wi-stats-overview-stat-value {
+    font-family: 'Space Grotesk', var(--font-family), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Jerarquía numérica: la cifra de cada KPI (ej. "$121.45") pasa a ser lo
+   más grande y pesado de la tarjeta — antes tenía el mismo peso visual
+   que su etiqueta ("Ingresos del mes"). Se sube un escalón de tamaño
+   (text-3xl -> ~2.25rem) y se afloja el tracking negativo por defecto de
+   Filament, que en Space Grotesk se ve apretado a este tamaño. La
+   etiqueta baja levemente de peso para acentuar el contraste. */
+.fi-wi-stats-overview-stat-value {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+    letter-spacing: -0.01em;
+}
+
+.fi-wi-stats-overview-stat-label {
+    font-weight: 500;
 }
