@@ -37,6 +37,25 @@
  * framework. Corregido usando anidamiento CSS con combinador
  * descendiente (mismo patrón documentado oficialmente por Filament para
  * este hook) + `!important`.
+ *
+ * FIX 2 (25 ago 2026, confirmado por el usuario en el entorno real): el
+ * fix anterior tampoco tuvo efecto — la documentación de Filament que se
+ * usó como referencia (ejemplos de la comunidad, sin versión específica)
+ * mencionaba `.fi-sidebar-item-active`/`.fi-sidebar-item-button`, pero
+ * esas clases no existen en Filament 5.7.6. Se clonó el código fuente
+ * real del tag `v5.7.6` (`filamentphp/filament` en GitHub, mismo criterio
+ * que se usó para el bug del `$view` estático, ver sección de este mismo
+ * archivo) y se confirmó en
+ * `packages/panels/resources/css/components/sidebar.css` y
+ * `.../components/sidebar/item.blade.php` que la clase activa real es
+ * `.fi-active` sobre el `<li class="fi-sidebar-item">`, el botón es
+ * `.fi-sidebar-item-btn` (sin "o" final), y el ícono, aunque tiene
+ * también la clase `.fi-sidebar-item-icon`, se colorea en el CSS
+ * original vía `.fi-icon` — ambas clases conviven en el mismo `<svg>`
+ * (confirmado en `generate_icon_html()`), así que cualquiera de las dos
+ * funciona como selector. Reescrito con los selectores exactos
+ * verificados contra el código fuente, sin depender de sintaxis de
+ * anidamiento.
  */
 .fi-main {
     background-color: rgb(241 245 249);
@@ -51,15 +70,13 @@
     box-shadow: 0 1px 2px rgb(15 23 42 / 0.06), 0 1px 3px rgb(15 23 42 / 0.05);
 }
 
-.fi-sidebar-item-active {
-    .fi-sidebar-item-button {
-        background-color: rgb(12 68 124) !important;
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background-color: rgb(12 68 124) !important;
+}
 
-        .fi-sidebar-item-label,
-        .fi-sidebar-item-icon {
-            color: rgb(255 255 255) !important;
-        }
-    }
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-icon {
+    color: rgb(255 255 255) !important;
 }
 
 /*

@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Fix 3: clases CSS reales de Filament 5.7.6 (verificadas contra el código fuente)
+
+- El usuario confirmó por captura que el fix 2 (anidamiento CSS + `!important`) tampoco tuvo efecto — el ítem activo del menú seguía igual.
+- Causa: la documentación/ejemplos usados como referencia en los 2 intentos anteriores correspondían a clases de versiones previas de Filament (`.fi-sidebar-item-active`, `.fi-sidebar-item-button`), que no existen en la 5.7.6 instalada en este proyecto.
+- Se clonó el código fuente real del tag `v5.7.6` de `filamentphp/filament` (mismo criterio que el bug del `$view` estático, sección 10 de `MEMORIA.md`) y se confirmó contra `sidebar.css`/`item.blade.php` que la clase activa real es `.fi-active` sobre `<li class="fi-sidebar-item">`, el botón es `.fi-sidebar-item-btn`, y el ícono se puede seleccionar por `.fi-sidebar-item-icon` (coincide con `.fi-icon` en el mismo `<svg>`).
+- Reescrito con los selectores exactos verificados, sin depender de sintaxis de anidamiento (por las dudas de compatibilidad con el pipeline de build del proyecto).
+- **Aún sin confirmar por el usuario en el entorno real** — corregido sin acceso a Sail/npm, pero esta vez validado contra el código fuente real de la versión exacta instalada, no contra documentación genérica.
+
+---
+
 ## [2026-08-25] Fix 2: ítem activo del menú lateral seguía sin fondo sólido
 
 - El usuario confirmó por captura de pantalla, tras aplicar el patch anterior y recompilar, que (1) el fondo de página y (2) las sombras en tarjetas sí se veían — buena separación entre página y tarjetas. Pero (3) el ítem activo del menú lateral ("Escritorio") seguía con el pill tenue por defecto de Filament, no el fondo sólido azul marino esperado.
