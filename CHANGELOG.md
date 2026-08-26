@@ -8,6 +8,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Confirmado funcionando: topbar sólido en navy
+
+- El usuario aplicó el patch y confirmó por captura de pantalla que el topbar se ve navy sólido, el logo se lee correctamente en blanco (el swap por CSS funcionó), el ícono de sidebar se ve blanco, y el buscador/avatar contrastan bien.
+- El usuario confirmó que ahora sí "sintió que cogió formato".
+- **Con esto, el rediseño del encabezado queda cerrado, en su versión final (topbar sólido en navy).**
+
+---
+
 ## [2026-08-25] Rediseño más audaz: topbar sólido en color de marca (navy)
 
 - El usuario, tras ver confirmado el rediseño anterior, dijo que lo esperaba más audaz — el acento de 2px se sentía "igual de genérico".
