@@ -8,13 +8,18 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Confirmado funcionando: tipografía Space Grotesk + jerarquía numérica
+
+- El usuario aplicó el patch, resolvió el mismo problema de PATH de WSL/npm ya visto antes (usando `sail npm install`/`sail npm run build` en vez del npm de Windows) y confirmó por captura de pantalla del Escritorio.
+- Se ve Space Grotesk en el título de página, títulos de sección y cifras de KPI, con jerarquía numérica clara.
+
 ## [2026-08-26] Tipografía + jerarquía numérica (primera de 3 direcciones para pulir el panel)
 
 - El usuario sintió que al panel le faltaba personalidad pese al rediseño del encabezado. Se propusieron 3 direcciones (tipografía, tarjetas/gráficos, detalles de marca) y se eligió empezar por tipografía.
 - Se agregó Space Grotesk (autoalojada vía `@fontsource/space-grotesk`, npm) para título de página, títulos de sección/widget y la cifra de los 4 KPIs del Dashboard.
 - El resto del panel (tablas, formularios) sigue en Inter para no arriesgar legibilidad.
 - Cifra de cada KPI subida de tamaño y con tracking ajustado para que destaque más que su etiqueta.
-- **Requiere `npm install` tras aplicar el patch** (nueva dependencia en `package.json`). Aún sin confirmar por el usuario en el entorno real.
+- **Requiere `npm install` tras aplicar el patch** (nueva dependencia en `package.json`). **Confirmado funcionando en el entorno real** (ver entrada siguiente).
 
 ---
 
