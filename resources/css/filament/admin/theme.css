@@ -125,28 +125,51 @@
 
 /*
  * Rediseño del encabezado (topbar): buscador, menú de usuario con
- * nombre+rol, y acento de marca. Selectores verificados contra el código
- * fuente real de Filament v5.7.6 (mismo criterio que el resto de este
- * archivo) — ver MEMORIA.md, entrada del 25 ago 2026 (vigesimoquinta),
- * para el detalle de qué archivo del paquete se usó para confirmar cada
- * clase.
+ * nombre+rol, y topbar sólido en color de marca (navy). Selectores
+ * verificados contra el código fuente real de Filament v5.7.6 (mismo
+ * criterio que el resto de este archivo) — ver MEMORIA.md, entradas del
+ * 25 ago 2026 (vigesimoquinta y vigesimoctava), para el detalle de qué
+ * archivo del paquete se usó para confirmar cada clase.
  */
 
-/* Acento sutil de marca en el borde inferior del topbar — franja de 2px
-   con degradado de los 2 colores de marca, sin tocar el fondo blanco ni
-   el texto (evita repetir el problema de contraste del sidebar oscuro
-   descartado, ver sección 8.1). */
+/* Topbar sólido en el color de marca (navy), a pedido del usuario tras
+   ver que el acento sutil de 2px se sentía "igual de genérico" — este
+   reemplaza ese intento anterior. Selectores verificados contra
+   topbar.css/topbar.blade.php/icon-button.css/logo.blade.php/logo.css
+   reales de Filament 5.7.6 (mismo criterio que el resto de este
+   archivo), justo para no repetir el problema de contraste del sidebar
+   oscuro descartado (ver sección 8.1): acá el texto/ícono siempre queda
+   sobre navy sólido o blanco sólido, nunca sobre un gris intermedio. */
 .fi-topbar {
-    position: relative;
+    background-color: rgb(12 68 124) !important;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.16) !important;
 }
 
-.fi-topbar::after {
-    content: '';
-    position: absolute;
-    inset-inline: 0;
-    bottom: 0;
-    height: 2px;
-    background: linear-gradient(90deg, rgb(12 68 124), rgb(15 110 86));
+/* El buscador y su dropdown de resultados (.fi-input-wrp, bg-white de
+   base, ver input/wrapper.css) ya contrastan bien tal cual sobre navy
+   sólido — no hace falta tocarlos. */
+
+/* Los 2 botones de abrir/cerrar sidebar (clase base .fi-icon-btn,
+   text-gray-500 por defecto, ver icon-button.css) pasan a blanco/blanco
+   translúcido para que se vean sobre el navy. */
+.fi-topbar .fi-icon-btn {
+    color: rgb(255 255 255 / 0.85) !important;
+}
+
+.fi-topbar .fi-icon-btn:hover {
+    color: rgb(255 255 255) !important;
+}
+
+/* El logo (imagen navy sobre fondo transparente, confirmado en
+   public/images/logo-horizontal.png) se vuelve invisible sobre un
+   fondo también navy — se swapea solo la instancia del topbar por la
+   variante blanca ya existente en el proyecto
+   (public/images/logo-horizontal-white.png), sin tocar el logo del
+   drawer móvil (.fi-sidebar) ni el de la página de login
+   (header/simple.blade.php), que siguen sobre fondo claro y no
+   necesitan cambiar. */
+.fi-topbar-start .fi-logo {
+    content: url('/images/logo-horizontal-white.png');
 }
 
 /* Buscador global un poco más ancho en desktop, para que no se vea

@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Rediseño más audaz: topbar sólido en color de marca (navy)
+
+- El usuario, tras ver confirmado el rediseño anterior, dijo que lo esperaba más audaz — el acento de 2px se sentía "igual de genérico".
+- Se mostraron 3 conceptos (topbar sólido, topbar flotante, bloque de marca en el logo) y el usuario eligió el **topbar sólido en navy**.
+- Se clonó de nuevo el código fuente real de Filament v5.7.6 para verificar contraste de cada elemento hijo del topbar (no solo el fondo): botones de sidebar (`.fi-icon-btn`), logo y buscador.
+- **Hallazgo clave**: el logo actual es texto navy sobre transparente — invisible sobre topbar también navy. El proyecto ya tenía preparada una variante blanca (`public/images/logo-horizontal-white.png`); se usa un swap por CSS puro (`content: url(...)`) solo para la instancia del logo dentro del topbar, sin afectar el logo del drawer móvil ni el de login (que siguen sobre fondo claro).
+- El bloque de "acento sutil" de la entrada anterior se reemplaza por: `.fi-topbar` con fondo navy sólido y sombra en vez del ring gris; `.fi-icon-btn` del topbar en blanco/blanco translúcido; logo swapeado. El buscador no necesitó cambios — su fondo blanco ya contrasta bien.
+- **Aún sin confirmar por el usuario en el entorno real.**
+
+---
+
 ## [2026-08-25] Confirmado funcionando: rediseño del encabezado (topbar)
 
 - El usuario aplicó el patch de la entrada anterior y corrió el build con `./vendor/bin/sail npm run build` (el `npm run build` directo falló primero por un problema de PATH de WSL —npm/vite resolvían al Node de Windows—, sin relación con el código del patch; resuelto usando `sail`).
