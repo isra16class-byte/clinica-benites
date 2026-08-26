@@ -8,6 +8,15 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Confirmado funcionando: rediseño del encabezado (topbar)
+
+- El usuario aplicó el patch de la entrada anterior y corrió el build con `./vendor/bin/sail npm run build` (el `npm run build` directo falló primero por un problema de PATH de WSL —npm/vite resolvían al Node de Windows—, sin relación con el código del patch; resuelto usando `sail`).
+- Confirmado por captura de pantalla del Escritorio: el buscador global ya muestra el placeholder específico, con el ancho ampliado en desktop; el acento de marca de 2px (degradado navy→verde azulado) se ve en el borde inferior del topbar, sutil y sin afectar el fondo blanco ni el texto; y el resto del panel (sidebar, tarjetas, gráficos) se ve intacto.
+- El usuario confirmó explícitamente que también probó el menú de usuario (nombre+rol+Editar perfil+Cerrar sesión) y la página `/admin/profile`, y que todo está bien.
+- **Con esto, el rediseño del encabezado del panel queda cumplido y confirmado en el entorno real.**
+
+---
+
 ## [2026-08-25] Implementado el rediseño del encabezado (topbar): buscador, menú de usuario y página de perfil
 
 - Se implementó, sin re-investigar nada, el plan ya redactado y verificado en la entrada anterior (vigesimoquinta entrada de `MEMORIA.md`).
