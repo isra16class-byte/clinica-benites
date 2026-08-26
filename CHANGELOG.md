@@ -8,6 +8,18 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Fix: textos descuadrados y "línea fea" bajo los widgets del Dashboard (dirección A)
+
+- Reportado por el usuario con captura de pantalla del Escritorio real: en la fila de 4 KPIs, la tarjeta "Por cobrar" mostraba su etiqueta/cifra/descripción arrancando más abajo que las otras 3, y aparecía una línea gris oscura, plana y de ancho completo, en el hueco entre la fila de KPIs y la fila de gráficos.
+- **Causa raíz (confirmada contra el CSS real de `packages/widgets/resources/css/stats-overview-widget.css` de Filament 5.7.6, clonado para verificar)**: la entrada anterior (dirección A, más arriba en este changelog) agregó `padding-block: 0.25rem` a `.fi-section`/`.fi-wi-stats-overview-stat` pensando en dar "más aire interno" — pero `.fi-wi-stats-overview-stat` ya trae `p-6` (1.5rem) de fábrica, y esa propiedad, al no ser un comodín y venir después en el CSS, ganaba igual sin necesitar `!important` — así que en la práctica **aplastaba** el padding vertical de las 3 tarjetas normales de 1.5rem a solo 0.25rem. La tarjeta "Por cobrar" no se veía afectada porque `.cb-stat-destacado` forzaba su propio `padding: 1.5rem !important` en las 4 direcciones — quedando con el padding de fábrica mientras sus 3 vecinas quedaban comprimidas. Ese desfase de padding vertical es lo que descuadraba los textos entre tarjetas, y la sombra más marcada de `.cb-stat-destacado` cayendo sobre una tarjeta más alta (y más pegada a la fila de gráficos) es lo que se leía como la línea oscura suelta.
+- **Solución aplicada, en `theme.css`**:
+  - Se quita `padding-block: 0.25rem` de la regla compartida `.fi-section`/`.fi-wi-stats-overview-stat` — se deja solo el `border-radius: 1rem`. Las 4 tarjetas de KPI vuelven a compartir el mismo padding vertical de fábrica, así que sus textos vuelven a arrancar a la misma altura.
+  - `.cb-stat-destacado` ya no fuerza `padding: 1.5rem` en las 4 direcciones (redundante ahora que el padding base ya no está aplastado) — en su lugar agrega solo `padding-bottom: 2rem` extra, así el contenido sigue arrancando alineado con las otras 3 tarjetas, pero la tarjeta queda igual más alta/espaciosa abajo, conservando la idea de "jerarquía por tamaño" de la dirección A.
+  - La sombra de `.cb-stat-destacado` baja de intensidad (de `0 4px 6px .07 / 0 2px 4px .06` a `0 2px 4px .06 / 0 1px 2px .05`) para no repetir el efecto de línea marcada bajo esa tarjeta.
+- **Aún sin confirmar por el usuario en el entorno real** — corregido sin acceso a PHP/Sail/npm en esta sesión (verificado a mano el balance de llaves del único archivo tocado, `theme.css`, y el CSS contra el código fuente real de Filament 5.7.6); pendiente que el usuario aplique el patch, corra `sail npm run build` y confirme con una captura nueva del Escritorio.
+
+---
+
 ## [2026-08-26] Dashboard gerencial — dirección A: jerarquía por tamaño (Refinar tarjetas y gráficos)
 
 - Segunda de las 3 direcciones de "toque visual" del panel (ver entrada de tipografía, abajo). El usuario propuso 3 caminos para "refinar tarjetas y gráficos" del Dashboard gerencial — A (jerarquía por tamaño, mínimo riesgo), B (borde lateral de color por estado) y C (grid asimétrico) — y eligió **A**.
