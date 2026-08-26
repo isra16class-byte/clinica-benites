@@ -8,6 +8,14 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Confirmado: rediseño visual completo funcionando en el entorno real
+
+- El usuario confirmó por captura de pantalla que el fix 3 (clases CSS verificadas contra el código fuente de Filament 5.7.6) funcionó: "Escritorio" en el menú lateral ahora muestra fondo azul marino sólido con texto e ícono en blanco.
+- Con esto, el rediseño visual completo de esta sesión queda confirmado de punta a punta: paleta de marca (azul marino + verde azulado) en el color primario del panel y en los 2 `ChartWidget`, contraste de superficies (fondo de página, sombras en tarjetas) y estado activo del menú lateral.
+- Solo actualización de estado en `MEMORIA.md`/`CHANGELOG.md` — no se tocó código en esta entrada.
+
+---
+
 ## [2026-08-25] Fix 3: clases CSS reales de Filament 5.7.6 (verificadas contra el código fuente)
 
 - El usuario confirmó por captura que el fix 2 (anidamiento CSS + `!important`) tampoco tuvo efecto — el ítem activo del menú seguía igual.
