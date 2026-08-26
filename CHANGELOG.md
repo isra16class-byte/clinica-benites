@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Fix — tipografía uniforme de "Por cobrar" (pendiente tras el fix de padding)
+
+- El fix anterior ("textos descuadrados y línea", ver debajo) corrigió el `padding-block: 0.25rem` que aplastaba a las 3 tarjetas normales — confirmado funcionando en el entorno real por el usuario (`sail npm run build` sin errores). Quedaba pendiente el pedido original de tipografía uniforme: la cifra de "Por cobrar" seguía en `font-size: 2.75rem` mientras las otras 3 quedan en `2.25rem`.
+- `theme.css`: se quita `.cb-stat-destacado .fi-wi-stats-overview-stat-value { font-size: ...; line-height: ...; }`. La jerarquía de "Por cobrar" queda solo en `padding-bottom: 2rem` extra y la sombra — sin diferencia de tipografía.
+- Sin cambios de estructura ni de grid — 100% CSS.
+- **Nota de proceso**: el patch anterior se había aplicado localmente sin `git push` — al generar este patch sobre un clon del repo público, `git am` falló por no encontrar esa base. Resuelto con `git am --abort` + `git push origin main` del usuario, re-clonando antes de continuar.
+- **Aún sin confirmar por el usuario en el entorno real** — sin acceso a PHP/Sail/npm en esta sesión.
+
+---
+
 ## [2026-08-26] Fix: textos descuadrados y "línea fea" bajo los widgets del Dashboard (dirección A)
 
 - Reportado por el usuario con captura de pantalla del Escritorio real: en la fila de 4 KPIs, la tarjeta "Por cobrar" mostraba su etiqueta/cifra/descripción arrancando más abajo que las otras 3, y aparecía una línea gris oscura, plana y de ancho completo, en el hueco entre la fila de KPIs y la fila de gráficos.

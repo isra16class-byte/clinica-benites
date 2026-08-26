@@ -112,9 +112,9 @@
  * "Por cobrar" destacado (solo cuando hay deuda > 0, ver
  * `extraAttributes()` condicional en IndicadoresGerencialesWidget.php):
  * ocupa más espacio visual que las otras 3 tarjetas de KPI — más aire
- * abajo y tipografía de la cifra algo mayor, más una sombra levemente
- * más marcada para que se note sin competir en color con el resto del
- * Dashboard (mismo objetivo de "confianza, no sorpresa" de DISEÑO.md).
+ * abajo y una sombra levemente más marcada para que se note sin
+ * competir en color con el resto del Dashboard (mismo objetivo de
+ * "confianza, no sorpresa" de DISEÑO.md).
  *
  * FIX (26 ago 2026, mismo reporte que arriba): antes forzaba
  * `padding: 1.5rem !important` en las 4 direcciones. Con el padding
@@ -128,15 +128,18 @@
  * contenido sigue arrancando a la misma altura que las otras 3, pero la
  * tarjeta queda más alta/espaciosa igual, y la sombra baja de
  * intensidad para no repetir el efecto de línea marcada.
+ *
+ * FIX 2 (26 ago 2026, mismo reporte del usuario): esta tarjeta además
+ * tenía la cifra en un tamaño de fuente mayor (2.75rem) que las otras 3
+ * (2.25rem, ver `.fi-wi-stats-overview-stat-value` más abajo en este
+ * archivo) — el usuario lo notó como inconsistente, no como jerarquía
+ * intencional, y pidió que quede uniforme. Se quita esa diferencia de
+ * tamaño; la jerarquía de esta tarjeta queda solo en el aire extra
+ * abajo y la sombra, sin tocar la tipografía de la cifra.
  */
 .cb-stat-destacado {
     padding-bottom: 2rem;
     box-shadow: 0 2px 4px rgb(15 23 42 / 0.06), 0 1px 2px rgb(15 23 42 / 0.05) !important;
-}
-
-.cb-stat-destacado .fi-wi-stats-overview-stat-value {
-    font-size: 2.75rem;
-    line-height: 3rem;
 }
 
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
