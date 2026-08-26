@@ -8,6 +8,18 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Implementado el rediseño del encabezado (topbar): buscador, menú de usuario y página de perfil
+
+- Se implementó, sin re-investigar nada, el plan ya redactado y verificado en la entrada anterior (vigesimoquinta entrada de `MEMORIA.md`).
+- **Archivo nuevo** `lang/vendor/filament-panels/es/global-search.php`: sobreescribe el placeholder del buscador global sin tocar el vendor (`"Buscar pacientes, citas, médicos, facturas..."`).
+- **Archivo nuevo** `app/Filament/Pages/EditProfile.php`: extiende `Filament\Auth\Pages\EditProfile` y agrega un campo `Rol` de solo lectura (mismo mapeo admin/recepción/médico que `UsersTable.php`/`UserForm.php`), no editable desde el propio perfil.
+- **`AdminPanelProvider.php`**: se agregó `->profile(\App\Filament\Pages\EditProfile::class, isSimple: false)` y un `->userMenuItems([...])` con el ítem `'profile'` mostrando nombre+rol (vía `HtmlString`, sin URL ni acción, así Filament lo renderiza como header no-clickeable) y el ítem `'edit_profile'` apuntando a la página de perfil. No se tocó `'logout'` — Filament lo agrega solo, ya en español.
+- **CSS** (`theme.css`): acento de 2px en el borde inferior de `.fi-topbar` con degradado de los 2 colores de marca, `.fi-global-search` con `min-width: 20rem` desde `lg`, `.fi-user-menu .fi-dropdown-panel` ensanchado a 18rem y `truncate` neutralizado para que nombre+rol se vean en 2 líneas, y el badge de rol con color diferenciado por rol (navy admin / verde azulado médico / gris recepción), incluidas variantes `.dark`.
+- Se instaló PHP en el entorno de esta sesión (no estaba disponible al principio) y se corrió `php -l` sobre los 2 archivos nuevos y sobre `AdminPanelProvider.php` modificado — los 3 pasaron sin errores de sintaxis. El código se copió tal cual quedó redactado en `MEMORIA.md`, sin necesidad de ajustar nada al verlo.
+- **Aún sin confirmar por el usuario en el entorno real** — pendiente aplicar el patch, correr `npm run build` y verificar: placeholder del buscador, menú de usuario (nombre+rol+Editar perfil+Cerrar sesión), página `/admin/profile`, y que no se haya afectado ningún otro dropdown/badge del panel.
+
+---
+
 ## [2026-08-25] Investigación y plan completo para el rediseño del encabezado (topbar)
 
 - Sesión dedicada 100% a investigación/planificación, a pedido explícito del usuario — **no se tocó ningún archivo de código**, para dejar todo listo y verificado antes de implementar.

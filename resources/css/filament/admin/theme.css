@@ -122,3 +122,118 @@
         order: 10;
     }
 }
+
+/*
+ * Rediseño del encabezado (topbar): buscador, menú de usuario con
+ * nombre+rol, y acento de marca. Selectores verificados contra el código
+ * fuente real de Filament v5.7.6 (mismo criterio que el resto de este
+ * archivo) — ver MEMORIA.md, entrada del 25 ago 2026 (vigesimoquinta),
+ * para el detalle de qué archivo del paquete se usó para confirmar cada
+ * clase.
+ */
+
+/* Acento sutil de marca en el borde inferior del topbar — franja de 2px
+   con degradado de los 2 colores de marca, sin tocar el fondo blanco ni
+   el texto (evita repetir el problema de contraste del sidebar oscuro
+   descartado, ver sección 8.1). */
+.fi-topbar {
+    position: relative;
+}
+
+.fi-topbar::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 2px;
+    background: linear-gradient(90deg, rgb(12 68 124), rgb(15 110 86));
+}
+
+/* Buscador global un poco más ancho en desktop, para que no se vea
+   apretado — solo desde `lg` (mismo breakpoint que ya usa Filament para
+   mostrar/ocultar el logo del topbar, ver .fi-topbar-start en
+   topbar.css), para no arriesgar el layout en pantallas chicas/medianas. */
+@media (min-width: 1024px) {
+    .fi-global-search {
+        min-width: 20rem;
+    }
+}
+
+/* Menú de usuario: header de nombre+rol más ancho que el default de
+   Filament (14rem, ver dropdown/index.css) para que no se corte, y el
+   `truncate` heredado del <span> de .fi-dropdown-header (header.css)
+   neutralizado para poder mostrar 2 líneas en vez de una sola cortada
+   con "...". */
+.fi-user-menu .fi-dropdown-panel {
+    max-width: 18rem !important;
+}
+
+.fi-user-menu .fi-dropdown-header {
+    padding: 0.75rem 1rem;
+}
+
+.fi-user-menu .fi-dropdown-header span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.fi-user-menu-header-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgb(15 23 42);
+}
+
+.dark .fi-user-menu-header-name {
+    color: rgb(255 255 255);
+}
+
+/* Rol como badge chico, diferenciado tipográficamente del nombre (más
+   chico, con color de marca) y visualmente por color según el rol —
+   navy para admin, verde azulado para médico (mismo verde ya usado para
+   "Cobrado" en IngresosPorMesChartWidget, sección 6.6.2), gris neutro
+   para recepción. Colores en hex directo, sin tocar ->colors() global
+   del panel, para no afectar badges/botones ya confirmados en el resto
+   del sistema (ver el punto sobre esto en MEMORIA.md, misma entrada). */
+.fi-user-menu-header-role {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    padding: 0.0625rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.fi-user-menu-header-role-admin {
+    background-color: rgb(12 68 124 / 0.1);
+    color: rgb(12 68 124);
+}
+
+.dark .fi-user-menu-header-role-admin {
+    background-color: rgb(12 68 124 / 0.25);
+    color: rgb(147 197 253);
+}
+
+.fi-user-menu-header-role-medico {
+    background-color: rgb(15 110 86 / 0.1);
+    color: rgb(15 110 86);
+}
+
+.dark .fi-user-menu-header-role-medico {
+    background-color: rgb(15 110 86 / 0.25);
+    color: rgb(110 231 183);
+}
+
+.fi-user-menu-header-role-recepcion {
+    background-color: rgb(100 116 139 / 0.1);
+    color: rgb(71 85 105);
+}
+
+.dark .fi-user-menu-header-role-recepcion {
+    background-color: rgb(100 116 139 / 0.25);
+    color: rgb(203 213 225);
+}

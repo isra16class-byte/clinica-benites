@@ -30,6 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(asset('images/logo-horizontal.png'))
             ->brandLogoHeight('2.5rem')
             ->favicon(asset('favicon.ico'))
+            ->profile(\App\Filament\Pages\EditProfile::class, isSimple: false)
             ->colors([
                 'primary' => Color::hex('#0C447C'),
             ])
@@ -41,6 +42,30 @@ class AdminPanelProvider extends PanelProvider
                 'Administración',
             ])
             ->viteTheme('resources/css/filament/admin/theme.css')
+            ->userMenuItems([
+                'profile' => fn (\Filament\Actions\Action $action) => $action
+                    ->label(fn () => new \Illuminate\Support\HtmlString(
+                        '<span class="fi-user-menu-header-name">' .
+                            e(filament()->getUserName(filament()->auth()->user())) .
+                        '</span>' .
+                        '<span class="fi-user-menu-header-role fi-user-menu-header-role-' .
+                            e(filament()->auth()->user()->rol ?? 'default') . '">' .
+                            e(match (filament()->auth()->user()->rol ?? null) {
+                                'admin' => 'Administrador',
+                                'recepcion' => 'Recepción',
+                                'medico' => 'Médico',
+                                default => 'Sin rol asignado',
+                            }) .
+                        '</span>'
+                    ))
+                    ->url(null)
+                    ->icon(null),
+                'edit_profile' => fn () => \Filament\Actions\Action::make('edit_profile')
+                    ->label('Editar perfil')
+                    ->icon(\Filament\Support\Icons\Heroicon::OutlinedPencilSquare)
+                    ->url(fn (): ?string => filament()->getProfileUrl())
+                    ->sort(-1),
+            ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
