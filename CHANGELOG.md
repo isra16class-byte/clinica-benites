@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Feedback pendiente: encabezado del panel se siente genérico
+
+- El usuario, tras confirmar el rediseño de paleta/contraste, señaló que el encabezado (fila del logo + buscador + avatar) "se siente muy básico" y sugirió agregar el módulo de usuarios como un botón desplegable ahí mismo.
+- Diagnóstico compartido con el usuario (sin implementar aún): el buscador tiene placeholder genérico ("Buscar") sin contexto de qué se puede buscar, y el avatar es un círculo con una sola letra sin mostrar nombre/rol — información real que sí importa en una clínica con roles distintos (admin/recepción/médico).
+- Se verificó que `AdminPanelProvider.php` no tiene ninguna personalización de `userMenuItems()`, notificaciones, ni breadcrumbs — está 100% en default de Filament.
+- El usuario pidió que el menú del avatar muestre: **nombre + rol + editar perfil + cerrar sesión**. Se verificó que el modelo `User` tiene campo `rol` (string libre: admin/recepcion/medico, con helpers `isAdmin()`/`isRecepcion()`/`isMedico()`) pero **no existe ninguna página de perfil de usuario todavía** — hay que crearla desde cero.
+- **No se implementó nada de esto todavía** — se llegó al límite de la sesión. Se le entregó al usuario un prompt (ver mensaje final de la conversación) para retomar esto en una sesión nueva, con toda la info de contexto necesaria para no tener que re-investigar el modelo `User` ni el estado del `AdminPanelProvider`.
+
+---
+
 ## [2026-08-25] Confirmado: rediseño visual completo funcionando en el entorno real
 
 - El usuario confirmó por captura de pantalla que el fix 3 (clases CSS verificadas contra el código fuente de Filament 5.7.6) funcionó: "Escritorio" en el menú lateral ahora muestra fondo azul marino sólido con texto e ícono en blanco.
