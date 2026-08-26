@@ -2,7 +2,255 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 25 de agosto de 2026 — vigesimocuarta entrada del día (el usuario, tras confirmar el rediseño de paleta/contraste, señaló que el encabezado del panel — fila de logo, buscador y avatar de usuario — "se siente muy básico" y pidió mejorar esa zona, incluyendo mostrar el módulo de usuarios como un desplegable ahí. Se compartió un diagnóstico (buscador con placeholder genérico, avatar sin nombre/rol visible) y se confirmó que `AdminPanelProvider.php` no tiene ninguna personalización de `userMenuItems()`/notificaciones/breadcrumbs — 100% default de Filament. El usuario definió que el menú del avatar debe mostrar **nombre + rol + editar perfil + cerrar sesión**. Se verificó el modelo `User` (campo `rol` string libre: admin/recepcion/medico) y se confirmó que **no existe página de perfil de usuario** — hay que crearla. **No se implementó nada** por límite de sesión — se le entregó al usuario un prompt para la sesión siguiente con todo este contexto ya investigado, para no perder tiempo re-explorando el modelo o el provider.)
+Última actualización: 25 de agosto de 2026 — vigesimoquinta entrada del día (**sesión de investigación y planificación completa para el rediseño del encabezado (topbar) del panel** — pedido pendiente desde la entrada anterior. A pedido explícito del usuario, esta sesión se dedicó por completo a dejar todo investigado y documentado con precisión quirúrgica para que la próxima sesión pueda implementarlo de punta a punta sin tener que re-investigar nada — **no se tocó ningún archivo de código todavía**, mismo criterio ya usado antes en el proyecto para sesiones de planificación pura (ver secciones 6.2/6.3 "propuesta, sin tocar código" antes de construirse). Se clonó el repo (`https://github.com/isra16class-byte/clinica-benites`) y, siguiendo al pie de la letra la lección aprendida en la sesión del bug del sidebar (ver más abajo en esta misma sección 8.1, "Fix 2"), también se clonó el código fuente real del tag `v5.7.6` de `filamentphp/filament` en GitHub — no se confió en ningún ejemplo de documentación/comunidad sin versión específica. Sin acceso a PHP/Sail en este entorno de trabajo (igual que varias sesiones anteriores), así que nada de esto se validó corriendo código — pero sí se validó línea por línea contra el Blade/PHP/CSS reales del paquete instalado, que es el nivel de confianza más alto posible sin un entorno vivo.
+
+**Los 4 requisitos del usuario, y qué se encontró para cada uno:**
+
+1. **Buscador con placeholder específico** (hoy dice solo "Buscar", genérico): el placeholder no vive en `AdminPanelProvider.php` ni en ningún Resource — Filament lo resuelve vía traducción, clave `filament-panels::global-search.field.placeholder`, definida en el paquete en `vendor/filament/filament/packages/panels/resources/lang/es/global-search.php` (confirmado que Filament **sí trae el paquete de idioma español completo**, incluida esta clave, ya que `config('app.locale') = 'es'` desde el fix de la sección 5). Laravel permite **sobreescribir cualquier traducción de un paquete** creando el mismo archivo en `lang/vendor/{paquete}/{locale}/{archivo}.php` de la app — el paquete se registra internamente como `filament-panels` (confirmado en `FilamentServiceProvider.php`, línea `->name('filament-panels')` + `->hasTranslations()`). **No hace falta tocar ningún archivo del vendor ni forkear nada** — un archivo nuevo en `lang/vendor/filament-panels/es/global-search.php` (con el mismo array que trae el paquete, pero el `placeholder` cambiado) alcanza. El proyecto **no tiene carpeta `lang/` todavía** — hay que crearla.
+
+2. **Menú de usuario con nombre + rol + editar perfil + cerrar sesión** (hoy no existe ninguna personalización, el `AdminPanelProvider.php` no llama a `->userMenuItems()`): se encontró, leyendo `packages/panels/src/Panel/Concerns/HasUserMenu.php` y `packages/panels/resources/views/components/user-menu.blade.php` del código fuente real, que Filament **ya tiene un mecanismo oficial para exactamente este caso** — no hace falta ningún hack de CSS ni renderHook a mano:
+   - El ítem del menú con key `'profile'` es especial: si se le quita la URL (`->url(null)`) y no tiene ninguna acción asociada, el Blade lo detecta (`$hasProfileHeader = $itemsBeforeThemeSwitcher->has('profile') && blank($item->getUrl()) && (! $item->hasAction())`) y en vez de renderizarlo como un link cualquiera, lo renderiza como un **header** (`<x-filament::dropdown.header>`) — o sea, texto no clickeable, ideal para mostrar "Nombre + Rol".
+   - `Action::label()` (definido en `packages/actions/src/Concerns/HasLabel.php`) acepta `string | Htmlable | Closure | null` — **no solo texto plano**. Esto significa que se puede pasar un `Illuminate\Support\HtmlString` con HTML propio (ej. nombre en un `<span>` y rol en otro `<span>` más chico, con clases CSS propias) y Blade lo va a insertar sin escapar (porque `{{ }}` en Blade llama a `->toHtml()` en vez de escapar cuando el valor implementa `Htmlable`) — es el mecanismo **oficialmente soportado** por Filament para HTML custom en labels, no una vulnerabilidad ni un hack.
+   - Para el link "Editar perfil" (separado del header de nombre/rol), alcanza con registrar un segundo ítem con otra key (ej. `'edit_profile'`) apuntando a la URL de la página de perfil (`Filament::getProfileUrl()` / helper `filament()->getProfileUrl()`), con `->sort(-1)` para que aparezca pegado al header, antes de cualquier otro ítem.
+   - "Cerrar sesión" **no hay que tocarlo** — si no se registra explícitamente una key `'logout'`, Filament la agrega sola al final (`getUserLogoutMenuItem()`), ya en español (`__('filament-panels::layout.actions.logout.label')`), con su propio ícono y el POST correcto al logout — tocarla sería trabajo de más y riesgo de romper el logout real.
+
+3. **Página de perfil de usuario** (hoy no existe): se encontró que Filament 5.7.6 **ya trae una página de perfil lista para usar**, `Filament\Auth\Pages\EditProfile` (`packages/panels/src/Auth/Pages/EditProfile.php`), activable con **una sola línea** en el panel: `->profile()`. Esa página nativa ya incluye, sin escribir nada: campo Nombre, campo Email (con verificación de cambio de email si está habilitada, no es el caso acá), campo Contraseña + confirmación (opcional, si se deja vacío no cambia la contraseña), campo "Contraseña actual" (aparece solo si se cambia email o contraseña, por seguridad), y ya tiene traducción al español completa (`packages/panels/resources/lang/es/auth/pages/edit-profile.php`, confirmado que existe). O sea: **el 100% de "editar nombre, email y contraseña" que pide el punto 3 ya viene resuelto por Filament**, no hay que reconstruir un formulario de cero. Lo único que agrega valor real construir encima es un campo extra de solo lectura mostrando el Rol (para contexto, ya que el usuario no puede cambiar su propio rol desde acá — eso sigue siendo exclusivo de `/admin/users`, con los mismos permisos ya documentados en la sección 10) — para eso alcanza con crear `App\Filament\Pages\EditProfile extends Filament\Auth\Pages\EditProfile` y sobreescribir el método `form()` insertando un `TextInput::make('rol')->disabled()->dehydrated(false)` con el mismo `formatStateUsing()` (Administrador/Recepción/Médico) que ya usan `UsersTable.php`/`UserForm.php`, para que el rol se vea con el mismo texto en todo el panel. `dehydrated(false)` es clave — evita que ese campo se intente guardar (el usuario no puede cambiar su propio rol desde su perfil, por diseño, coherente con la matriz de permisos de la sección 10).
+
+4. **Verse profesional, jerarquía visual, paleta consistente, legibilidad nombre/rol diferenciados**: se confirmó contra el CSS real del paquete (`packages/support/resources/css/components/dropdown/header.css`, `dropdown/index.css`, `dropdown/list/item.css`, `packages/panels/resources/css/components/user-menu.css`, `topbar.css`, `global-search.css`) varios puntos que hay que tener en cuenta para que el resultado se vea bien y no roto:
+   - El panel desplegable del menú de usuario (`.fi-dropdown-panel`) tiene por defecto un ancho máximo fijo de **`max-w-[14rem]`** (224px, con `!important` de Tailwind) — bastante angosto para mostrar nombre + rol en dos líneas cómodamente sin que se corte. Hay que ensancharlo un poco con una regla scoped a `.fi-user-menu .fi-dropdown-panel` (la clase `.fi-user-menu` ya está confirmada en el propio `user-menu.blade.php`, se agrega vía `->class(['fi-user-menu'])` al dropdown — así el ensanchado no afecta a ningún otro dropdown del panel, solo a este).
+   - El `<span>` interno de `.fi-dropdown-header` (donde va el label) tiene la clase Tailwind **`truncate`** por defecto (`header.css`) — corta con `...` cualquier texto que no entre en una sola línea. Si el HTML del label mete nombre y rol en dos `<span>` apilados (`display: flex; flex-direction: column`), hay que **neutralizar el `truncate` heredado** en una regla propia (`.fi-user-menu .fi-dropdown-header span { white-space: normal; }` o similar), si no el rol/nombre se corta feo.
+   - El avatar (`<x-filament-panels::avatar.user>`) **no necesita ningún archivo de imagen** — por defecto Filament usa `Filament\AvatarProviders\UiAvatarsProvider` (confirmado en `packages/panels/src/Panel/Concerns/HasAvatars.php`), que genera un avatar con las iniciales del nombre automáticamente (servicio ui-avatars.com) — el "círculo con una sola letra" que el usuario mencionó como básico en el feedback ya es ese default, no hace falta cambiarlo para esta tarea (es un problema aparte, de branding, no de este pedido puntual).
+   - Los 2 colores de marca (azul marino `#0C447C`, verde azulado `#0F6E56`) **no están registrados como colores semánticos de Filament** (`->colors(['primary' => ...])` solo tiene el primario) — se aplicaron directo en hex en los `ChartWidget` (ver sección 6.6.2). Para el badge de rol en el header del menú, la decisión tomada (a falta de poder confirmarla con el usuario en esta sesión de solo-documentación) es usar los 2 colores de marca + un gris neutro para el 3er rol, **sin tocar la paleta global de colores de Filament** (evita el riesgo de que cambiar `->colors()` globalmente afecte sin querer otros badges/botones ya confirmados en el resto del panel, ej. los badges de estado de Citas/Facturas): **admin → navy `#0C447C`** (autoridad/marca principal), **médico → verde azulado `#0F6E56`** (color clínico/positivo, ya usado para "Cobrado" en el gráfico de ingresos), **recepción → gris neutro** (rol de uso más frecuente/operativo, no hace falta un color de marca ahí). Queda como supuesto razonable, ajustable después si el usuario prefiere otro criterio — mismo patrón de "decisión con supuesto documentado, editable" que ya se usó varias veces en el proyecto (secciones 6.2/6.3).
+   - `.fi-topbar` (`topbar.css`) es hoy `flex items-center bg-white px-4 shadow-xs ring-1 ring-gray-950/5` — fondo blanco liso. Para que se sienta menos genérico sin arriesgar nada (recordar el sidebar oscuro descartado en 8.1 por texto invisible), la idea validada es un detalle sutil y de bajo riesgo: una franja/acento de 2-3px con degradado de los 2 colores de marca pegado al borde inferior del `.fi-topbar` (vía `::after` o `box-shadow`, sin tocar el fondo blanco principal ni el texto) — refuerza marca sin repetir el intento fallido de forzar colores de texto sobre fondos oscuros.
+   - `.fi-global-search` (contenedor del buscador dentro de `.fi-topbar-end`) tiene `flex-1` pero **no un ancho mínimo** — en pantallas grandes se ve angosto/apretado. Se puede dar un `min-width` razonable (ej. `20rem`) **solo desde el breakpoint `lg`** (mismo breakpoint que ya usa Filament para `.fi-topbar-start`, que oculta el logo del topbar por debajo de `lg` porque en mobile/tablet se usa el logo del sidebar en su lugar) — así no se arriesga a romper el layout en pantallas chicas/medianas.
+
+**Plan de implementación completo, listo para ejecutar en la próxima sesión** (código ya redactado y verificado contra el código fuente real de Filament 5.7.6 — falta solo crear los archivos, correr `php -l`/probar en el entorno real, y ajustar si algo no calza):
+
+**Archivo nuevo 1 — `lang/vendor/filament-panels/es/global-search.php`** (sobreescribe el placeholder del buscador global, sin tocar el vendor):
+```php
+<?php
+
+return [
+    'field' => [
+        'label' => 'Búsqueda global',
+        'placeholder' => 'Buscar pacientes, citas, médicos, facturas...',
+    ],
+    'no_results_message' => 'No se han encontrado resultados.',
+];
+```
+(Se mantienen `label` y `no_results_message` iguales al original del paquete — Laravel reemplaza el archivo completo, no hace merge clave por clave, así que hay que copiar todo el array aunque solo cambie una línea.)
+
+**Archivo nuevo 2 — `app/Filament/Pages/EditProfile.php`** (extiende la página nativa de Filament, agrega el campo Rol de solo lectura):
+```php
+<?php
+
+namespace App\Filament\Pages;
+
+use Filament\Auth\Pages\EditProfile as BaseEditProfile;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
+
+class EditProfile extends BaseEditProfile
+{
+    public function form(Schema $schema): Schema
+    {
+        return $schema->components([
+            $this->getNameFormComponent(),
+            $this->getEmailFormComponent(),
+            $this->getRolFormComponent(),
+            $this->getPasswordFormComponent(),
+            $this->getPasswordConfirmationFormComponent(),
+            $this->getCurrentPasswordFormComponent(),
+        ]);
+    }
+
+    protected function getRolFormComponent(): Component
+    {
+        // Mismo mapeo de etiquetas que UsersTable.php/UserForm.php, para
+        // que el rol se vea igual en todo el panel. Solo lectura: el
+        // usuario no puede cambiar su propio rol desde su perfil (sigue
+        // siendo exclusivo de /admin/users, ver matriz de la sección 10).
+        return TextInput::make('rol')
+            ->label('Rol')
+            ->formatStateUsing(fn (?string $state): string => match ($state) {
+                'admin' => 'Administrador',
+                'recepcion' => 'Recepción',
+                'medico' => 'Médico',
+                default => $state ?? '—',
+            })
+            ->disabled()
+            ->dehydrated(false);
+    }
+}
+```
+
+**Cambios en `AdminPanelProvider.php`** — agregar, después de `->favicon(...)`:
+```php
+->profile(\App\Filament\Pages\EditProfile::class, isSimple: false)
+```
+(`isSimple: false` para que la página de perfil use el layout completo del panel, con sidebar/topbar, en vez del layout centrado tipo login — más coherente con que el usuario ya está navegando dentro del panel, no llegando de afuera.)
+
+Y agregar, en algún punto del builder (antes de `->discoverResources(...)`, mismo orden que el resto de configuración visual):
+```php
+->userMenuItems([
+    'profile' => fn (\Filament\Actions\Action $action) => $action
+        ->label(fn () => new \Illuminate\Support\HtmlString(
+            '<span class="fi-user-menu-header-name">' .
+                e(filament()->getUserName(filament()->auth()->user())) .
+            '</span>' .
+            '<span class="fi-user-menu-header-role fi-user-menu-header-role-' .
+                e(filament()->auth()->user()->rol ?? 'default') . '">' .
+                e(match (filament()->auth()->user()->rol ?? null) {
+                    'admin' => 'Administrador',
+                    'recepcion' => 'Recepción',
+                    'medico' => 'Médico',
+                    default => 'Sin rol asignado',
+                }) .
+            '</span>'
+        ))
+        ->url(null)
+        ->icon(null),
+    'edit_profile' => fn () => \Filament\Actions\Action::make('edit_profile')
+        ->label('Editar perfil')
+        ->icon(\Filament\Support\Icons\Heroicon::OutlinedPencilSquare)
+        ->url(fn (): ?string => filament()->getProfileUrl())
+        ->sort(-1),
+])
+```
+(No hace falta registrar `'logout'` — Filament la agrega sola al final, ya en español, ver arriba. Ojo con el `use` de `Action`/`HtmlString`/`Heroicon` arriba del archivo si se prefiere no usar el nombre completo con `\` inline como en el borrador de arriba — cualquiera de los dos estilos es válido, en el proyecto ya conviven ambos según el archivo.)
+
+**Adiciones a `theme.css`** (al final del archivo, mismo patrón de comentario extenso que ya usa el resto del archivo, explicando el porqué y citando el archivo fuente real de Filament donde se verificó cada selector):
+```css
+/*
+ * Rediseño del encabezado (topbar): buscador, menú de usuario con
+ * nombre+rol, y acento de marca. Selectores verificados contra el código
+ * fuente real de Filament v5.7.6 (mismo criterio que el resto de este
+ * archivo) — ver MEMORIA.md, entrada del 25 ago 2026 (vigesimoquinta),
+ * para el detalle de qué archivo del paquete se usó para confirmar cada
+ * clase.
+ */
+
+/* Acento sutil de marca en el borde inferior del topbar — franja de 2px
+   con degradado de los 2 colores de marca, sin tocar el fondo blanco ni
+   el texto (evita repetir el problema de contraste del sidebar oscuro
+   descartado, ver sección 8.1). */
+.fi-topbar {
+    position: relative;
+}
+
+.fi-topbar::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 2px;
+    background: linear-gradient(90deg, rgb(12 68 124), rgb(15 110 86));
+}
+
+/* Buscador global un poco más ancho en desktop, para que no se vea
+   apretado — solo desde `lg` (mismo breakpoint que ya usa Filament para
+   mostrar/ocultar el logo del topbar, ver .fi-topbar-start en
+   topbar.css), para no arriesgar el layout en pantallas chicas/medianas. */
+@media (min-width: 1024px) {
+    .fi-global-search {
+        min-width: 20rem;
+    }
+}
+
+/* Menú de usuario: header de nombre+rol más ancho que el default de
+   Filament (14rem, ver dropdown/index.css) para que no se corte, y el
+   `truncate` heredado del <span> de .fi-dropdown-header (header.css)
+   neutralizado para poder mostrar 2 líneas en vez de una sola cortada
+   con "...". */
+.fi-user-menu .fi-dropdown-panel {
+    max-width: 18rem !important;
+}
+
+.fi-user-menu .fi-dropdown-header {
+    padding: 0.75rem 1rem;
+}
+
+.fi-user-menu .fi-dropdown-header span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.fi-user-menu-header-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgb(15 23 42);
+}
+
+.dark .fi-user-menu-header-name {
+    color: rgb(255 255 255);
+}
+
+/* Rol como badge chico, diferenciado tipográficamente del nombre (más
+   chico, con color de marca) y visualmente por color según el rol —
+   navy para admin, verde azulado para médico (mismo verde ya usado para
+   "Cobrado" en IngresosPorMesChartWidget, sección 6.6.2), gris neutro
+   para recepción. Colores en hex directo, sin tocar ->colors() global
+   del panel, para no afectar badges/botones ya confirmados en el resto
+   del sistema (ver el punto sobre esto en MEMORIA.md, misma entrada). */
+.fi-user-menu-header-role {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    padding: 0.0625rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.fi-user-menu-header-role-admin {
+    background-color: rgb(12 68 124 / 0.1);
+    color: rgb(12 68 124);
+}
+
+.dark .fi-user-menu-header-role-admin {
+    background-color: rgb(12 68 124 / 0.25);
+    color: rgb(147 197 253);
+}
+
+.fi-user-menu-header-role-medico {
+    background-color: rgb(15 110 86 / 0.1);
+    color: rgb(15 110 86);
+}
+
+.dark .fi-user-menu-header-role-medico {
+    background-color: rgb(15 110 86 / 0.25);
+    color: rgb(110 231 183);
+}
+
+.fi-user-menu-header-role-recepcion {
+    background-color: rgb(100 116 139 / 0.1);
+    color: rgb(71 85 105);
+}
+
+.dark .fi-user-menu-header-role-recepcion {
+    background-color: rgb(100 116 139 / 0.25);
+    color: rgb(203 213 225);
+}
+```
+
+**Pendiente antes de dar por bueno el CSS de arriba**: los valores de color en `.dark` son un supuesto razonable (no hay ningún dark mode confirmado/probado en este proyecto todavía — `->darkMode()` nunca se llamó en `AdminPanelProvider.php`, así que Filament decide el modo según preferencia del sistema operativo del usuario por defecto) — si en el entorno real el panel nunca entra en modo oscuro, esas reglas simplemente no tienen efecto, sin romper nada; no vale la pena investigarlo más a fondo para esta tarea puntual.
+
+**Qué falta hacer en la próxima sesión, en orden:**
+1. Crear los 2 archivos nuevos (`lang/vendor/filament-panels/es/global-search.php`, `app/Filament/Pages/EditProfile.php`) con el contenido de arriba.
+2. Aplicar los 2 cambios a `AdminPanelProvider.php` (`->profile()` + `->userMenuItems()`).
+3. Agregar el bloque de CSS de arriba al final de `theme.css`.
+4. Si hay acceso a PHP en esa sesión, correr `php -l` sobre los 2 archivos nuevos y el provider modificado antes de dar el patch por bueno (esta sesión no tuvo PHP disponible en el entorno de trabajo, igual que varias sesiones anteriores documentadas en este archivo).
+5. Generar el patch de la forma acostumbrada (identidad `isra16class-byte`/`isra16class@gmail.com`, `git format-patch -1 HEAD`) y entregarlo.
+6. Una vez que el usuario lo aplique (`git am`), corra `npm run build` (cambio de CSS) y pruebe en el entorno real: confirmar que (a) el placeholder del buscador cambió, (b) el menú del avatar muestra nombre+rol+Editar perfil+Cerrar sesión con la jerarquía tipográfica esperada, (c) `/admin/profile` carga y permite cambiar nombre/email/contraseña, y (d) nada del resto del panel (otros dropdowns, otros badges) se vio afectado por el CSS nuevo — actualizar `MEMORIA.md`/`CHANGELOG.md` con el resultado, siguiendo el mismo patrón de "confirmado/aún sin confirmar" que usa el resto de este archivo.
+
+**Qué NO se hizo en esta entrada, a propósito**: no se creó ni modificó ningún archivo de código (`.php`/`.css`) — es 100% investigación y plan, dejado con el nivel de detalle suficiente para que la implementación de la próxima sesión sea directa (copiar/pegar el código ya redactado arriba, ajustando lo que no calce al probarlo en el entorno real) en vez de tener que re-investigar el código fuente de Filament desde cero.
+
+Última actualización anterior: 25 de agosto de 2026 — vigesimocuarta entrada del día (el usuario, tras confirmar el rediseño de paleta/contraste, señaló que el encabezado del panel — fila de logo, buscador y avatar de usuario — "se siente muy básico" y pidió mejorar esa zona, incluyendo mostrar el módulo de usuarios como un desplegable ahí. Se compartió un diagnóstico (buscador con placeholder genérico, avatar sin nombre/rol visible) y se confirmó que `AdminPanelProvider.php` no tiene ninguna personalización de `userMenuItems()`/notificaciones/breadcrumbs — 100% default de Filament. El usuario definió que el menú del avatar debe mostrar **nombre + rol + editar perfil + cerrar sesión**. Se verificó el modelo `User` (campo `rol` string libre: admin/recepcion/medico) y se confirmó que **no existe página de perfil de usuario** — hay que crearla. **No se implementó nada** por límite de sesión — se le entregó al usuario un prompt para la sesión siguiente con todo este contexto ya investigado, para no perder tiempo re-explorando el modelo o el provider.)
 
 Última actualización anterior: 25 de agosto de 2026 — vigesimotercera entrada del día (**confirmado funcionando por el usuario en el entorno real**, por captura de pantalla: tras aplicar el fix 3 (selectores verificados contra el código fuente de Filament 5.7.6) y recompilar, "Escritorio" en el menú lateral ya se ve con fondo azul marino sólido y texto/ícono en blanco, como estaba pensado. **Con esto, el rediseño visual completo de esta sesión queda cumplido**: color primario del panel y de los 2 `ChartWidget` en la paleta de marca (azul marino + verde azulado, entrada decimonovena), contraste de superficies — fondo de página gris-azulado, sombra sutil en tarjetas (entrada vigésima) — y estado activo del menú lateral con los selectores CSS reales de la versión instalada (entradas 21-22-23). Los 4 indicadores, los 2 gráficos y la navegación del panel están confirmados con la nueva identidad visual.)
 

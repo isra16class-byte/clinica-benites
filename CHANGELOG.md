@@ -8,6 +8,19 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-25] Investigación y plan completo para el rediseño del encabezado (topbar)
+
+- Sesión dedicada 100% a investigación/planificación, a pedido explícito del usuario — **no se tocó ningún archivo de código**, para dejar todo listo y verificado antes de implementar.
+- Se clonó el código fuente real del tag `v5.7.6` de `filamentphp/filament` (mismo criterio que el fix del sidebar) y se verificaron uno por uno los 4 requisitos del usuario contra el Blade/PHP/CSS real del paquete instalado, no contra documentación genérica.
+- **Buscador**: el placeholder se puede cambiar sin tocar el vendor, sobreescribiendo la traducción del paquete en `lang/vendor/filament-panels/es/global-search.php` (Laravel permite overridear traducciones de paquetes así).
+- **Menú de usuario**: se descubrió que Filament tiene un mecanismo **oficial** para header de nombre+rol (el ítem `'profile'` sin URL ni acción se renderiza como header, no como link) y que `Action::label()` acepta HTML controlado vía `Illuminate\Support\HtmlString` — no hace falta ningún hack de CSS ni renderHook.
+- **Página de perfil**: se descubrió que Filament 5.7.6 **ya trae una página de perfil nativa** (`Filament\Auth\Pages\EditProfile`, activable con `->profile()`) con nombre/email/contraseña ya funcionando — solo hace falta extenderla para agregar el campo Rol de solo lectura, no reconstruirla de cero.
+- **Estilo/legibilidad**: se identificaron y documentaron las clases CSS reales a tocar (`.fi-dropdown-panel` con ancho fijo de 14rem por defecto, `.fi-dropdown-header span` con `truncate` que hay que neutralizar para 2 líneas, `.fi-topbar`/`.fi-global-search` para el acento de marca y el ancho del buscador) y se dejó redactado el CSS completo, con los 2 colores de marca aplicados al badge de rol sin tocar la paleta global de colores del panel (evita riesgo sobre badges/botones ya confirmados en el resto del sistema).
+- Se dejó en `MEMORIA.md` (vigesimoquinta entrada del día) el plan completo con el código de los 2 archivos nuevos, los 2 cambios a `AdminPanelProvider.php` y el bloque de CSS completo, ya redactados y verificados — listos para copiar/pegar y ajustar en la próxima sesión, sin tener que re-investigar nada.
+- **Qué falta**: crear los archivos, aplicar los cambios, correr `php -l` si hay PHP disponible, y probar en el entorno real (buscador, menú de usuario, página `/admin/profile`, y que no se haya afectado ningún otro dropdown/badge del panel).
+
+---
+
 ## [2026-08-25] Feedback pendiente: encabezado del panel se siente genérico
 
 - El usuario, tras confirmar el rediseño de paleta/contraste, señaló que el encabezado (fila del logo + buscador + avatar) "se siente muy básico" y sugirió agregar el módulo de usuarios como un botón desplegable ahí mismo.
