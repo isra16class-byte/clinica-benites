@@ -152,6 +152,24 @@ class IndicadoresGerencialesWidget extends BaseWidget
      * acento del borde — mismo condicional de "destacar solo si aplica"
      * que ya se usa en `cb-stat-destacado`, para no teñir de warning una
      * tarjeta en $0 (estado "success", sin deuda).
+     *
+     * FIX (26 ago 2026, el usuario notó en captura real que el ancho
+     * doble se veía como espacio vacío — el texto seguía siendo el mismo
+     * de siempre, "Facturado y aún sin pagar", así que la tarjeta más
+     * ancha no aportaba nada, solo aire de más). Se eligió, de las 3
+     * opciones propuestas (A: sacar el span; B: llenar el espacio con
+     * contenido real; C: reducir el span), la **opción B**: la
+     * descripción pasa a ser dinámica — cantidad de facturas pendientes
+     * + antigüedad de la más vieja ("3 facturas pendientes — la más
+     * antigua, hace 12 días"). Esa antigüedad es justo el dato que le da
+     * sentido a que "Por cobrar" no se limite al mes actual (ver el
+     * comentario de arriba, "cartera pendiente completa") — una factura
+     * pendiente de hace semanas es más urgente que una de ayer, y antes
+     * ese matiz no se veía en ningún lado del Dashboard. `fecha` en
+     * `Factura` es una columna `date` sin cast a Carbon en el modelo
+     * (confirmado en la migración y en que `Factura.php` no declara
+     * `$casts`), así que se envuelve con `Carbon::parse()` antes de
+     * `diffInDays()` — devolvería un string plano si no.
      */
     private function statPorCobrar(): Stat
     {
@@ -164,8 +182,32 @@ class IndicadoresGerencialesWidget extends BaseWidget
             ? "cb-stat-accent-{$color} cb-stat-destacado cb-stat-asimetrico"
             : "cb-stat-accent-{$color}";
 
+        if ($porCobrar > 0) {
+            $cantidadPendientes = Factura::query()
+                ->where('estado_pago', 'pendiente')
+                ->count();
+
+            $facturaMasAntigua = Factura::query()
+                ->where('estado_pago', 'pendiente')
+                ->orderBy('fecha')
+                ->first();
+
+            $diasDesde = Carbon::parse($facturaMasAntigua->fecha)->diffInDays(Carbon::now());
+
+            $descripcion = sprintf(
+                '%d factura%s pendiente%s — la más antigua, hace %d día%s',
+                $cantidadPendientes,
+                $cantidadPendientes === 1 ? '' : 's',
+                $cantidadPendientes === 1 ? '' : 's',
+                $diasDesde,
+                $diasDesde === 1 ? '' : 's',
+            );
+        } else {
+            $descripcion = 'Sin facturas pendientes';
+        }
+
         return Stat::make('Por cobrar', '$'.number_format($porCobrar, 2))
-            ->description('Facturado y aún sin pagar')
+            ->description($descripcion)
             ->color($color)
             ->columnSpan(['default' => 1, 'lg' => 2])
             ->extraAttributes(['class' => $clases]);

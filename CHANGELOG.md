@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Fix de contenido — "Por cobrar" aprovecha su ancho doble (dirección C, opción B)
+
+- El usuario reportó, con captura real, que el ancho doble de "Por cobrar" (dirección C, entrada anterior) se veía como espacio vacío: la descripción seguía siendo el texto fijo de siempre, así que el ancho extra no aportaba nada.
+- De las 3 opciones propuestas (A: sacar el span; B: llenar el espacio con contenido real; C: reducir el span), se eligió **B**.
+- `IndicadoresGerencialesWidget::statPorCobrar()`: la descripción pasa de texto fijo a dinámica — cantidad de facturas pendientes + antigüedad de la más vieja (ej. "3 facturas pendientes — la más antigua, hace 12 días"), solo cuando hay deuda > 0 ("Sin facturas pendientes" si no la hay). Requiere `Carbon::parse()` sobre `fecha` (columna `date` sin cast en el modelo `Factura`) antes de `diffInDays()`.
+- Sin cambios de CSS ni de grid — el `columnSpan(2)`/`cb-stat-asimetrico` de la entrada anterior se mantienen igual, esto solo cambia qué texto se muestra dentro.
+- Verificado con `php -l`, sin errores.
+- **Aún sin confirmar por el usuario en el entorno real** — sin acceso a Sail/npm/base de datos real en esta sesión.
+
+---
+
 ## [2026-08-26] Confirmado + dirección C — grid asimétrico en el Dashboard gerencial
 
 - El usuario confirmó en el entorno real que el acento de color en las 4 tarjetas de KPI (entrada anterior) se ve bien. Con eso, la dirección A + el pedido de generalizar el acento quedan cerrados y confirmados.
