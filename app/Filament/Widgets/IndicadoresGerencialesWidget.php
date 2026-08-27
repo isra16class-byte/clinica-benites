@@ -9,6 +9,7 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\HtmlString;
 
 /**
  * Sesión 1 del Dashboard gerencial (MEMORIA.md sección 6.6): los 4
@@ -32,6 +33,45 @@ use Illuminate\Support\Carbon;
  * de la v5.7.6 — solo alimenta el color del ícono/texto de la descripción
  * y, si hubiera, el del gráfico de fondo), de ahí la necesidad de esta
  * clase aparte.
+ *
+ * Tarjetas presionables — dirección A "expande hacia abajo" (26 ago 2026,
+ * a pedido del usuario: "que las tarjetas sean presionables... y muestre
+ * más detalles"). Se descartaron 2 alternativas antes de elegir esta (ver
+ * MEMORIA.md): B (la tarjeta crece en ANCHO, empujando a las otras) tenía
+ * más riesgo de CSS nuevo sin poder probarlo en vivo; C (popover flotante)
+ * no se sentía como "la tarjeta se transforma", que era el pedido.
+ *
+ * Mecanismo (confirmado contra el código fuente real de Filament 5.7.6 y
+ * Livewire 4.4.1, no contra documentación de comunidad):
+ * - `Stat::value()` acepta `string|Htmlable|Closure` (no solo string) —
+ *   confirmado en el constructor de `Stat.php` — así que en vez de pasar
+ *   el número como texto plano, se pasa un `HtmlString` que envuelve el
+ *   número + un bloque de detalle oculto, todo dentro del mismo
+ *   `<div class="fi-wi-stats-overview-stat-value">` que ya trae el Blade
+ *   (nunca forkeado). El bloque de detalle usa `x-show="expanded"` +
+ *   `x-collapse` para animar el alto en vez de aparecer de golpe.
+ * - `x-collapse` NO lo registra Filament — lo registra Livewire 4.4.1
+ *   globalmente (`js/lifecycle.js`, `Alpine.plugin(collapse)`), confirmado
+ *   clonando el repo de Livewire en el tag instalado (`composer.lock`).
+ *   Ya está disponible sin instalar nada nuevo; mismo mecanismo que ya usa
+ *   el propio sidebar colapsable de Filament.
+ * - El clic/teclado (`x-data`, `@click`, `@keydown`) vive en el `<div>`
+ *   exterior de la tarjeta vía `extraAttributes()` — confirmado en
+ *   `HasExtraAttributes.php` que ese método admite cualquier atributo, no
+ *   solo `class`, y no lo escapa.
+ * - **Problema no anticipado en la propuesta original, resuelto en
+ *   `theme.css`**: `.fi-wi-stats-overview-stat` trae `h-full` de fábrica
+ *   dentro de un grid con `align-items: stretch` (confirmado en
+ *   `stats-overview-widget.css` de Filament) — si una tarjeta crece, la
+ *   fila entera se estira y las otras 3 quedarían con aire vacío abajo
+ *   (mismo tipo de problema que hizo descartar la dirección "C" del
+ *   pulido visual, aunque por otro mecanismo). Sacar el `stretch` siempre
+ *   rompería a "Por cobrar" (`cb-stat-destacado`), que hoy depende de ese
+ *   mismo stretch para verse pareja con las otras 3 pese a su padding
+ *   extra — ya confirmado por el usuario en el entorno real. Se usa
+ *   `:has()` en `theme.css` para desactivar el stretch SOLO mientras hay
+ *   una tarjeta expandida, dejando el comportamiento normal intacto en
+ *   reposo.
  */
 class IndicadoresGerencialesWidget extends BaseWidget
 {
@@ -55,6 +95,168 @@ class IndicadoresGerencialesWidget extends BaseWidget
             $this->statCitasAtendidas(),
             $this->statOcupacionCamas(),
         ];
+    }
+
+    /**
+     * Atributos comunes que hacen presionable una tarjeta (ver comentario
+     * de clase). `$clases` es el mismo string de clases CSS que cada stat
+     * ya arma hoy (acento de color + `cb-stat-destacado` si aplica) — se
+     * agrega tal cual, sin tocar esa lógica existente.
+     *
+     * @return array<string, string>
+     */
+    private function atributosExpandible(string $clases): array
+    {
+        return [
+            'class' => $clases,
+            'x-data' => '{ expanded: false }',
+            '@click' => 'expanded = !expanded',
+            '@keydown.enter' => 'expanded = !expanded',
+            '@keydown.space.prevent' => 'expanded = !expanded',
+            ':class' => "{ 'cb-stat-expanded': expanded }",
+            ':aria-expanded' => 'expanded',
+            'role' => 'button',
+            'tabindex' => '0',
+        ];
+    }
+
+    /**
+     * Arma el contenido del `<div class="fi-wi-stats-overview-stat-value">`
+     * (ver `stat.blade.php` de Filament): el número de siempre + una
+     * flecha que indica que es presionable + el bloque de detalle, oculto
+     * hasta que `expanded` (definido en `atributosExpandible()`, mismo
+     * `x-data` de la tarjeta que envuelve este value) sea `true`.
+     * `$detalleHtml` ya viene armado (con sus propios valores escapados
+     * con `e()`) por cada `desglose*()` de abajo.
+     */
+    private function valorConDetalle(string $valor, string $detalleHtml): HtmlString
+    {
+        return new HtmlString(
+            '<span>'.e($valor).'</span>'
+            .'<svg class="cb-stat-chevron" :class="{ \'cb-stat-chevron-abierto\': expanded }" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd" /></svg>'
+            .'<div x-show="expanded" x-collapse.duration.200ms x-cloak class="cb-stat-detalle">'
+            .$detalleHtml
+            .'</div>'
+        );
+    }
+
+    /**
+     * Detalle de "Ingresos del mes": monto exacto del mes anterior y la
+     * diferencia en dólares (no solo el % que ya se ve siempre) — el dato
+     * concreto que el % no muestra por sí solo.
+     */
+    private function desgloseIngresosMes(float $actual, float $anterior): string
+    {
+        if ($anterior <= 0) {
+            return '<p class="cb-stat-detalle-vacio">Sin datos del mes anterior para comparar.</p>';
+        }
+
+        $diferencia = $actual - $anterior;
+        $signo = $diferencia >= 0 ? '+' : '-';
+
+        return '<p class="cb-stat-detalle-texto">Mes anterior: $'.e(number_format($anterior, 2)).'</p>'
+            .'<p class="cb-stat-detalle-texto">Diferencia: '.e($signo).'$'.e(number_format(abs($diferencia), 2)).'</p>';
+    }
+
+    /**
+     * Detalle de "Por cobrar": cantidad de facturas pendientes y
+     * antigüedad de la más vieja — el mismo dato de negocio que se había
+     * propuesto (y descartado junto con el grid asimétrico, ver
+     * MEMORIA.md) para la dirección C, ahora como detalle bajo demanda en
+     * vez de descripción siempre visible. Mismo detalle técnico de esa
+     * vez: `fecha` en `Factura` es una columna `date` sin cast declarado
+     * (`Factura.php` no tiene `$casts`), así que se envuelve con
+     * `Carbon::parse()` antes de `diffInDays()`.
+     */
+    private function desglosePorCobrar(float $porCobrar): string
+    {
+        if ($porCobrar <= 0) {
+            return '<p class="cb-stat-detalle-vacio">Sin facturas pendientes.</p>';
+        }
+
+        $pendientes = Factura::query()->where('estado_pago', 'pendiente');
+
+        $cantidad = (clone $pendientes)->count();
+        $masAntigua = (clone $pendientes)->orderBy('fecha')->first();
+
+        $texto = $cantidad === 1 ? '1 factura pendiente' : "{$cantidad} facturas pendientes";
+
+        $dias = Carbon::parse($masAntigua->fecha)->diffInDays();
+        $antiguedad = match (true) {
+            $dias === 0 => 'hoy',
+            $dias === 1 => 'hace 1 día',
+            default => "hace {$dias} días",
+        };
+
+        return '<p class="cb-stat-detalle-texto">'.e($texto).'</p>'
+            .'<p class="cb-stat-detalle-texto">La más antigua, '.e($antiguedad).'.</p>';
+    }
+
+    /**
+     * Detalle de "Citas atendidas hoy": desglose por área, para saber de
+     * un vistazo dónde se concentró la atención del día sin tener que
+     * abrir la lista completa de Citas y filtrar a mano.
+     */
+    private function desgloseAreaCitasHoy(): string
+    {
+        $citas = Cita::query()
+            ->whereDate('fecha', today())
+            ->where('estado', 'atendida')
+            ->with('area')
+            ->get();
+
+        if ($citas->isEmpty()) {
+            return '<p class="cb-stat-detalle-vacio">Sin citas atendidas hoy todavía.</p>';
+        }
+
+        $porArea = $citas
+            ->groupBy(fn (Cita $cita) => $cita->area?->nombre ?? 'Sin área')
+            ->map->count()
+            ->sortDesc();
+
+        $filas = $porArea->map(
+            fn (int $cantidad, string $area) => '<li><span>'.e($area).'</span><span>'.e((string) $cantidad).'</span></li>'
+        )->implode('');
+
+        return '<ul class="cb-stat-detalle-lista">'.$filas.'</ul>';
+    }
+
+    /**
+     * Detalle de "Ocupación de camas": desglose por tipo (hospitalización
+     * / UCI / UCIN, ver migración de `camas`) — el total agregado no dice
+     * si la presión está en UCI (más crítico) o en hospitalización
+     * general. Usa `withCount()` con la relación ya existente
+     * (`Cama::internamientos()`) en vez de SQL crudo, mismo criterio de
+     * `Cama::ocupada()` (estado derivado en vivo, nunca guardado aparte).
+     */
+    private function desgloseTipoCamas(): string
+    {
+        $etiquetas = [
+            'hospitalizacion' => 'Hospitalización',
+            'uci' => 'UCI',
+            'ucin' => 'UCIN',
+        ];
+
+        $camas = Cama::query()
+            ->withCount([
+                'internamientos as ocupadas_count' => fn ($query) => $query->whereNull('fecha_alta'),
+            ])
+            ->get()
+            ->groupBy('tipo');
+
+        if ($camas->isEmpty()) {
+            return '<p class="cb-stat-detalle-vacio">Sin camas registradas.</p>';
+        }
+
+        $filas = $camas->map(function ($grupo, string $tipo) use ($etiquetas) {
+            $etiqueta = $etiquetas[$tipo] ?? ucfirst($tipo);
+            $ocupadas = $grupo->sum('ocupadas_count');
+            $total = $grupo->count();
+
+            return '<li><span>'.e($etiqueta).'</span><span>'.e("{$ocupadas} / {$total}").'</span></li>';
+        })->implode('');
+
+        return '<ul class="cb-stat-detalle-lista">'.$filas.'</ul>';
     }
 
     /**
@@ -91,11 +293,16 @@ class IndicadoresGerencialesWidget extends BaseWidget
             $icono = null;
         }
 
-        return Stat::make('Ingresos del mes', '$'.number_format($ingresosMesActual, 2))
+        $valor = $this->valorConDetalle(
+            '$'.number_format($ingresosMesActual, 2),
+            $this->desgloseIngresosMes($ingresosMesActual, $ingresosMesAnterior),
+        );
+
+        return Stat::make('Ingresos del mes', $valor)
             ->description($descripcion)
             ->descriptionIcon($icono)
             ->color($color)
-            ->extraAttributes(['class' => "cb-stat-accent-{$color}"]);
+            ->extraAttributes($this->atributosExpandible("cb-stat-accent-{$color}"));
     }
 
     /**
@@ -129,10 +336,15 @@ class IndicadoresGerencialesWidget extends BaseWidget
         $color = $porCobrar > 0 ? 'warning' : 'success';
         $clases = $porCobrar > 0 ? "cb-stat-accent-{$color} cb-stat-destacado" : "cb-stat-accent-{$color}";
 
-        return Stat::make('Por cobrar', '$'.number_format($porCobrar, 2))
+        $valor = $this->valorConDetalle(
+            '$'.number_format($porCobrar, 2),
+            $this->desglosePorCobrar($porCobrar),
+        );
+
+        return Stat::make('Por cobrar', $valor)
             ->description('Facturado y aún sin pagar')
             ->color($color)
-            ->extraAttributes(['class' => $clases]);
+            ->extraAttributes($this->atributosExpandible($clases));
     }
 
     /**
@@ -154,10 +366,12 @@ class IndicadoresGerencialesWidget extends BaseWidget
             ->where('estado', 'atendida')
             ->count();
 
-        return Stat::make('Citas atendidas hoy', (string) $hoy)
+        $valor = $this->valorConDetalle((string) $hoy, $this->desgloseAreaCitasHoy());
+
+        return Stat::make('Citas atendidas hoy', $valor)
             ->description("{$semana} atendidas esta semana")
             ->color('info')
-            ->extraAttributes(['class' => 'cb-stat-accent-info']);
+            ->extraAttributes($this->atributosExpandible('cb-stat-accent-info'));
     }
 
     /**
@@ -183,9 +397,11 @@ class IndicadoresGerencialesWidget extends BaseWidget
         $porcentaje = round(($ocupadas / $total) * 100);
         $color = $porcentaje >= 90 ? 'danger' : ($porcentaje >= 70 ? 'warning' : 'success');
 
-        return Stat::make('Ocupación de camas', "{$ocupadas} / {$total}")
+        $valor = $this->valorConDetalle("{$ocupadas} / {$total}", $this->desgloseTipoCamas());
+
+        return Stat::make('Ocupación de camas', $valor)
             ->description("{$porcentaje}% ocupado")
             ->color($color)
-            ->extraAttributes(['class' => "cb-stat-accent-{$color}"]);
+            ->extraAttributes($this->atributosExpandible("cb-stat-accent-{$color}"));
     }
 }

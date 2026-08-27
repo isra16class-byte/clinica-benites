@@ -8,6 +8,23 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Tarjetas de KPI presionables — dirección A "expande hacia abajo"
+
+- A pedido del usuario ("que las tarjetas sean presionables... y muestre más detalles"), retomando una propuesta de una sesión anterior que se quedó sin créditos justo tras elegir la dirección A (de 3: A expande hacia abajo/bajo riesgo, B expande hacia el costado/más riesgo, C popover — descartadas).
+- `IndicadoresGerencialesWidget.php`: las 4 tarjetas ahora son presionables (clic o Enter/Espacio) vía Alpine.js (`x-data`/`@click`/`x-show`/`x-collapse`, agregado con `extraAttributes()`, sin forkear el Blade de Filament). Al presionar, debajo del número aparece un bloque de detalle con animación suave de alto:
+  - Ingresos del mes → monto del mes anterior + diferencia en $.
+  - Por cobrar → cantidad de facturas pendientes + antigüedad de la más vieja (idea reciclada de la dirección C descartada — ver entradas de abajo — ahora como detalle bajo demanda).
+  - Citas atendidas hoy → desglose por área.
+  - Ocupación de camas → desglose por tipo (Hospitalización/UCI/UCIN), vía `withCount()` sobre la relación `Cama::internamientos()`.
+- `Stat::value()` pasa de string plano a un `HtmlString` (número + flecha + bloque de detalle) — confirmado en el código fuente real de Filament 5.7.6 que `Stat::value()`/`description()` aceptan `Htmlable` y que Blade no los escapa si lo son.
+- `x-collapse` (la animación de alto) no la registra Filament — se confirmó clonando Livewire 4.4.1 (`js/lifecycle.js`, `Alpine.plugin(collapse)`) que ya está disponible globalmente sin instalar nada nuevo.
+- `theme.css`: estilos del bloque de detalle/flecha, `cursor:pointer`, hover sutil, y una regla `[x-cloak]{display:none}` nueva (Filament usa `x-cloak` en varios componentes propios pero nunca definió esa regla CSS — se agrega porque el proyecto nunca la había necesitado hasta ahora).
+- **Problema encontrado al escribir el CSS, no anticipado en la propuesta original**: el grid de las 4 tarjetas usa `align-items: stretch` de fábrica — expandir una tarjeta estiraba la fila completa y dejaba a las otras 3 con aire vacío, pero sacar el stretch siempre rompía a "Por cobrar" (`cb-stat-destacado`, que depende de ese stretch para verse pareja pese a su padding extra). Resuelto con un selector `:has()` que desactiva el stretch solo mientras hay una tarjeta expandida.
+- Verificado con `php -l`, sin errores; CSS con llaves balanceadas verificado a mano.
+- **Aún sin confirmar por el usuario en el entorno real** — sin acceso a Sail/npm en esta sesión, no se pudo correr `npm run build` ni verlo en el navegador.
+
+---
+
 ## [2026-08-26] Revertido — dirección C completa (grid asimétrico + fix de contenido)
 
 - El usuario pidió retroceder los 2 commits de la dirección C ("Dashboard gerencial: grid asimétrico" y "Por cobrar: descripción dinámica") — no le convenció ni siquiera con el ajuste de contenido de la entrada anterior.

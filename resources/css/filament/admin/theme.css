@@ -229,6 +229,143 @@
     padding-bottom: 2rem;
 }
 
+/*
+ * Tarjetas presionables — dirección A "expande hacia abajo" (26 ago 2026,
+ * ver el comentario de clase de IndicadoresGerencialesWidget.php para el
+ * mecanismo completo de Alpine/HtmlString). Este bloque cubre solo la
+ * parte de CSS.
+ *
+ * `[x-cloak]` (26 ago 2026): confirmado clonando el código fuente
+ * completo de `filamentphp/filament` (todos los paquetes, no solo
+ * widgets) que Filament usa `x-cloak` en varios componentes propios
+ * (dropdown, tabs, sidebar) pero NUNCA define la regla CSS
+ * `[x-cloak] { display: none }` en ninguno de sus `.css` — depende de que
+ * el proyecto consumidor la traiga (convención estándar documentada por
+ * Alpine.js, no un descuido). Como este `theme.css` nunca la había
+ * necesitado hasta ahora (nada usaba `x-cloak` en el proyecto), se agrega
+ * acá para no depender de que ya exista en algún lado no verificado —
+ * evita el parpadeo del bloque de detalle antes de que Alpine inicialice
+ * en la carga de la página.
+ */
+[x-cloak] {
+    display: none !important;
+}
+
+.fi-wi-stats-overview-stat {
+    cursor: pointer;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    background-color: rgb(248 250 252);
+}
+
+.dark .fi-wi-stats-overview-stat:hover {
+    background-color: rgb(30 41 59);
+}
+
+/*
+ * El número (`.fi-wi-stats-overview-stat-value`) ahora envuelve, además
+ * de la cifra, la flecha y el bloque de detalle (ver
+ * `valorConDetalle()`) — se pasa de bloque simple a `flex` para que la
+ * cifra y la flecha queden en la misma línea, y el detalle (que sigue
+ * siendo un bloque, `display:block` por defecto) caiga debajo.
+ */
+.fi-wi-stats-overview-stat-value {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cb-stat-chevron {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: rgb(148 163 184);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.dark .cb-stat-chevron {
+    color: rgb(100 116 139);
+}
+
+.cb-stat-chevron-abierto {
+    transform: rotate(180deg);
+}
+
+/*
+ * Bloque de detalle: mismo ancho completo de la tarjeta (`flex-basis:
+ * 100%` para que, al estar dentro de un contenedor `flex` con `flex-wrap`,
+ * pase a su propia línea en vez de intentar compartir la fila con la
+ * cifra y la flecha), tipografía reducida a la misma escala que la
+ * descripción de la tarjeta (no la cifra grande, heredada si no se
+ * resetea acá) y un separador sutil arriba para distinguirlo del número.
+ */
+.cb-stat-detalle {
+    flex-basis: 100%;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgb(226 232 240);
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: rgb(100 116 139);
+}
+
+.dark .cb-stat-detalle {
+    border-top-color: rgb(51 65 85);
+    color: rgb(148 163 184);
+}
+
+.cb-stat-detalle-texto,
+.cb-stat-detalle-vacio {
+    margin: 0;
+}
+
+.cb-stat-detalle-texto + .cb-stat-detalle-texto {
+    margin-top: 0.25rem;
+}
+
+.cb-stat-detalle-lista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.cb-stat-detalle-lista li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.cb-stat-detalle-lista li + li {
+    margin-top: 0.25rem;
+}
+
+/*
+ * El problema que la propuesta original no había anticipado (ver
+ * comentario de clase en IndicadoresGerencialesWidget.php): las 4
+ * tarjetas comparten fila en un grid con `align-items: stretch` (heredado
+ * de `.fi-wi-stats-overview-stat` con `h-full` de fábrica, ver
+ * `stats-overview-widget.css` de Filament). Si se deja ese stretch activo
+ * mientras una tarjeta está expandida, la fila entera crece a la altura
+ * de la tarjeta expandida y las otras 3 se estiran con aire vacío abajo —
+ * mismo tipo de problema, por otro mecanismo, que hizo descartar la
+ * dirección "C" del pulido visual (ver MEMORIA.md). Pero sacar el stretch
+ * siempre rompería a "Por cobrar" (`cb-stat-destacado`), que depende de
+ * ese mismo stretch para verse pareja con las otras 3 pese a su padding
+ * extra, ya confirmado por el usuario en el entorno real. Con `:has()`
+ * (soportado en todos los navegadores modernos desde 2023 — Chrome/Edge
+ * 105+, Safari 15.4+, Firefox 121+), se apunta al contenedor del widget
+ * (`.fi-wi-stats-overview`, ancestro de las 4 tarjetas) y se desactiva el
+ * stretch de las 4 SOLO mientras alguna tiene la clase `cb-stat-expanded`
+ * (agregada por Alpine vía `:class`, ver `atributosExpandible()`) — en
+ * reposo (nada expandido) el comportamiento queda exactamente como antes.
+ */
+.fi-wi-stats-overview:has(.cb-stat-expanded) .fi-wi-stats-overview-stat {
+    height: auto;
+    align-self: start;
+}
+
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
     background-color: rgb(12 68 124) !important;
 }
