@@ -14,7 +14,7 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 - **Causa raíz**: en Tailwind v4, las utilidades (`lg:hidden`, la clase que oculta el botón en escritorio en `nav.blade.php`) viven dentro de `@layer utilities` — una capa CSS que, por especificidad de capas (no de selector), **siempre pierde contra cualquier regla CSS normal fuera de una capa**, sin importar el orden en que aparezcan en el archivo. Las reglas custom del sitio público (`.cb-burger { display: flex; ... }` y el resto de `public.css`) estaban escritas fuera de cualquier `@layer`, así que le ganaban a `lg:hidden` en cualquier tamaño de pantalla.
 - **Solución**: se envolvió todo el CSS custom de `public.css` en las capas que Tailwind v4 espera — `@layer base` para `html`/`body`, `@layer components` para el resto (nav, hero, botones, franja de confianza, animaciones). `@import 'tailwindcss'` y el bloque `@theme` (tokens de color/tipografía) quedan sin capa, como corresponde. Con esto, las utilidades responsivas de Tailwind (`lg:hidden`, `lg:flex`, etc.) vuelven a poder ganarles a las reglas custom cuando corresponde, sin cambiar ninguna clase en los archivos `.blade.php`.
 - Ningún nombre de clase ni archivo Blade cambió — es un fix puramente de organización de capas CSS en `resources/css/public.css`.
-- Verificado con balance de llaves (script, 75/75). **Sin acceso a Sail/npm en esta sesión** — pendiente confirmar por el usuario tras recompilar (`npm run build`/`npm run dev`).
+- Verificado con balance de llaves (script, 75/75). **Confirmado por el usuario en el entorno real**: tras recompilar, el ícono de hamburguesa ya no aparece en escritorio.
 
 ---
 
