@@ -8,6 +8,18 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Emblema técnico en el espacio vacío del hero (Portada)
+
+- El usuario, viendo una captura real de la Portada en escritorio, preguntó para qué estaba pensado el espacio vacío a la derecha del texto. Respuesta: para nada — es consecuencia de que `.cb-subheadline` limita el ancho (`max-width: 38rem`, legibilidad) dentro de un contenedor bastante más ancho (`max-w-7xl`), en un layout de una sola columna. Solo lo ocupaban los orbes decorativos de fondo.
+- Se presentaron 4 direcciones antes de tocar código (vacío a propósito / card de confianza / elemento gráfico grande / fotos reales) — el usuario eligió el elemento gráfico, mismo lenguaje visual que la línea de pulso ya existente.
+- Nuevo `<div class="cb-hero-emblem">` en `hero.blade.php`: SVG con un aro de 24 marcas calculadas por trigonometría real (`@for` + `deg2rad`, no a mano), que gira muy despacio (150s) como atmósfera — no compite con la línea de pulso, que sigue siendo el único movimiento protagonista de la sección. Aro exterior que se dibuja al cargar (mismo truco `pathLength="1"` de la línea de pulso), 4 escuadras tipo reticle de cámara, y en el centro el mismo ícono cruz-en-círculo del trust-strip ("Atención de emergencias") ampliado, con su brazo horizontal convertido en una réplica en miniatura de la línea de pulso (mismo gradiente, con blip dorado que late).
+- Solo visible desde `xl` (1280px) — se descartó `lg` (1024px) tras calcular que a esos anchos el texto todavía puede superponerse.
+- El CSS nuevo se agregó dentro del `@layer components` existente a propósito — mismo cuidado que el fix del ícono de hamburguesa (CSS custom sin capa le gana a las utilidades de Tailwind sin importar el orden).
+- Respeta `prefers-reduced-motion` (rotación/dibujado/latido se desactivan).
+- Verificado con balance de llaves del CSS (92/92) y de tags del Blade, y con una vista previa estática renderizada aparte (`cairosvg`) para validar el diseño antes de integrarlo — sin acceso a Sail/npm en esta sesión. **Pendiente confirmar visualmente por el usuario en el entorno real**, en una pantalla ≥1280px.
+
+---
+
 ## [2026-08-27] Logo horizontal blanco reemplazado por versión generada con IA (Gemini)
 
 - El usuario compartió una imagen del logo generada con Gemini (JPG, 1833×560), con más calidad/detalle 3D que el archivo actual, y pidió integrarla al sistema y al sitio público.
