@@ -285,8 +285,8 @@
        Blade sobre por qué (trust-strip cortado por el fold en laptops
        comunes). */
     .cb-hero-content {
-        padding-top: 8rem;
-        padding-bottom: 5rem;
+        padding-top: 9rem;
+        padding-bottom: 5.5rem;
     }
 
     .cb-eyebrow {
@@ -328,7 +328,7 @@
 
     .cb-subheadline {
         max-width: 38rem;
-        margin-top: 1.75rem;
+        margin-top: 2rem;
         font-size: 1.125rem;
         line-height: 1.7;
         color: rgb(255 255 255 / 72%);
@@ -337,7 +337,7 @@
     /* Línea de pulso — el elemento firma de la sección: une "precisión" (trazo
        técnico, se dibuja como un plano) y "vida/calidez" (late, no es estática). */
     .cb-pulse-wrap {
-        margin-top: 2.5rem;
+        margin-top: 3rem;
         max-width: 30rem;
     }
 
@@ -371,7 +371,7 @@
     }
 
     .cb-cta-row {
-        margin-top: 2.75rem;
+        margin-top: 3.25rem;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -430,7 +430,7 @@
     /* ---------- Franja de confianza ---------- */
 
     .cb-trust-strip {
-        margin-top: 4rem;
+        margin-top: 4.5rem;
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 2rem 1.5rem;

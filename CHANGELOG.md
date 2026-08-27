@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Más aire en el hero, solo en pantallas altas (>900px)
+
+- El usuario confirmó en su entorno real que el fix anterior (compresión vertical) funcionaba, pero pidió correr el bloque "más abajito, unos milímetros" porque sentía que había espacio de sobra y quedaba muy junto.
+- Aclaró un dato importante: su primera impresión positiva fue con el navegador al 90% de zoom, no al 100%. Medido con su captura real (pantalla 1920×1080, chrome del navegador ~110px de alto), su viewport real a 100% de zoom da **~926px de alto** — justo por encima del umbral de compresión (900px) fijado en el cambio anterior. O sea, su caso ya usaba el espaciado "base" (sin comprimir), donde efectivamente había margen sin arriesgar el fix de las laptops chicas.
+- **Aplicado**: se aumentó el espaciado únicamente en el escalón base (sin `@media`), en `public.css`: `.cb-hero-content` (`padding-top: 8rem→9rem`, `padding-bottom: 5rem→5.5rem`), `.cb-pulse-wrap` (`margin-top: 2.5rem→3rem`), `.cb-subheadline` (`margin-top: 1.75rem→2rem`), `.cb-cta-row` (`margin-top: 2.75rem→3.25rem`), `.cb-trust-strip` (`margin-top: 4rem→4.5rem`). Los dos escalones de compresión (`@media max-height: 900px` y `700px`) no se tocaron — siguen sobreescribiendo estos mismos valores en pantallas más bajas, así que el cambio no llega a laptops chicas.
+- **Verificado con Playwright**: en la resolución real del usuario (926px de alto) el trust-strip sigue completo, con 53px de margen libre (antes del cambio, menos). En el borde exacto del umbral (901px, el caso más ajustado del escalón base) quedan 28px libres. Las 3 laptops chicas medidas en el cambio anterior (1366×768, 1440×900, 1536×864) no cambiaron ni un píxel — confirmado comparando las mismas mediciones antes/después.
+- **Pendiente confirmar por el usuario en su propio entorno real**, ahora sí al 100% de zoom (la captura que motivó este cambio estaba al 90%).
+
+---
+
 ## [2026-08-27] Compresión vertical del hero — trust-strip cortado por el fold en laptops comunes
 
 - El usuario reportó una conversación anterior (sesión sin créditos) donde sospechaba que, al 100% de zoom del navegador, la franja de confianza (trust-strip: +26 especialidades / Quirófanos·UCI·UCIN / Ambulancia propia / Atención de emergencias) no se alcanzaba a ver sin hacer scroll — compartió una captura recortada mostrándola.
