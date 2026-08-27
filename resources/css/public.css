@@ -238,7 +238,7 @@
         position: absolute;
         top: 12.5rem;
         right: max(4rem, calc((100vw - 80rem) / 2 + 4rem));
-        width: min(26rem, 32vw);
+        width: min(21rem, 27vw);
         pointer-events: none;
     }
 
