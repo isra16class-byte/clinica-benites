@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Fix: diamante del popover desalineado verticalmente con el texto
+
+- El usuario reportó, con captura de pantalla real del Escritorio (popover de "Ocupación de camas", entrada de abajo), que los 3 diamantes (Hospitalización/UCIN/UCI) se veían pegados arriba de cada línea, no alineados con el centro vertical del texto.
+- **Causa raíz**: el diamante (`::before` en `.cb-stat-detalle-texto` y cada `<li>` de `.cb-stat-detalle-lista`) se posicionaba con `top: 0.4em` — un offset fijo pensado para acercarse al tope de una línea de texto, pero que asume una relación fija entre tamaño de fuente y altura de línea. El `line-height` real del proyecto deja el texto centrado dentro de su propia caja, así que ese offset en `em` lo dejaba visiblemente más arriba del centro real — más notorio en `.cb-stat-detalle-lista li` por tratarse de un contenedor flex de dos columnas (Hospitalización/2 de 5), donde el desfase se nota más al haber dos elementos alineados en la misma fila.
+- **Solución**: se cambió `top: 0.4em` por `top: 50%` + `transform: translateY(-50%) rotate(45deg)` — centra el diamante respecto al contenedor (`<li>` o párrafo, ambos con `position: relative`), sin depender de la relación entre tamaño de fuente y `line-height`. Es más robusto que un valor en `em`: no se desalinea de nuevo si el `line-height` cambia más adelante.
+- De paso se corrigió un dato incorrecto en el comentario de esa misma sección de `theme.css` (decía "cuadrado de 0.4rem", el tamaño real del diamante ya era `0.5rem` desde que se implementó, ver la entrada de abajo).
+- Verificado con balance de llaves de `theme.css` (script). Es un fix puramente CSS (no toca PHP), así que solo necesita recompilar assets (`sail npm run build`) para verse — no requiere `sail artisan` ni tocar la base de datos. **Aún sin confirmar por el usuario en el entorno real** — sin acceso a Sail/npm en esta sesión.
+
+---
+
 ## [2026-08-26] Popover de tarjetas: diamante de color a la izquierda de cada línea de detalle
 
 - El usuario confirmó (captura de pantalla real) que la dirección C (entrada de abajo) funciona bien y la prefiere sobre A, y pidió personalizarla más: "un diamantito al lado de cada texto con su respectivo color dinámico".

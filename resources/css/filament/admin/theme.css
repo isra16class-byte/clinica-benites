@@ -353,13 +353,24 @@
  * sola vez arriba, en el contenedor, y las reglas del diamante de abajo
  * son compartidas por los 5 colores.
  *
- * El diamante es un cuadrado de 0.4rem rotado 45°, no un `<svg>` — no
+ * El diamante es un cuadrado de 0.5rem rotado 45°, no un `<svg>` — no
  * hace falta más fidelidad para un marcador tan chico, y así no se
  * agrega ningún ícono nuevo al proyecto. Solo decora líneas con datos
  * reales (`.cb-stat-detalle-texto` y cada `<li>` de
  * `.cb-stat-detalle-lista`) — el estado vacío (`.cb-stat-detalle-vacio`,
  * ej. "Sin facturas pendientes.") queda sin diamante a propósito, para
  * no sugerir un dato que no existe.
+ *
+ * Posición vertical: centrado con `top: 50%` + `translateY(-50%)` en
+ * vez de un offset fijo en `em` (ej. `top: 0.4em`) — un offset en `em`
+ * asume una relación fija entre tamaño de fuente y altura de línea que
+ * no se cumple acá (el `line-height` real deja al texto centrado
+ * dentro de su propia caja, mientras el offset en `em` lo ubica cerca
+ * del tope), y por eso el diamante quedaba visiblemente más arriba que
+ * el texto (reportado por el usuario con captura real, 26 ago 2026).
+ * Centrar respecto al contenedor (el `<li>` o el párrafo, ambos con
+ * `position: relative`) es correcto sin importar si el line-height es
+ * el default de Filament o cambia más adelante.
  */
 .cb-stat-popover-accent-success {
     --cb-popover-accent: var(--color-success-600);
@@ -392,11 +403,11 @@
     content: '';
     position: absolute;
     left: 0.0625rem;
-    top: 0.4em;
+    top: 50%;
     width: 0.5rem;
     height: 0.5rem;
     background-color: var(--cb-popover-accent, currentColor);
-    transform: rotate(45deg);
+    transform: translateY(-50%) rotate(45deg);
 }
 
 .cb-stat-detalle-texto,
