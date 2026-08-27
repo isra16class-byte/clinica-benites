@@ -27,8 +27,12 @@
         </nav>
 
         <div class="hidden lg:block">
-            {{-- TODO: reemplazar por el número real de WhatsApp de la clínica antes de publicar. --}}
-            <a href="https://wa.me/593000000000" class="cb-btn-primary" target="_blank" rel="noopener">
+            {{--
+                TODO: reemplazar por el número real de WhatsApp de la clínica
+                antes de publicar. El mensaje precargado (?text=) ya queda
+                andando solo con reemplazar el número — no depende de eso.
+            --}}
+            <a href="https://wa.me/593000000000?text=Hola%2C%20deseo%20agendar%20una%20cita%20en%20Cl%C3%ADnica%20Benites." class="cb-btn-primary" target="_blank" rel="noopener">
                 Agendar por WhatsApp
             </a>
         </div>
@@ -45,7 +49,7 @@
         <a href="#especialidades" class="cb-nav-link">Especialidades</a>
         <a href="#servicios" class="cb-nav-link">Servicios</a>
         <a href="#contacto" class="cb-nav-link">Contacto</a>
-        <a href="https://wa.me/593000000000" class="cb-btn-primary mt-3 justify-center" target="_blank" rel="noopener">
+        <a href="https://wa.me/593000000000?text=Hola%2C%20deseo%20agendar%20una%20cita%20en%20Cl%C3%ADnica%20Benites." class="cb-btn-primary mt-3 justify-center" target="_blank" rel="noopener">
             Agendar por WhatsApp
         </a>
     </nav>

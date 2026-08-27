@@ -124,14 +124,18 @@
         </div>
 
         <p class="cb-subheadline cb-reveal" style="animation-delay:.5s">
-            Más de 26 especialidades médicas y quirúrgicas, quirófanos y cuidados
-            intensivos de alta complejidad, reunidos en un mismo centro privado
-            &mdash; para que cada paciente reciba la atención que su salud merece.
+            Más de 26 especialidades médicas y quirúrgicas, quirófanos y
+            cuidados intensivos de alta complejidad, en un solo centro
+            privado de Guayaquil.
         </p>
 
         <div class="cb-cta-row cb-reveal" style="animation-delay:.62s">
-            {{-- TODO: reemplazar por el número real de WhatsApp de la clínica antes de publicar. --}}
-            <a href="https://wa.me/593000000000" class="cb-btn-primary" target="_blank" rel="noopener">
+            {{--
+                TODO: reemplazar por el número real de WhatsApp de la clínica
+                antes de publicar. El mensaje precargado (?text=) ya queda
+                andando solo con reemplazar el número — no depende de eso.
+            --}}
+            <a href="https://wa.me/593000000000?text=Hola%2C%20deseo%20agendar%20una%20cita%20en%20Cl%C3%ADnica%20Benites." class="cb-btn-primary" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M4 20l1.4-4.1A8 8 0 1 1 9 18.6z"/>
                     <path d="M9 10.5c.4 1.8 1.7 3.1 3.5 3.5"/>

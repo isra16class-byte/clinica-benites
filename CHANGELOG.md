@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Mensaje precargado de WhatsApp + bajada del hero más corta (a partir de feedback externo)
+
+- El usuario compartió una devolución de Perplexity sobre la Portada (capturada antes del patch del emblema). Se evaluó punto por punto en vez de aplicarla entera.
+- **Descartado a propósito**: agregar "años de trayectoria", "número de especialistas" o certificaciones — son justamente los datos que MEMORIA.md ya tiene listados como pendientes de confirmar con el dueño; inventarlos rompía el criterio ya establecido de no afirmar nada no confirmado.
+- **Verificado en vez de asumido**: la advertencia sobre contraste de color se chequeó con los ratios WCAG reales (calculados con Python/Pillow) para cada texto del hero contra los dos extremos del degradado de fondo. Peor caso: 3.58:1 (acento verde-dorado del titular sobre la parte más clara del fondo) — pasa igual porque ese texto es grande/negrita (mínimo 3:1, no 4.5:1). Resto, todo por encima de 6:1. No hacía falta ningún cambio.
+- **Aplicado**: los 3 links de WhatsApp del sitio (`hero.blade.php`, y `nav.blade.php` desktop + mobile) ahora incluyen `?text=Hola%2C%20deseo%20agendar%20una%20cita%20en%20Cl%C3%ADnica%20Benites.` — funciona ya mismo, no depende de tener el número real (el TODO de reemplazar `593000000000` sigue pendiente, sin cambios).
+- **Aplicado**: la bajada del hero (`.cb-subheadline`) se acortó, sacando la cláusula final más genérica. Se mantuvo el único dato concreto ("+26 especialidades", ya confirmado contra `Servicios_CB_2026.pdf`) — no se agregó ningún dato nuevo, solo se recortó redacción.
+- Verificado con balance de tags en ambos archivos `.blade.php` afectados.
+
+---
+
 ## [2026-08-27] Emblema técnico en el espacio vacío del hero (Portada)
 
 - El usuario, viendo una captura real de la Portada en escritorio, preguntó para qué estaba pensado el espacio vacío a la derecha del texto. Respuesta: para nada — es consecuencia de que `.cb-subheadline` limita el ancho (`max-width: 38rem`, legibilidad) dentro de un contenedor bastante más ancho (`max-w-7xl`), en un layout de una sola columna. Solo lo ocupaban los orbes decorativos de fondo.
