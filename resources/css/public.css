@@ -242,20 +242,28 @@
         pointer-events: none;
     }
 
-    /* Grid 2x2 de fotos reales. Gap visible entre celdas + esquinas
-       redondeadas (a diferencia de la foto única anterior, a sangre) —
-       mismo lenguaje que el mockup de referencia del usuario, con sombra
-       propia por foto para que cada una se lea como pieza suelta, no como
-       una sola imagen recortada en cuatro. */
-    .cb-hero-photo-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.85rem;
+    /* Grid 2x2 → collage asimétrico de 4 fotos, a pedido del usuario, que
+       compartió una referencia de collage tipo "scrapbook" (polaroids
+       torcidos + washi tape + texto a mano). Se rescata el concepto
+       (fotos de tamaños distintos, en cascada, con superposición) sin los
+       elementos que chocan con la identidad seria de la marca (nada de
+       marco blanco, cinta, rotación ni texto caligráfico) — ver DISEÑO.md.
+       Composición en 4 "escalones" diagonales (a → d, arriba-izquierda
+       hacia abajo-derecha), cada uno superpuesto ~12% con el siguiente en
+       una esquina, dando profundidad sin gap uniforme. z-index alterna
+       para que la superposición se lea como capas reales, no como un
+       simple orden de apilado. `aspect-ratio` en el contenedor (más alto
+       que ancho, 4/5) en vez de cuadrado como el grid anterior — deja
+       espacio vertical de sobra para la cascada sin acercarse al
+       trust-strip (verificado con Playwright, ver CHANGELOG). */
+    .cb-hero-collage {
+        position: relative;
         width: 100%;
+        aspect-ratio: 4 / 5;
     }
 
-    .cb-hero-photo-item {
-        aspect-ratio: 1;
+    .cb-hero-collage-item {
+        position: absolute;
         overflow: hidden;
         border-radius: 1rem;
         opacity: 0;
@@ -263,15 +271,43 @@
         animation: cb-hero-photo-fade-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    /* Aparición escalonada, sutil (misma duración/curva, solo el delay
-       cambia) — un detalle de "orden", no una coreografía llamativa;
-       respeta el mismo criterio de restraint que el resto de la sección. */
-    .cb-hero-photo-item:nth-child(1) { animation-delay: 0.65s; }
-    .cb-hero-photo-item:nth-child(2) { animation-delay: 0.8s; }
-    .cb-hero-photo-item:nth-child(3) { animation-delay: 0.8s; }
-    .cb-hero-photo-item:nth-child(4) { animation-delay: 0.95s; }
+    .cb-hero-collage-item--a {
+        top: 0;
+        left: 0;
+        width: 66%;
+        height: 46%;
+        z-index: 2;
+        animation-delay: 0.65s;
+    }
 
-    .cb-hero-photo-item img {
+    .cb-hero-collage-item--b {
+        top: 34%;
+        left: 40%;
+        width: 60%;
+        height: 34%;
+        z-index: 3;
+        animation-delay: 0.8s;
+    }
+
+    .cb-hero-collage-item--c {
+        top: 60%;
+        left: 0;
+        width: 48%;
+        height: 30%;
+        z-index: 2;
+        animation-delay: 0.8s;
+    }
+
+    .cb-hero-collage-item--d {
+        top: 78%;
+        left: 36%;
+        width: 56%;
+        height: 22%;
+        z-index: 3;
+        animation-delay: 0.95s;
+    }
+
+    .cb-hero-collage-item img {
         display: block;
         width: 100%;
         height: 100%;
@@ -682,7 +718,7 @@
             display: none;
         }
 
-        .cb-hero-photo-item {
+        .cb-hero-collage-item {
             animation: none;
             opacity: 1;
         }

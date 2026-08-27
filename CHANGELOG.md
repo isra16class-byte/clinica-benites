@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Grid 2x2 de fotos → collage asimétrico en cascada
+
+- El usuario compartió una referencia visual de un collage tipo scrapbook (polaroids con marco blanco y ligera rotación, washi tape, texto caligráfico "Enero") y preguntó si se podía hacer algo similar con las fotos del hero.
+- Se conversó el punto antes de tocar código: ese estilo choca con la identidad de marca ya establecida (`DISEÑO.md` — paleta navy seria, tipografía técnica, sin elementos hechos a mano). El usuario confirmó que solo quería rescatar 3 ideas del concepto, sin el resto: fotos en tamaños/posiciones asimétricas, superposición ligera en vez de gap uniforme, y fondo navy sólido con bordes limpios (sin marco blanco, cinta ni caligrafía).
+- **Implementado**: `.cb-hero-photo-grid` (grid 2x2 uniforme con gap) se reemplazó por `.cb-hero-collage` (`position: relative`, `aspect-ratio: 4/5`) con 4 fotos posicionadas de forma absoluta en una cascada diagonal (`.cb-hero-collage-item--a/b/c/d`), cada una superpuesta ~12% con la siguiente en una esquina, `z-index` alternado para que se lean como capas reales. Mismas 4 fotos que el cambio anterior (quirófano, UCI, cardiología, neonatología) — solo cambia el layout. Se conservaron `border-radius`, `box-shadow` y la animación de fade-in escalonado del grid anterior.
+- El contenedor padre (`.cb-hero-side`, con su `top`/`right` ya resueltos en cambios previos) no se tocó.
+- **Verificado con Playwright** en 1280/1600/1920px, con espera de 3.2s para dar tiempo a que termine también la animación de dibujo de la línea de pulso (en una primera verificación se había cortado por tomar la captura antes de tiempo — ajuste al método de prueba, no un bug del cambio). Las 4 fotos se ven en cascada, con superposición limpia, sin gap uniforme ni elementos de scrapbook. En 1280px, la foto más grande queda con la misma separación ajustada respecto al título que ya era un límite conocido — no es una regresión nueva.
+- **Pendiente confirmar por el usuario en su propio entorno real.**
+
+---
+
 ## [2026-08-27] Confirmado por el usuario en el entorno real — fotos del grid del hero
 
 - El usuario confirmó ("si funciono") que las 3 fotos nuevas (UCI, cateterismo cardiaco, neonatología) se ven bien junto al quirófano en su entorno real, sin fotos repetidas.

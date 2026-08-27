@@ -36,29 +36,27 @@
         de verdad — ver max-w-7xl): antes de eso, el texto todavía ocupa
         suficiente ancho como para que esta columna se le monte encima.
 
-        Las 4 fotos son generadas con IA (mismo criterio ya usado para
-        `hero-quirofano.jpg`), cada una representando un área distinta de
-        la clínica en vez de repetir la misma imagen: quirófano, UCI,
-        cateterismo cardiaco (cardiología) y neonatología/UCIN. Se eligieron
-        estas 4 porque cubren especialidades/servicios ya mencionados en el
-        trust-strip de arriba (quirófanos · UCI · UCIN) y en el listado de
-        especialidades confirmado (Cardiología/Cateterismo Cardiaco,
-        Pediatría y Neonatología) — ver MEMORIA.md sección 6.1. Son fotos
-        generadas, no de la clínica real: reemplazar por fotos reales de
-        las instalaciones cuando estén disponibles.
+        Collage asimétrico de 4 fotos (quirófano, UCI, cardiología,
+        neonatología) — reemplaza al grid 2x2 uniforme anterior, a
+        pedido del usuario que compartió una referencia de collage tipo
+        scrapbook. Se rescató el concepto (tamaños distintos, cascada,
+        superposición) sin los elementos de esa referencia que chocan
+        con la identidad seria de la marca (sin marco blanco, cinta ni
+        texto a mano) — ver DISEÑO.md y `.cb-hero-collage` en public.css
+        para el detalle de la composición.
     --}}
     <div class="cb-hero-side hidden xl:block" aria-hidden="true">
-        <div class="cb-hero-photo-grid">
-            <div class="cb-hero-photo-item">
+        <div class="cb-hero-collage">
+            <div class="cb-hero-collage-item cb-hero-collage-item--a">
                 <img src="{{ asset('images/hero-quirofano.jpg') }}" alt="" loading="lazy">
             </div>
-            <div class="cb-hero-photo-item">
+            <div class="cb-hero-collage-item cb-hero-collage-item--b">
                 <img src="{{ asset('images/hero-uci.jpg') }}" alt="" loading="lazy">
             </div>
-            <div class="cb-hero-photo-item">
+            <div class="cb-hero-collage-item cb-hero-collage-item--c">
                 <img src="{{ asset('images/hero-cardiologia.jpg') }}" alt="" loading="lazy">
             </div>
-            <div class="cb-hero-photo-item">
+            <div class="cb-hero-collage-item cb-hero-collage-item--d">
                 <img src="{{ asset('images/hero-neonatologia.jpg') }}" alt="" loading="lazy">
             </div>
         </div>
