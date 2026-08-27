@@ -67,9 +67,28 @@
     background-color: rgb(15 23 42);
 }
 
+/*
+ * FIX (26 ago 2026 — "línea fea" bajo la fila de 4 KPIs, reportada de
+ * nuevo por el usuario tras confirmar que el fix de padding de arriba
+ * sí funcionó pero la línea seguía viéndose): esta regla usa 2 capas de
+ * sombra, ambas con blur (2px y 3px) y sin ningún componente sólido
+ * tipo `ring` — a diferencia del default real de Filament para estos
+ * mismos selectores (`shadow-sm ring-1 ring-gray-950/5` en
+ * stats-overview-widget.css / section.css, confirmado clonando el tag
+ * v5.7.6 de filamentphp/filament), que combina una sombra difusa suave
+ * con un borde de 1px SIN blur (el `ring`, un box-shadow con spread
+ * pero blur 0). Sobre el fondo plano gris-azulado del panel (`.fi-main`,
+ * sin textura que rompa el degradado), el blur de las 2 capas actuales
+ * se nota como una franja continua por debajo de toda la fila —incluso
+ * en los huecos entre tarjetas—, en vez de leerse como una sombra suave
+ * por tarjeta individual. Corregido volviendo al mismo patrón que usa
+ * Filament de fábrica: 1 sombra suave con blur chico + 1 borde nítido
+ * de 1px (spread, blur 0) — misma separación visual entre superficies,
+ * sin la franja borrosa.
+ */
 .fi-section,
 .fi-wi-stats-overview-stat {
-    box-shadow: 0 1px 2px rgb(15 23 42 / 0.06), 0 1px 3px rgb(15 23 42 / 0.05);
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.05), 0 0 0 1px rgb(15 23 42 / 0.05);
 }
 
 /*
@@ -136,10 +155,22 @@
  * intencional, y pidió que quede uniforme. Se quita esa diferencia de
  * tamaño; la jerarquía de esta tarjeta queda solo en el aire extra
  * abajo y la sombra, sin tocar la tipografía de la cifra.
+ * FIX 3 (26 ago 2026, mismo reporte: el usuario confirmó que la
+ * tipografía ya quedó uniforme, pero la línea bajo la fila de KPIs
+ * seguía viéndose igual en una captura tomada después del FIX/FIX 2 de
+ * arriba). Esta sombra usaba las mismas 2 capas con blur puro que la
+ * regla compartida de `.fi-section`/`.fi-wi-stats-overview-stat` (ver
+ * el fix de esa regla más arriba en este archivo) — sin componente
+ * sólido tipo `ring`, así que aportaba a la misma franja borrosa bajo
+ * la fila, con más fuerza todavía por ser una sombra más intensa. Se
+ * corrige con el mismo patrón: 1 sombra suave con blur chico + 1 borde
+ * nítido de 1px (spread, blur 0), algo más marcado que el de las otras
+ * 3 tarjetas para que "Por cobrar" se siga notando, pero sin blur
+ * adicional que genere la franja.
  */
 .cb-stat-destacado {
     padding-bottom: 2rem;
-    box-shadow: 0 2px 4px rgb(15 23 42 / 0.06), 0 1px 2px rgb(15 23 42 / 0.05) !important;
+    box-shadow: 0 2px 4px rgb(15 23 42 / 0.08), 0 0 0 1px rgb(15 23 42 / 0.08) !important;
 }
 
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {

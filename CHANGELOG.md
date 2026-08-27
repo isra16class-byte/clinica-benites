@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Fix — la línea bajo los 4 KPIs seguía ahí (causa real: box-shadow sin ring, no el padding)
+
+- El usuario aclaró que la captura analizada en la entrada anterior ya tenía aplicado el fix de "textos descuadrados y línea" (padding-block) — y la línea seguía viéndose igual. Esto descarta que el padding fuera la causa de la línea (sí era la causa correcta del descuadre de textos, pero eran 2 bugs distintos superpuestos).
+- Diagnóstico original (pixel a pixel contra el fondo con Python/Pillow, comparado contra `stats-overview-widget.css`/`section.css` de Filament 5.7.6 real): el `box-shadow` de `.fi-section`/`.fi-wi-stats-overview-stat` usa 2 capas con blur puro (`0 1px 2px`, `0 1px 3px`) sin ningún componente sólido tipo `ring` — a diferencia del default de Filament (`shadow-sm ring-1`, que sí trae un borde de 1px sin blur). Sobre el fondo plano de `.fi-main`, ese blur se lee como una franja continua bajo la fila, incluso en los huecos entre tarjetas.
+- `theme.css`: se corrige tanto la regla compartida (`.fi-section`/`.fi-wi-stats-overview-stat`) como `.cb-stat-destacado` (tenía el mismo problema, con una sombra aún más intensa) — ambas pasan a usar 1 sombra suave con blur chico + 1 borde nítido de 1px (spread, blur 0), igual que el patrón real de Filament.
+- Sin cambios de estructura ni de grid — 100% CSS.
+- **Aún sin confirmar por el usuario en el entorno real** — sin acceso a PHP/Sail/npm en esta sesión.
+
+---
+
 ## [2026-08-26] Fix — tipografía uniforme de "Por cobrar" (pendiente tras el fix de padding)
 
 - El fix anterior ("textos descuadrados y línea", ver debajo) corrigió el `padding-block: 0.25rem` que aplastaba a las 3 tarjetas normales — confirmado funcionando en el entorno real por el usuario (`sail npm run build` sin errores). Quedaba pendiente el pedido original de tipografía uniforme: la cifra de "Por cobrar" seguía en `font-size: 2.75rem` mientras las otras 3 quedan en `2.25rem`.
