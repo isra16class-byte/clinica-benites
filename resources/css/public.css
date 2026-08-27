@@ -213,87 +213,57 @@
         animation: cb-orb-float 22s ease-in-out infinite reverse;
     }
 
-    /* Columna derecha del hero (foto + emblema) — rellena el espacio vacío
-       a la derecha en pantallas anchas (el bloque de texto tiene max-width
-       por legibilidad; el contenedor es más ancho que eso). La foto va
-       arriba, a sangre; el emblema, más chico, debajo — mismo criterio de
-       "arribita, que se siga viendo la animación al lado de la foto" que
-       pidió el usuario. Solo desde xl (1280px): antes de eso el texto
-       todavía ocupa suficiente ancho como para que esto se le monte
-       encima. */
+    /* Columna derecha del hero (grid 2x2 de fotos) — rellena el espacio
+       vacío a la derecha en pantallas anchas (el bloque de texto tiene
+       max-width por legibilidad; el contenedor es más ancho que eso).
+       `top` a pedido del usuario: más abajo que la versión anterior
+       (7rem, casi pegada al nav fijo) — ahora arranca a la altura del
+       título, no de entrada al cargar la sección. Solo desde xl (1280px):
+       antes de eso el texto todavía ocupa suficiente ancho como para que
+       esto se le monte encima. */
     .cb-hero-side {
         position: absolute;
-        top: 7rem;
-        right: -2.5rem;
-        width: min(28rem, 34vw);
-        flex-direction: column;
-        align-items: center;
+        top: 12.5rem;
+        right: -1.5rem;
+        width: min(26rem, 32vw);
         pointer-events: none;
     }
 
-    /* Foto real (quirófano), a sangre — sin marco ni borde redondeado. La
-       máscara suaviza el borde izquierdo como refuerzo del degradado que
-       la imagen ya trae de origen hacia el navy, para que se funda con el
-       fondo en vez de leerse como una tarjeta pegada encima. */
-    .cb-hero-photo {
+    /* Grid 2x2 de fotos reales. Gap visible entre celdas + esquinas
+       redondeadas (a diferencia de la foto única anterior, a sangre) —
+       mismo lenguaje que el mockup de referencia del usuario, con sombra
+       propia por foto para que cada una se lea como pieza suelta, no como
+       una sola imagen recortada en cuatro. */
+    .cb-hero-photo-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.85rem;
         width: 100%;
-        aspect-ratio: 1376 / 768;
-        overflow: hidden;
-        opacity: 0;
-        -webkit-mask-image: linear-gradient(90deg, transparent, black 16%);
-        mask-image: linear-gradient(90deg, transparent, black 16%);
-        animation: cb-hero-photo-fade-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
     }
 
-    .cb-hero-photo img {
+    .cb-hero-photo-item {
+        aspect-ratio: 1;
+        overflow: hidden;
+        border-radius: 1rem;
+        opacity: 0;
+        box-shadow: 0 18px 34px -16px rgb(0 15 40 / 60%);
+        animation: cb-hero-photo-fade-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Aparición escalonada, sutil (misma duración/curva, solo el delay
+       cambia) — un detalle de "orden", no una coreografía llamativa;
+       respeta el mismo criterio de restraint que el resto de la sección. */
+    .cb-hero-photo-item:nth-child(1) { animation-delay: 0.65s; }
+    .cb-hero-photo-item:nth-child(2) { animation-delay: 0.8s; }
+    .cb-hero-photo-item:nth-child(3) { animation-delay: 0.8s; }
+    .cb-hero-photo-item:nth-child(4) { animation-delay: 0.95s; }
+
+    .cb-hero-photo-item img {
         display: block;
         width: 100%;
         height: 100%;
         object-fit: cover;
         object-position: 60% 45%;
-    }
-
-    /* Emblema técnico — mismo lenguaje visual que la línea de pulso: trazo
-       técnico que "se dibuja" al cargar + un acento dorado que late.
-       Reutiliza el mismo ícono cruz-en-círculo del trust-strip (Atención
-       de emergencias), ampliado, para no inventar un motivo nuevo. Más
-       chico que en la versión anterior (dejó de ser el único protagonismo
-       de la columna) y con margen negativo para pisar apenas el borde
-       inferior de la foto, así se leen como una sola composición y no como
-       dos bloques apilados con un corte seco. */
-    .cb-hero-emblem {
-        width: min(15rem, 60%);
-        aspect-ratio: 1;
-        margin-top: -1.5rem;
-        opacity: 0;
-        animation: cb-emblem-fade-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) 1.3s forwards;
-    }
-
-    /* El aro de marcas gira solo, muy despacio — atmósfera, no protagonismo
-       (la línea de pulso sigue siendo el único movimiento "principal" de la
-       sección, ver nota al inicio de hero.blade.php). */
-    .cb-emblem-ticks {
-        transform-origin: 240px 240px;
-        animation: cb-emblem-rotate 150s linear infinite;
-    }
-
-    .cb-emblem-ring-draw {
-        stroke-dasharray: 1;
-        stroke-dashoffset: 1;
-        animation: cb-draw-line 1.6s 1.7s cubic-bezier(0.65, 0, 0.35, 1) forwards;
-    }
-
-    .cb-emblem-pulse-draw {
-        stroke-dasharray: 1;
-        stroke-dashoffset: 1;
-        animation: cb-draw-line 1s 2.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
-    }
-
-    .cb-emblem-blip {
-        fill: var(--color-cb-gold-300);
-        filter: drop-shadow(0 0 5px var(--color-cb-gold-300));
-        opacity: 0;
-        animation: cb-emblem-blip-pulse 2.6s ease-in-out 3.3s infinite;
     }
 
     .cb-eyebrow {
@@ -571,38 +541,9 @@
         }
     }
 
-    @keyframes cb-emblem-fade-in {
-        to {
-            opacity: 1;
-        }
-    }
-
     @keyframes cb-hero-photo-fade-in {
         to {
             opacity: 1;
-        }
-    }
-
-    @keyframes cb-emblem-rotate {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-
-    @keyframes cb-emblem-blip-pulse {
-        0%,
-        100% {
-            opacity: 0;
-            transform: scale(0.7);
-        }
-        15%,
-        45% {
-            opacity: 1;
-            transform: scale(1);
-        }
-        60% {
-            opacity: 0;
-            transform: scale(1.15);
         }
     }
 
@@ -644,25 +585,9 @@
             display: none;
         }
 
-        .cb-hero-photo,
-        .cb-hero-emblem {
+        .cb-hero-photo-item {
             animation: none;
             opacity: 1;
-        }
-
-        .cb-emblem-ticks {
-            animation: none;
-        }
-
-        .cb-emblem-ring-draw,
-        .cb-emblem-pulse-draw {
-            animation: none;
-            stroke-dashoffset: 0;
-        }
-
-        .cb-emblem-blip {
-            animation: none;
-            opacity: 0;
         }
     }
 }
