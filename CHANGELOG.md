@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Fix definitivo — se saca el box-shadow del todo (cualquier sombra simétrica se lee como línea)
+
+- El usuario reportó que, tras el fix anterior (blur → blur+ring), la línea empezó a verse **también arriba** de la fila de 4 KPIs, además de seguir abajo — de forma uniforme.
+- Causa real: un `ring` (box-shadow sin offset, solo spread) se aplica por igual en los 4 lados de cada tarjeta. Sobre una fila de tarjetas de igual altura y alineadas, ese borde se lee como una línea continua en CUALQUIER lado donde se aplique — no es un problema de blur vs. ring específicamente, es inherente a poner un efecto simétrico sobre una fila pareja de elementos.
+- `theme.css`: se saca `box-shadow` del todo de `.fi-section`/`.fi-wi-stats-overview-stat` (sin reemplazo — la separación entre tarjetas y fondo ya la da el color de `.fi-main`, ajuste del 25 ago). Para `.cb-stat-destacado`, en vez de una sombra más marcada, se usa un acento de un solo lado: borde izquierdo de 3px en `var(--color-warning-600)` (variable real de Filament 5.7.6, confirmada en el código fuente, mismo naranja que ya usa la tarjeta en su descripción) — al no ser simétrico, no puede alinearse con sus vecinas en una línea.
+- Sin cambios de estructura ni de grid — 100% CSS.
+- **Aún sin confirmar por el usuario en el entorno real** — sin acceso a PHP/Sail/npm en esta sesión.
+
+---
+
 ## [2026-08-26] Fix — la línea bajo los 4 KPIs seguía ahí (causa real: box-shadow sin ring, no el padding)
 
 - El usuario aclaró que la captura analizada en la entrada anterior ya tenía aplicado el fix de "textos descuadrados y línea" (padding-block) — y la línea seguía viéndose igual. Esto descarta que el padding fuera la causa de la línea (sí era la causa correcta del descuadre de textos, pero eran 2 bugs distintos superpuestos).

@@ -68,28 +68,30 @@
 }
 
 /*
- * FIX (26 ago 2026 — "línea fea" bajo la fila de 4 KPIs, reportada de
- * nuevo por el usuario tras confirmar que el fix de padding de arriba
- * sí funcionó pero la línea seguía viéndose): esta regla usa 2 capas de
- * sombra, ambas con blur (2px y 3px) y sin ningún componente sólido
- * tipo `ring` — a diferencia del default real de Filament para estos
- * mismos selectores (`shadow-sm ring-1 ring-gray-950/5` en
- * stats-overview-widget.css / section.css, confirmado clonando el tag
- * v5.7.6 de filamentphp/filament), que combina una sombra difusa suave
- * con un borde de 1px SIN blur (el `ring`, un box-shadow con spread
- * pero blur 0). Sobre el fondo plano gris-azulado del panel (`.fi-main`,
- * sin textura que rompa el degradado), el blur de las 2 capas actuales
- * se nota como una franja continua por debajo de toda la fila —incluso
- * en los huecos entre tarjetas—, en vez de leerse como una sombra suave
- * por tarjeta individual. Corregido volviendo al mismo patrón que usa
- * Filament de fábrica: 1 sombra suave con blur chico + 1 borde nítido
- * de 1px (spread, blur 0) — misma separación visual entre superficies,
- * sin la franja borrosa.
+ * FIX 2 (26 ago 2026 — el usuario reportó que, tras el FIX de abajo
+ * (cambiar el blur por un `ring` de 1px), la línea empezó a verse
+ * TAMBIÉN arriba de la fila, de forma uniforme, además de seguir abajo).
+ * Esto revela la causa real, que el fix anterior no había identificado
+ * bien: un `ring` (box-shadow sin offset, solo spread) se aplica por
+ * igual en los 4 lados de cada tarjeta — arriba, abajo, izquierda y
+ * derecha —, no solo abajo. Como las 4 tarjetas de esta fila tienen
+ * exactamente la misma altura y están alineadas, ese borde superior de
+ * las 4 se lee como una línea continua, igual que el inferior. En
+ * realidad esto no es un bug de una sombra puntual: CUALQUIER
+ * sombra/borde simétrico aplicado a una fila de tarjetas iguales se va
+ * a leer como una línea que las "toca a todas", más notorio todavía
+ * sobre el fondo gris-azulado de `.fi-main` (ver el ajuste de contraste
+ * más arriba en este archivo, del 25 ago 2026) que sobre el blanco por
+ * defecto de Filament. La separación entre tarjetas y fondo ya está
+ * resuelta con ese color de fondo — la sombra era decorativa y
+ * redundante, así que se saca directamente en vez de seguir ajustando
+ * su blur/spread.
  */
 .fi-section,
 .fi-wi-stats-overview-stat {
-    box-shadow: 0 1px 2px rgb(15 23 42 / 0.05), 0 0 0 1px rgb(15 23 42 / 0.05);
+    box-shadow: none;
 }
+
 
 /*
  * Refinar tarjetas y gráficos — dirección A (26 ago 2026, MEMORIA.md /
@@ -167,10 +169,29 @@
  * nítido de 1px (spread, blur 0), algo más marcado que el de las otras
  * 3 tarjetas para que "Por cobrar" se siga notando, pero sin blur
  * adicional que genere la franja.
+ *
+ * FIX 4 (26 ago 2026, mismo reporte: el usuario notó que, tras el
+ * FIX 3, la línea empezó a verse TAMBIÉN arriba de la fila, uniforme,
+ * además de seguir abajo). Causa real (ver el fix de la regla
+ * compartida más arriba en este archivo, mismo día): un `ring` se
+ * aplica por igual en los 4 lados, así que sobre una fila de tarjetas
+ * alineadas cualquier sombra/borde simétrico se lee como una línea que
+ * las toca a todas — no es un problema de blur vs. ring, es inherente a
+ * poner ese efecto en una fila pareja. Se saca el `box-shadow` del
+ * todo (igual que en la regla compartida) y la jerarquía de "Por
+ * cobrar" pasa a un acento de un solo lado (borde izquierdo). Usa la
+ * variable real `--color-warning-600` que expone Filament (confirmada
+ * en `packages/support/resources/css/index.css` de la v5.7.6) en vez de
+ * un hex adivinado, para que sea exactamente el mismo naranja que ya
+ * usa esta tarjeta en su descripción (`->color('warning')` en
+ * `statPorCobrar()`) — no es simétrico, así que no puede repetir el
+ * efecto de línea sobre la fila.
  */
 .cb-stat-destacado {
     padding-bottom: 2rem;
-    box-shadow: 0 2px 4px rgb(15 23 42 / 0.08), 0 0 0 1px rgb(15 23 42 / 0.08) !important;
+    padding-left: calc(1.5rem - 3px);
+    border-left: 3px solid var(--color-warning-600);
+    box-shadow: none !important;
 }
 
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
