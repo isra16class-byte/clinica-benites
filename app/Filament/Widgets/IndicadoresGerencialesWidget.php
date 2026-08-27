@@ -146,6 +146,16 @@ class IndicadoresGerencialesWidget extends BaseWidget
      * con `e()`) por cada `desglose*()` de abajo — mismo contenido/HTML
      * que usaba la dirección A, solo cambia el contenedor que lo muestra.
      *
+     * `$color` es el MISMO color semántico que cada stat ya le pasa a
+     * `->color()` (success/danger/warning/info/gray) — se agrega como
+     * clase `cb-stat-popover-accent-{color}` al panel (26 ago 2026, a
+     * pedido del usuario: "un diamantito al lado de cada texto con su
+     * respectivo color dinámico") para que el diamante de cada línea (ver
+     * `theme.css`) use el mismo color de acento que ya tiene el borde
+     * izquierdo de la tarjeta — mismo criterio que `cb-stat-accent-{color}`
+     * (una sola fuente de verdad para el color de cada stat, sin
+     * duplicar el `match` de colores en otro lugar).
+     *
      * `x-anchor.bottom-start.offset.8="$refs.stat"`: ancla el panel a la
      * tarjeta (ver `atributosPopover()`), lo abre 8px por debajo del
      * borde inferior izquierdo, y por defecto permite `flip` (se voltea
@@ -157,12 +167,12 @@ class IndicadoresGerencialesWidget extends BaseWidget
      * que un clic adentro (ej. sobre el texto) burbujee hasta el `@click`
      * de la tarjeta y la cierre al toque de abrirla.
      */
-    private function valorConPopover(string $valor, string $detalleHtml): HtmlString
+    private function valorConPopover(string $valor, string $detalleHtml, string $color): HtmlString
     {
         return new HtmlString(
             '<span>'.e($valor).'</span>'
             .'<svg class="cb-stat-chevron" :class="{ \'cb-stat-chevron-abierto\': open }" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd" /></svg>'
-            .'<div x-show="open" x-cloak x-transition.origin.top x-anchor.bottom-start.offset.8="$refs.stat" @click.stop class="cb-stat-popover" role="tooltip">'
+            .'<div x-show="open" x-cloak x-transition.origin.top x-anchor.bottom-start.offset.8="$refs.stat" @click.stop class="cb-stat-popover cb-stat-popover-accent-'.e($color).'" role="tooltip">'
             .$detalleHtml
             .'</div>'
         );
@@ -336,6 +346,7 @@ class IndicadoresGerencialesWidget extends BaseWidget
         $valor = $this->valorConPopover(
             '$'.number_format($ingresosMesActual, 2),
             $this->desgloseIngresosMes($ingresosMesActual, $ingresosMesAnterior),
+            $color,
         );
 
         return Stat::make('Ingresos del mes', $valor)
@@ -379,6 +390,7 @@ class IndicadoresGerencialesWidget extends BaseWidget
         $valor = $this->valorConPopover(
             '$'.number_format($porCobrar, 2),
             $this->desglosePorCobrar($porCobrar),
+            $color,
         );
 
         return Stat::make('Por cobrar', $valor)
@@ -406,7 +418,7 @@ class IndicadoresGerencialesWidget extends BaseWidget
             ->where('estado', 'atendida')
             ->count();
 
-        $valor = $this->valorConPopover((string) $hoy, $this->desgloseAreaCitasHoy());
+        $valor = $this->valorConPopover((string) $hoy, $this->desgloseAreaCitasHoy(), 'info');
 
         return Stat::make('Citas atendidas hoy', $valor)
             ->description("{$semana} atendidas esta semana")
@@ -437,7 +449,7 @@ class IndicadoresGerencialesWidget extends BaseWidget
         $porcentaje = round(($ocupadas / $total) * 100);
         $color = $porcentaje >= 90 ? 'danger' : ($porcentaje >= 70 ? 'warning' : 'success');
 
-        $valor = $this->valorConPopover("{$ocupadas} / {$total}", $this->desgloseTipoCamas());
+        $valor = $this->valorConPopover("{$ocupadas} / {$total}", $this->desgloseTipoCamas(), $color);
 
         return Stat::make('Ocupación de camas', $valor)
             ->description("{$porcentaje}% ocupado")

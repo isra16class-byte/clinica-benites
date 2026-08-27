@@ -338,6 +338,67 @@
         0 0 0 1px rgb(255 255 255 / 0.1);
 }
 
+/*
+ * Diamante de color a la izquierda de cada línea del panel (26 ago 2026,
+ * a pedido del usuario: "un diamantito al lado de cada texto con su
+ * respectivo color dinámico"). El color viene de la clase
+ * `cb-stat-popover-accent-{color}` que el panel ya recibe (ver
+ * `valorConPopover()` en IndicadoresGerencialesWidget.php) — es el MISMO
+ * color semántico que ya pinta el borde izquierdo de la tarjeta
+ * (`cb-stat-accent-{color}`), así que se reutilizan las mismas variables
+ * reales de Filament (`--color-{success,danger,warning,info}-600`,
+ * `--color-gray-400`) en vez de definir un color nuevo. Se resuelve con
+ * una custom property (`--cb-popover-accent`) para no repetir el
+ * selector `::before` 5 veces (una por color) — el color se resuelve una
+ * sola vez arriba, en el contenedor, y las reglas del diamante de abajo
+ * son compartidas por los 5 colores.
+ *
+ * El diamante es un cuadrado de 0.4rem rotado 45°, no un `<svg>` — no
+ * hace falta más fidelidad para un marcador tan chico, y así no se
+ * agrega ningún ícono nuevo al proyecto. Solo decora líneas con datos
+ * reales (`.cb-stat-detalle-texto` y cada `<li>` de
+ * `.cb-stat-detalle-lista`) — el estado vacío (`.cb-stat-detalle-vacio`,
+ * ej. "Sin facturas pendientes.") queda sin diamante a propósito, para
+ * no sugerir un dato que no existe.
+ */
+.cb-stat-popover-accent-success {
+    --cb-popover-accent: var(--color-success-600);
+}
+
+.cb-stat-popover-accent-danger {
+    --cb-popover-accent: var(--color-danger-600);
+}
+
+.cb-stat-popover-accent-warning {
+    --cb-popover-accent: var(--color-warning-600);
+}
+
+.cb-stat-popover-accent-info {
+    --cb-popover-accent: var(--color-info-600);
+}
+
+.cb-stat-popover-accent-gray {
+    --cb-popover-accent: var(--color-gray-400);
+}
+
+.cb-stat-detalle-texto,
+.cb-stat-detalle-lista li {
+    position: relative;
+    padding-left: 1rem;
+}
+
+.cb-stat-detalle-texto::before,
+.cb-stat-detalle-lista li::before {
+    content: '';
+    position: absolute;
+    left: 0.0625rem;
+    top: 0.4em;
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: var(--cb-popover-accent, currentColor);
+    transform: rotate(45deg);
+}
+
 .cb-stat-detalle-texto,
 .cb-stat-detalle-vacio {
     margin: 0;

@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Popover de tarjetas: diamante de color a la izquierda de cada línea de detalle
+
+- El usuario confirmó (captura de pantalla real) que la dirección C (entrada de abajo) funciona bien y la prefiere sobre A, y pidió personalizarla más: "un diamantito al lado de cada texto con su respectivo color dinámico".
+- `valorConPopover()` ahora recibe un tercer parámetro `$color` (el mismo color semántico que cada stat ya usa en `->color()`) y lo agrega como clase `cb-stat-popover-accent-{color}` al panel. Las 4 llamadas (`statIngresosDelMes`, `statPorCobrar`, `statCitasAtendidas`, `statOcupacionCamas`) se actualizaron para pasarlo.
+- `theme.css`: 5 reglas `cb-stat-popover-accent-{color}` definen una custom property `--cb-popover-accent` reutilizando las mismas variables reales de Filament (`--color-{success,danger,warning,info}-600`, `--color-gray-400`) ya en uso para el acento del borde izquierdo de la tarjeta (`cb-stat-accent-{color}`) — una sola fuente de verdad de color, sin duplicar el `match` de colores.
+- El diamante en sí es un `::before` (cuadrado de `0.5rem` rotado 45°, `position: absolute`) en `.cb-stat-detalle-texto` y cada `<li>` de `.cb-stat-detalle-lista` — no se agregó ningún ícono SVG nuevo, no hacía falta para un marcador tan chico. El estado vacío (`.cb-stat-detalle-vacio`, ej. "Sin facturas pendientes.") queda **sin** diamante a propósito, para no sugerir un dato que no existe.
+- Verificado con `php -l` (sin errores) y balance de llaves de `theme.css` con script. **Aún sin confirmar por el usuario en el entorno real** — sin acceso a Sail/npm en esta sesión.
+
+---
+
 ## [2026-08-26] Tarjetas de KPI presionables — reemplazo de dirección A por dirección C "popover flotante"
 
 - A pedido del usuario, tras confirmar la dirección A (expande hacia abajo, entrada de abajo) y su fix de `diffInDays()`: "me gustaría implementar la C y descartar la A para ver cuál me queda mejor" — retomando la conversación de la sesión que se quedó sin créditos, donde se habían propuesto 3 direcciones (A expande hacia abajo, B expande hacia el costado, C popover/modal) y se había elegido A. Esta sesión reemplaza A por C sobre el mismo código, sin tocar el contenido de los detalles (mismas funciones `desglose*()`, sin cambios).
