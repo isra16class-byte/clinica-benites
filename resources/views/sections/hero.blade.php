@@ -22,76 +22,98 @@
     <div class="cb-orb cb-orb-gold" aria-hidden="true"></div>
 
     {{--
-        Emblema técnico del hero: rellena el espacio que queda vacío a la
-        derecha en pantallas anchas (el bloque de texto tiene max-width por
-        legibilidad — ver .cb-subheadline — pero el contenedor de la sección
-        es más ancho que eso). Mismo lenguaje que la línea de pulso: un trazo
-        que "se dibuja" al cargar, con un acento dorado que late. El motivo
-        central (cruz en círculo) es el mismo del ícono "Atención de
-        emergencias" del trust-strip, solo ampliado — reutiliza vocabulario
-        visual ya establecido en vez de inventar un ícono nuevo.
+        Columna derecha del hero: foto real arriba + emblema técnico debajo,
+        agrupados en un mismo wrapper para que se posicionen juntos sin
+        cálculos manuales de píxeles entre los dos. Rellena el espacio que
+        queda vacío a la derecha en pantallas anchas (el bloque de texto
+        tiene max-width por legibilidad — ver .cb-subheadline — pero el
+        contenedor de la sección es más ancho que eso).
         Solo desde xl (1280px, donde el contenedor llega a su ancho máximo
         de verdad — ver max-w-7xl): antes de eso, el texto todavía ocupa
-        suficiente ancho como para que el emblema se le monte encima.
+        suficiente ancho como para que esta columna se le monte encima.
     --}}
-    <div class="cb-hero-emblem hidden xl:block" aria-hidden="true">
-        <svg viewBox="0 0 480 480" class="h-full w-full">
-            <defs>
-                <linearGradient id="cb-emblem-pulse-gradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#4aa88c"/>
-                    <stop offset="55%" stop-color="#ddc48c"/>
-                    <stop offset="100%" stop-color="#4aa88c"/>
-                </linearGradient>
-            </defs>
+    <div class="cb-hero-side hidden xl:flex" aria-hidden="true">
+        {{--
+            Foto real (quirófano) — a sangre, sin marco ni borde redondeado.
+            La imagen ya trae, de origen, un degradado hacia el navy en su
+            borde izquierdo (se pidió así a propósito) — por eso alcanza con
+            una máscara CSS suave de refuerzo en vez de un overlay de color
+            propio: la idea es que se funda con el fondo, no que se vea
+            "pegada" como una tarjeta.
+        --}}
+        <div class="cb-hero-photo">
+            <img src="{{ asset('images/hero-quirofano.jpg') }}" alt="" loading="lazy">
+        </div>
 
-            {{-- Aro de marcas — gira muy despacio, como el bisel de un instrumento --}}
-            <g class="cb-emblem-ticks" stroke="#f7f3ea" stroke-linecap="round">
-                @php
-                    $cx = 240;
-                    $cy = 240;
-                    $rOuter = 190;
-                @endphp
-                @for ($i = 0; $i < 24; $i++)
+        {{--
+            Emblema técnico: mismo lenguaje que la línea de pulso — un trazo
+            que "se dibuja" al cargar, con un acento dorado que late. El
+            motivo central (cruz en círculo) es el mismo del ícono "Atención
+            de emergencias" del trust-strip, solo ampliado — reutiliza
+            vocabulario visual ya establecido en vez de inventar un ícono
+            nuevo. Va debajo de la foto, más chico que antes (dejó de ser el
+            único protagonista de esta columna), así se lo sigue viendo
+            "al lado" de la foto en vez de competir con ella en tamaño.
+        --}}
+        <div class="cb-hero-emblem">
+            <svg viewBox="0 0 480 480" class="h-full w-full">
+                <defs>
+                    <linearGradient id="cb-emblem-pulse-gradient" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#4aa88c"/>
+                        <stop offset="55%" stop-color="#ddc48c"/>
+                        <stop offset="100%" stop-color="#4aa88c"/>
+                    </linearGradient>
+                </defs>
+
+                {{-- Aro de marcas — gira muy despacio, como el bisel de un instrumento --}}
+                <g class="cb-emblem-ticks" stroke="#f7f3ea" stroke-linecap="round">
                     @php
-                        $angle = $i * 15;
-                        $isCardinal = $i % 6 === 0;
-                        $len = $isCardinal ? 20 : 9;
-                        $rInner = $rOuter - $len;
-                        $rad = deg2rad($angle - 90);
-                        $x1 = round($cx + $rOuter * cos($rad), 1);
-                        $y1 = round($cy + $rOuter * sin($rad), 1);
-                        $x2 = round($cx + $rInner * cos($rad), 1);
-                        $y2 = round($cy + $rInner * sin($rad), 1);
+                        $cx = 240;
+                        $cy = 240;
+                        $rOuter = 190;
                     @endphp
-                    <line x1="{{ $x1 }}" y1="{{ $y1 }}" x2="{{ $x2 }}" y2="{{ $y2 }}"
-                        stroke-width="{{ $isCardinal ? '1.75' : '1.25' }}"
-                        stroke-opacity="{{ $isCardinal ? '0.3' : '0.16' }}"/>
-                @endfor
-            </g>
+                    @for ($i = 0; $i < 24; $i++)
+                        @php
+                            $angle = $i * 15;
+                            $isCardinal = $i % 6 === 0;
+                            $len = $isCardinal ? 20 : 9;
+                            $rInner = $rOuter - $len;
+                            $rad = deg2rad($angle - 90);
+                            $x1 = round($cx + $rOuter * cos($rad), 1);
+                            $y1 = round($cy + $rOuter * sin($rad), 1);
+                            $x2 = round($cx + $rInner * cos($rad), 1);
+                            $y2 = round($cy + $rInner * sin($rad), 1);
+                        @endphp
+                        <line x1="{{ $x1 }}" y1="{{ $y1 }}" x2="{{ $x2 }}" y2="{{ $y2 }}"
+                            stroke-width="{{ $isCardinal ? '1.75' : '1.25' }}"
+                            stroke-opacity="{{ $isCardinal ? '0.3' : '0.16' }}"/>
+                    @endfor
+                </g>
 
-            {{-- Aro exterior, se dibuja al cargar --}}
-            <circle class="cb-emblem-ring-draw" cx="240" cy="240" r="190" pathLength="1"
-                fill="none" stroke="#f7f3ea" stroke-opacity="0.2" stroke-width="1.5"/>
+                {{-- Aro exterior, se dibuja al cargar --}}
+                <circle class="cb-emblem-ring-draw" cx="240" cy="240" r="190" pathLength="1"
+                    fill="none" stroke="#f7f3ea" stroke-opacity="0.2" stroke-width="1.5"/>
 
-            {{-- Reticle de precisión (4 escuadras) --}}
-            <g stroke="#4aa88c" stroke-opacity="0.4" stroke-width="1.75" stroke-linecap="round" fill="none">
-                <path d="M145,167 L145,145 L167,145"/>
-                <path d="M313,145 L335,145 L335,167"/>
-                <path d="M145,313 L145,335 L167,335"/>
-                <path d="M335,313 L335,335 L313,335"/>
-            </g>
+                {{-- Reticle de precisión (4 escuadras) --}}
+                <g stroke="#4aa88c" stroke-opacity="0.4" stroke-width="1.75" stroke-linecap="round" fill="none">
+                    <path d="M145,167 L145,145 L167,145"/>
+                    <path d="M313,145 L335,145 L335,167"/>
+                    <path d="M145,313 L145,335 L167,335"/>
+                    <path d="M335,313 L335,335 L313,335"/>
+                </g>
 
-            {{-- Cruz en círculo (mismo motivo del ícono "Atención de emergencias") --}}
-            <circle cx="240" cy="240" r="48" fill="none" stroke="#f7f3ea" stroke-opacity="0.5" stroke-width="2"/>
-            <line x1="240" y1="205" x2="240" y2="275" stroke="#f7f3ea" stroke-opacity="0.5" stroke-width="2" stroke-linecap="round"/>
+                {{-- Cruz en círculo (mismo motivo del ícono "Atención de emergencias") --}}
+                <circle cx="240" cy="240" r="48" fill="none" stroke="#f7f3ea" stroke-opacity="0.5" stroke-width="2"/>
+                <line x1="240" y1="205" x2="240" y2="275" stroke="#f7f3ea" stroke-opacity="0.5" stroke-width="2" stroke-linecap="round"/>
 
-            {{-- El brazo horizontal de la cruz es, en realidad, un mini pulso --}}
-            <path class="cb-emblem-pulse-draw" pathLength="1"
-                d="M205,240 L221,240 L227,226 L233,254 L239,240 L275,240"
-                fill="none" stroke="url(#cb-emblem-pulse-gradient)" stroke-width="2.25"
-                stroke-linecap="round" stroke-linejoin="round"/>
-            <circle class="cb-emblem-blip" cx="233" cy="254" r="3.5"/>
-        </svg>
+                {{-- El brazo horizontal de la cruz es, en realidad, un mini pulso --}}
+                <path class="cb-emblem-pulse-draw" pathLength="1"
+                    d="M205,240 L221,240 L227,226 L233,254 L239,240 L275,240"
+                    fill="none" stroke="url(#cb-emblem-pulse-gradient)" stroke-width="2.25"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+                <circle class="cb-emblem-blip" cx="233" cy="254" r="3.5"/>
+            </svg>
+        </div>
     </div>
 
     <div class="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 pt-32 pb-20 sm:px-10 lg:px-16">

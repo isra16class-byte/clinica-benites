@@ -213,25 +213,60 @@
         animation: cb-orb-float 22s ease-in-out infinite reverse;
     }
 
-    /* Emblema técnico del hero — elemento gráfico grande para el espacio
-       vacío a la derecha en pantallas anchas (el bloque de texto tiene
-       max-width por legibilidad; el contenedor es más ancho que eso).
-       Mismo lenguaje visual que la línea de pulso: trazo técnico que "se
-       dibuja" al cargar + un acento dorado que late. Reutiliza el mismo
-       ícono cruz-en-círculo del trust-strip (Atención de emergencias),
-       ampliado como pieza central, para no inventar un motivo nuevo.
-       Solo desde xl (1280px): antes de eso el texto todavía ocupa
-       suficiente ancho como para que esto se le monte encima. */
-    .cb-hero-emblem {
+    /* Columna derecha del hero (foto + emblema) — rellena el espacio vacío
+       a la derecha en pantallas anchas (el bloque de texto tiene max-width
+       por legibilidad; el contenedor es más ancho que eso). La foto va
+       arriba, a sangre; el emblema, más chico, debajo — mismo criterio de
+       "arribita, que se siga viendo la animación al lado de la foto" que
+       pidió el usuario. Solo desde xl (1280px): antes de eso el texto
+       todavía ocupa suficiente ancho como para que esto se le monte
+       encima. */
+    .cb-hero-side {
         position: absolute;
-        top: 50%;
+        top: 7rem;
         right: -2.5rem;
-        width: min(30rem, 34vw);
-        aspect-ratio: 1;
-        transform: translateY(-50%);
+        width: min(28rem, 34vw);
+        flex-direction: column;
+        align-items: center;
         pointer-events: none;
+    }
+
+    /* Foto real (quirófano), a sangre — sin marco ni borde redondeado. La
+       máscara suaviza el borde izquierdo como refuerzo del degradado que
+       la imagen ya trae de origen hacia el navy, para que se funda con el
+       fondo en vez de leerse como una tarjeta pegada encima. */
+    .cb-hero-photo {
+        width: 100%;
+        aspect-ratio: 1376 / 768;
+        overflow: hidden;
         opacity: 0;
-        animation: cb-emblem-fade-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards;
+        -webkit-mask-image: linear-gradient(90deg, transparent, black 16%);
+        mask-image: linear-gradient(90deg, transparent, black 16%);
+        animation: cb-hero-photo-fade-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+    }
+
+    .cb-hero-photo img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: 60% 45%;
+    }
+
+    /* Emblema técnico — mismo lenguaje visual que la línea de pulso: trazo
+       técnico que "se dibuja" al cargar + un acento dorado que late.
+       Reutiliza el mismo ícono cruz-en-círculo del trust-strip (Atención
+       de emergencias), ampliado, para no inventar un motivo nuevo. Más
+       chico que en la versión anterior (dejó de ser el único protagonismo
+       de la columna) y con margen negativo para pisar apenas el borde
+       inferior de la foto, así se leen como una sola composición y no como
+       dos bloques apilados con un corte seco. */
+    .cb-hero-emblem {
+        width: min(15rem, 60%);
+        aspect-ratio: 1;
+        margin-top: -1.5rem;
+        opacity: 0;
+        animation: cb-emblem-fade-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) 1.3s forwards;
     }
 
     /* El aro de marcas gira solo, muy despacio — atmósfera, no protagonismo
@@ -245,20 +280,20 @@
     .cb-emblem-ring-draw {
         stroke-dasharray: 1;
         stroke-dashoffset: 1;
-        animation: cb-draw-line 1.6s 1.3s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+        animation: cb-draw-line 1.6s 1.7s cubic-bezier(0.65, 0, 0.35, 1) forwards;
     }
 
     .cb-emblem-pulse-draw {
         stroke-dasharray: 1;
         stroke-dashoffset: 1;
-        animation: cb-draw-line 1s 2.1s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+        animation: cb-draw-line 1s 2.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
     }
 
     .cb-emblem-blip {
         fill: var(--color-cb-gold-300);
         filter: drop-shadow(0 0 5px var(--color-cb-gold-300));
         opacity: 0;
-        animation: cb-emblem-blip-pulse 2.6s ease-in-out 2.9s infinite;
+        animation: cb-emblem-blip-pulse 2.6s ease-in-out 3.3s infinite;
     }
 
     .cb-eyebrow {
@@ -542,6 +577,12 @@
         }
     }
 
+    @keyframes cb-hero-photo-fade-in {
+        to {
+            opacity: 1;
+        }
+    }
+
     @keyframes cb-emblem-rotate {
         to {
             transform: rotate(360deg);
@@ -603,6 +644,7 @@
             display: none;
         }
 
+        .cb-hero-photo,
         .cb-hero-emblem {
             animation: none;
             opacity: 1;
