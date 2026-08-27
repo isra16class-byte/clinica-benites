@@ -32,26 +32,6 @@ use Illuminate\Support\Carbon;
  * de la v5.7.6 — solo alimenta el color del ícono/texto de la descripción
  * y, si hubiera, el del gráfico de fondo), de ahí la necesidad de esta
  * clase aparte.
- *
- * Grid asimétrico (26 ago 2026, dirección C de MEMORIA.md/DISEÑO.md,
- * tercera de las 3 direcciones propuestas para "Refinar tarjetas y
- * gráficos" — A y el pedido de generalizar el acento ya están resueltos y
- * confirmados): "Por cobrar" pasa a ocupar 2 unidades de un grid de 5 (en
- * vez de 1 de 4), los otros 3 KPIs quedan en 1 unidad cada uno — filas
- * exactas: 2+1+1+1 = 5, sin sobrantes ni huecos. Confirmado contra
- * `Stat.php`/`CanSpanColumns.php` de Filament 5.7.6 que `Stat` SÍ soporta
- * `->columnSpan()` (hereda de `Component`, que usa el trait
- * `CanSpanColumns` — no es un método propio de formularios nada más). A
- * diferencia de la dirección A (int fijo `4`, que Filament resuelve como
- * `'lg' => 4` con el mobile ya en 1 columna por defecto, confirmado en
- * `Filament\Schemas\Concerns\HasColumns::getAllColumns()`), acá se pasa el
- * array explícito para no perder ese comportamiento responsivo ya
- * correcto: en mobile/tablet (por debajo de `lg`) sigue en 1 columna
- * apilada, y recién en `lg` (1024px+) es donde entra el grid de 5 con
- * "Por cobrar" ocupando 2. Mismo cuidado en el `columnSpan` de la propia
- * tarjeta (ver `statPorCobrar()`): span 1 por debajo de `lg`, span 2 solo
- * desde `lg` — así el span de 2 nunca compite con un grid que todavía no
- * llegó a 5 columnas.
  */
 class IndicadoresGerencialesWidget extends BaseWidget
 {
@@ -62,12 +42,9 @@ class IndicadoresGerencialesWidget extends BaseWidget
         return Auth::user()?->isAdmin() ?? false;
     }
 
-    protected function getColumns(): array
+    protected function getColumns(): int
     {
-        return [
-            'default' => 1,
-            'lg' => 5,
-        ];
+        return 4;
     }
 
     protected function getStats(): array
@@ -142,34 +119,6 @@ class IndicadoresGerencialesWidget extends BaseWidget
      * `statIngresosDelMes()`) para que el color de acento sea siempre
      * consistente con el color real del stat, incluso cuando no hay
      * deuda (estado "success", sin `cb-stat-destacado`).
-     *
-     * Grid asimétrico (26 ago 2026, dirección C): además de las clases de
-     * arriba, esta tarjeta gana `->columnSpan(['default' => 1, 'lg' => 2])`
-     * (2 unidades del grid de 5 de `getColumns()`, solo desde `lg`; 1 unidad
-     * por debajo, donde el grid entero sigue apilado en 1 columna) y, SOLO
-     * cuando hay deuda > 0, la clase `cb-stat-asimetrico` (ver theme.css)
-     * con un tinte de fondo sutil en el mismo warning que ya tiene el
-     * acento del borde — mismo condicional de "destacar solo si aplica"
-     * que ya se usa en `cb-stat-destacado`, para no teñir de warning una
-     * tarjeta en $0 (estado "success", sin deuda).
-     *
-     * FIX (26 ago 2026, el usuario notó en captura real que el ancho
-     * doble se veía como espacio vacío — el texto seguía siendo el mismo
-     * de siempre, "Facturado y aún sin pagar", así que la tarjeta más
-     * ancha no aportaba nada, solo aire de más). Se eligió, de las 3
-     * opciones propuestas (A: sacar el span; B: llenar el espacio con
-     * contenido real; C: reducir el span), la **opción B**: la
-     * descripción pasa a ser dinámica — cantidad de facturas pendientes
-     * + antigüedad de la más vieja ("3 facturas pendientes — la más
-     * antigua, hace 12 días"). Esa antigüedad es justo el dato que le da
-     * sentido a que "Por cobrar" no se limite al mes actual (ver el
-     * comentario de arriba, "cartera pendiente completa") — una factura
-     * pendiente de hace semanas es más urgente que una de ayer, y antes
-     * ese matiz no se veía en ningún lado del Dashboard. `fecha` en
-     * `Factura` es una columna `date` sin cast a Carbon en el modelo
-     * (confirmado en la migración y en que `Factura.php` no declara
-     * `$casts`), así que se envuelve con `Carbon::parse()` antes de
-     * `diffInDays()` — devolvería un string plano si no.
      */
     private function statPorCobrar(): Stat
     {
@@ -178,38 +127,11 @@ class IndicadoresGerencialesWidget extends BaseWidget
             ->sum('monto');
 
         $color = $porCobrar > 0 ? 'warning' : 'success';
-        $clases = $porCobrar > 0
-            ? "cb-stat-accent-{$color} cb-stat-destacado cb-stat-asimetrico"
-            : "cb-stat-accent-{$color}";
-
-        if ($porCobrar > 0) {
-            $cantidadPendientes = Factura::query()
-                ->where('estado_pago', 'pendiente')
-                ->count();
-
-            $facturaMasAntigua = Factura::query()
-                ->where('estado_pago', 'pendiente')
-                ->orderBy('fecha')
-                ->first();
-
-            $diasDesde = Carbon::parse($facturaMasAntigua->fecha)->diffInDays(Carbon::now());
-
-            $descripcion = sprintf(
-                '%d factura%s pendiente%s — la más antigua, hace %d día%s',
-                $cantidadPendientes,
-                $cantidadPendientes === 1 ? '' : 's',
-                $cantidadPendientes === 1 ? '' : 's',
-                $diasDesde,
-                $diasDesde === 1 ? '' : 's',
-            );
-        } else {
-            $descripcion = 'Sin facturas pendientes';
-        }
+        $clases = $porCobrar > 0 ? "cb-stat-accent-{$color} cb-stat-destacado" : "cb-stat-accent-{$color}";
 
         return Stat::make('Por cobrar', '$'.number_format($porCobrar, 2))
-            ->description($descripcion)
+            ->description('Facturado y aún sin pagar')
             ->color($color)
-            ->columnSpan(['default' => 1, 'lg' => 2])
             ->extraAttributes(['class' => $clases]);
     }
 

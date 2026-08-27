@@ -8,6 +8,16 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Revertido — dirección C completa (grid asimétrico + fix de contenido)
+
+- El usuario pidió retroceder los 2 commits de la dirección C ("Dashboard gerencial: grid asimétrico" y "Por cobrar: descripción dinámica") — no le convenció ni siquiera con el ajuste de contenido de la entrada anterior.
+- Se restauraron `IndicadoresGerencialesWidget.php`, `IngresosPorMesChartWidget.php`, `FacturacionPorAreaChartWidget.php` y `theme.css` al estado exacto del commit `87e675d` ("acento de color en las 4 tarjetas de KPI"), el último confirmado por el usuario en el entorno real.
+- Dashboard gerencial vuelve a: 4 tarjetas en grid parejo de 4, sin `columnSpan`, sin `cb-stat-asimetrico`, sin la suavizada de grilla del eje Y en los gráficos. El acento de color por tarjeta, el radio/sombra unificado (dirección A) y el resto del panel quedan intactos.
+- Las 2 entradas de abajo (grid asimétrico y su fix de contenido) se dejan sin borrar, como registro de qué se intentó y por qué se descartó.
+- Verificado con `php -l`, sin errores; diff contra `87e675d` confirmado en cero para los 4 archivos restaurados.
+
+---
+
 ## [2026-08-26] Fix de contenido — "Por cobrar" aprovecha su ancho doble (dirección C, opción B)
 
 - El usuario reportó, con captura real, que el ancho doble de "Por cobrar" (dirección C, entrada anterior) se veía como espacio vacío: la descripción seguía siendo el texto fijo de siempre, así que el ancho extra no aportaba nada.

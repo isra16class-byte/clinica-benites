@@ -67,11 +67,6 @@ class FacturacionPorAreaChartWidget extends ChartWidget
      * anteponer "$" o no queda resuelta *adentro* del JS (interpolando
      * un booleano de PHP), en vez de cambiar la forma de lo que se
      * devuelve.
-     *
-     * Grilla del eje Y más suave (26 ago 2026, dirección C — mismo
-     * criterio y mismo color que en IngresosPorMesChartWidget, ver el
-     * comentario de ese archivo para el detalle de por qué y contra qué
-     * se confirmó).
      */
     protected function getOptions(): RawJs
     {
@@ -83,9 +78,6 @@ class FacturacionPorAreaChartWidget extends ChartWidget
                     y: {
                         ticks: {
                             callback: (value) => ({$esFacturacion} ? '$' : '') + value.toLocaleString('es-EC'),
-                        },
-                        grid: {
-                            color: 'rgb(100 116 139 / 0.08)',
                         },
                     },
                 },
