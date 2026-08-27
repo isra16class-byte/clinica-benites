@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Azul de marca real, medido de la fachada física y el PDF de servicios
+
+- El usuario compartió una foto real de la fachada de la clínica (Google Street View) y preguntó por qué se habían elegido esos colores, sugiriendo acercar el azul del sitio al que usa la clínica de verdad (comparando con la portada de `Servicios_CB_2026.pdf`).
+- Medición real en píxeles (no de memoria, con Pillow sobre recortes limpios): fachada física `#2B5E9F`; PDF de `#0066B4` (claro) a `#001F5F` (oscuro). El navy que ya usaba el sitio (`#071B33`) resultó tener el mismo matiz de azul (~210-213° HSL) pero mucho más oscuro/apagado que ambas fuentes reales.
+- Se presentaron 3 direcciones con una vista previa comparativa antes de tocar código (ajuste sutil / azul real solo como acento / azul real como fondo del hero) — el usuario eligió la última.
+- Cambio en `resources/css/public.css`: los 4 tokens `--color-cb-navy-950/900/800/700` (bloque `@theme`) se reemplazaron por los valores reales medidos, y el `rgb(7 27 51 / 70%)` hardcodeado del fondo del nav se actualizó a `rgb(0 31 95 / 70%)` para que coincida. El verde azulado y el dorado no se tocaron.
+- **Alcance acotado a pedido del usuario**: solo el sitio público. El panel Filament usa su propio primario (`Color::Teal`) y no comparte estos tokens — queda sin cambios.
+- Verificado con balance de llaves (script, 75/75). **Sin acceso a Sail/npm en esta sesión** — pendiente confirmar por el usuario tras recompilar.
+
+---
+
 ## [2026-08-27] Fix: ícono de hamburguesa visible en escritorio (Portada/Hero)
 
 - El usuario confirmó, con captura de pantalla real del Escritorio (`localhost/#inicio`, patch anterior ya aplicado), que la Portada se ve como se diseñó — pero reportó un bug: el ícono de hamburguesa (☰) aparece al lado del menú de escritorio, cuando debería quedar oculto en pantallas grandes y solo mostrarse en móvil.

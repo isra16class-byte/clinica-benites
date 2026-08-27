@@ -32,10 +32,19 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 
-    --color-cb-navy-950: #071b33;
-    --color-cb-navy-900: #0c2544;
-    --color-cb-navy-800: #123057;
-    --color-cb-navy-700: #0c447c;
+    /* Azul de marca real (27 ago 2026): tomado a partir de 2 fuentes reales
+       medidas en píxeles (no de memoria) — la fachada física (foto de Google
+       Street View, panel azul del edificio: #2B5E9F) y el gradiente de la
+       portada de `Servicios_CB_2026.pdf` (de #0066B4 arriba a #001F5F abajo).
+       Reemplaza el navy más oscuro/apagado que se venía usando (#0C447C y
+       derivados) — mismo matiz de azul (~210-213°), pero más vívido y fiel a
+       la marca real de la clínica. Ver MEMORIA.md sección 8.5 para el detalle
+       de la medición y la dirección elegida (fondo del hero en el azul real,
+       en vez de un ajuste sutil o usarlo solo como acento). */
+    --color-cb-navy-950: #001f5f; /* PDF, punto más oscuro del gradiente — real */
+    --color-cb-navy-900: #163e7f; /* transición, mezcla de los 2 puntos reales */
+    --color-cb-navy-800: #2b5e9f; /* fachada física — el azul "de marca" principal */
+    --color-cb-navy-700: #0066b4; /* PDF, punto más claro del gradiente — real */
     --color-cb-teal-600: #0f6e56;
     --color-cb-teal-400: #4aa88c;
     --color-cb-gold-500: #c6a15b;
@@ -63,7 +72,7 @@
         inset-inline: 0;
         top: 0;
         z-index: 50;
-        background-color: rgb(7 27 51 / 70%);
+        background-color: rgb(0 31 95 / 70%);
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
         border-bottom: 1px solid rgb(255 255 255 / 10%);

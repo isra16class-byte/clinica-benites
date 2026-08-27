@@ -2,7 +2,9 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 27 de agosto de 2026 — **confirmado por el usuario en el entorno real** (nueva captura de `localhost/#inicio` tras recompilar): el ícono de hamburguesa ya no aparece en escritorio, solo se ven los links de navegación y el botón "Agendar por WhatsApp", como se diseñó. Con esto, el fix de capas de Tailwind (ver entrada de abajo) queda confirmado de punta a punta.
+Última actualización: 27 de agosto de 2026 — **azul de marca real del sitio público**, a pedido del usuario tras compartir una foto real de la fachada física de la clínica (Google Street View) y comparar contra el gradiente de `Servicios_CB_2026.pdf`. Se midieron los colores reales en píxeles (no de memoria): fachada `#2B5E9F`, PDF de `#0066B4` (claro) a `#001F5F` (oscuro) — mismo matiz de azul que el navy que ya se usaba (~210-213°), pero bastante más vívido/saturado. Se le presentaron al usuario 3 direcciones (ajuste sutil, azul real solo como acento, o azul real como fondo del hero) con una vista previa comparativa antes de tocar código; el usuario eligió la dirección **C — azul real como fondo del hero**. Se reemplazaron los 4 tokens `--color-cb-navy-*` en `resources/css/public.css` por los valores reales medidos. **Alcance acotado a pedido del usuario**: solo el sitio público — el panel Filament (que usa su propio primario `Color::Teal`, no estos tokens) no se tocó. Detalle completo en la sección 8.5.
+
+Última actualización anterior: 27 de agosto de 2026 — **confirmado por el usuario en el entorno real** (nueva captura de `localhost/#inicio` tras recompilar): el ícono de hamburguesa ya no aparece en escritorio, solo se ven los links de navegación y el botón "Agendar por WhatsApp", como se diseñó. Con esto, el fix de capas de Tailwind (ver entrada de abajo) queda confirmado de punta a punta.
 
 Última actualización anterior: 27 de agosto de 2026 — **fix de un bug reportado por el usuario** sobre la Portada/Hero recién confirmada en el entorno real (captura de `localhost/#inicio`): el ícono de hamburguesa se veía siempre, también en escritorio, cuando debía quedar oculto salvo en móvil. Causa: en Tailwind v4 las utilidades responsivas (`lg:hidden`) viven en `@layer utilities`, que por especificidad de capas siempre pierde contra CSS fuera de cualquier capa — todo el CSS custom de `resources/css/public.css` estaba sin capa. Se envolvió en `@layer base`/`@layer components` (`@import`/`@theme` quedan igual, sin capa). Ningún archivo `.blade.php` cambió. Detalle completo en la sección **8.5** (subsección de este fix) y en `CHANGELOG.md`.
 
@@ -1055,6 +1057,23 @@ El usuario reportó, sobre esa misma captura, un bug: el ícono de hamburguesa (
 **Causa raíz**: en Tailwind v4 las utilidades como `lg:hidden` viven dentro de `@layer utilities` — una capa que, por especificidad de *capas* CSS (no de selector), siempre pierde contra cualquier regla escrita fuera de una capa, sin importar el orden en el archivo. Todo el CSS custom de `public.css` (`.cb-burger { display: flex; ... }` incluido) estaba fuera de cualquier `@layer`, así que le ganaba a `lg:hidden` en cualquier tamaño de pantalla.
 
 **Solución**: se reorganizó `public.css` envolviendo las reglas en las capas que Tailwind v4 espera — `@layer base` para `html`/`body`, `@layer components` para el resto (nav, hero, botones, franja de confianza, animaciones, keyframes, `prefers-reduced-motion`). `@import 'tailwindcss'` y el bloque `@theme` (tokens de color/fuente) quedan sin capa, como corresponde — no son estilos, son configuración. Con esto `lg:hidden`/`lg:flex` vuelven a ganar cuando corresponde, sin tocar ninguna clase en los `.blade.php`. Verificado con balance de llaves (script, 75/75). **Confirmado por el usuario en el entorno real** (nueva captura de `localhost/#inicio` tras recompilar): el ícono de hamburguesa ya no aparece en escritorio, queda cerrado de punta a punta.
+
+### Azul de marca real, medido de la fachada física y el PDF (27 ago 2026, mismo día)
+
+El usuario compartió una foto real de la fachada de la clínica (Google Maps/Street View, `Av. Francisco de Orellana`, nov 2024) y preguntó por qué se habían elegido esos colores — y sugirió acercar el azul al que la clínica usa de verdad, comparándolo con la portada de `Servicios_CB_2026.pdf`.
+
+**Medición real (no de memoria)**, con Pillow sobre recortes limpios (sin texto ni ventanas):
+- Fachada física (panel azul sólido del edificio, foto Street View): `rgb(43, 94, 159)` → `#2B5E9F`.
+- Portada del PDF (gradiente diagonal): de `rgb(0, 102, 180)` → `#0066B4` (parte más clara, arriba) a `rgb(0, 31, 95)` → `#001F5F` (parte más oscura, abajo).
+- Navy que ya usaba el sitio (fondo del hero): `#071B33` — mismo matiz de azul (~210-213° en HSL, prácticamente el mismo tono en ambos casos), pero bastante más oscuro/apagado que las 2 fuentes reales.
+
+**3 direcciones presentadas antes de tocar código** (con una vista previa comparativa, ver `visualize`): (A) ajuste sutil manteniendo el fondo oscuro tipo "moody VIP"; (B) el azul real solo como acento puntual, sin tocar el fondo; (C) el azul real como fondo del hero, alejándose del look oscuro y acercándose al azul corporativo real. El usuario eligió **C**.
+
+**Cambio aplicado** (`resources/css/public.css`, bloque `@theme`): los 4 tokens `--color-cb-navy-950/900/800/700` se reemplazaron por los valores reales medidos —`#001F5F` (PDF oscuro), `#163E7F` (mezcla intermedia), `#2B5E9F` (fachada real), `#0066B4` (PDF claro) respectivamente— y el valor hardcodeado `rgb(7 27 51 / 70%)` del fondo del nav (que no pasaba por la variable) se actualizó a `rgb(0 31 95 / 70%)` para que coincida. El resto de la paleta (verde azulado `#0F6E56`, dorado/champán) no se tocó.
+
+**Alcance**: solo el sitio público, a pedido explícito del usuario. El panel Filament usa su propio color primario (`Color::Teal`, definido en `AdminPanelProvider.php`, ver sección 8.1) — no comparte estos tokens de `public.css`, así que queda intacto.
+
+Verificado con balance de llaves (script, 75/75). **Pendiente confirmar en el entorno real tras recompilar** — sin acceso a Sail/npm en esta sesión.
 
 ## 9. Propuesta de funciones futuras (investigadas, no priorizadas aún)
 
