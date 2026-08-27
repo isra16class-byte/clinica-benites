@@ -8,6 +8,19 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Las 3 fotos placeholder del grid del hero, reemplazadas por 3 fotos reales distintas
+
+- El grid 2x2 de fotos del hero repetía `hero-quirofano.jpg` en las 4 celdas desde que se construyó (placeholder explícito, ver entrada del changelog correspondiente). El usuario pidió reemplazar las 3 repetidas por fotos distintas.
+- Antes de definir qué 3 fotos usar, se le recordó al usuario que la clínica tiene 27 especialidades confirmadas (`Servicios_CB_2026.pdf`, MEMORIA.md sección 6.1) — se descartó la primera idea (fotos genéricas tipo "recepción"/"personal médico sin especificar") en favor de fotos que representen áreas ya mencionadas en el propio trust-strip del hero y en la lista de especialidades: **UCI**, **Cateterismo Cardiaco** (cardiología) y **Neonatología** (UCIN), sumadas al quirófano que ya estaba.
+- El usuario preguntó si la clínica tenía **Odontología**. Se revisó el repo: no está en las 27 especialidades del PDF de marketing; la única mención de "Odontología" en todo el proyecto es un dato de prueba usado en una sesión de testing anterior (Área de ejemplo para probar el flujo Médico/Cita), no un dato confirmado con el cliente. **No se agregó** — mismo criterio que el resto de datos no confirmados (MEMORIA.md sección 6): no se afirma nada sin confirmar con el contacto interno.
+- Se generaron 3 prompts para Gemini (mismo estilo visual que `hero-quirofano.jpg`: paleta azul/navy, iluminación cinematográfica, personal médico de espaldas/perfil sin rostro identificable, degradado oscuro en el borde izquierdo para que la máscara CSS del grid funcione igual en las 4 fotos) — el usuario las generó y subió.
+- **Optimización de imágenes**: las 3 fotos subidas (1376×768 cada una) se redimensionaron a 960×536 (mismo tamaño que `hero-quirofano.jpg`) y se recomprimieron con ImageMagick (`-quality 82 -strip`) — quedaron en 47KB (`hero-neonatologia.jpg`), 54KB (`hero-uci.jpg`) y 60KB (`hero-cardiologia.jpg`), todas por debajo de los 75KB de la foto existente. Guardadas en `public/images/`.
+- **`hero.blade.php`**: las 3 celdas que apuntaban a `hero-quirofano.jpg` ahora apuntan a `hero-uci.jpg`, `hero-cardiologia.jpg` y `hero-neonatologia.jpg` respectivamente (celda 1, el quirófano, sin cambios). El comentario Blade que documentaba el TODO de las fotos repetidas se reescribió para explicar qué representa cada foto y por qué se eligieron esas 4 áreas, y sigue dejando claro que son fotos generadas con IA (no de la clínica real), pendientes de reemplazo cuando haya fotos reales.
+- **Verificado con Playwright** (mismo mecanismo que cambios anteriores del hero): se compiló `public.css` real con `npx @tailwindcss/cli` (0 errores) y se armó una vista previa estática de nav+hero con ese CSS compilado, renderizada en 3 anchos (1280/1600/1920px). Las 4 fotos se ven completas y distintas en los 3 casos; el fundido oscuro de cada una es visualmente consistente con las demás (todas comparten el mismo estilo de sombra a la izquierda). En 1280px (límite mínimo del breakpoint `xl`) el título y el grid quedan con la misma separación ya documentada como ajustada en una entrada anterior — no es una regresión de este cambio.
+- **Pendiente confirmar por el usuario en su propio entorno real.**
+
+---
+
 ## [2026-08-27] Más aire en el hero, solo en pantallas altas (>900px)
 
 - El usuario confirmó en su entorno real que el fix anterior (compresión vertical) funcionaba, pero pidió correr el bloque "más abajito, unos milímetros" porque sentía que había espacio de sobra y quedaba muy junto.

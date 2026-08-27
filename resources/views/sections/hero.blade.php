@@ -36,11 +36,16 @@
         de verdad — ver max-w-7xl): antes de eso, el texto todavía ocupa
         suficiente ancho como para que esta columna se le monte encima.
 
-        TODO: las 4 fotos usan hoy el mismo archivo real
-        (`hero-quirofano.jpg`) como placeholder — a pedido del usuario,
-        mientras no haya 3 fotos reales más para reemplazarlas. Reemplazar
-        cada `src` por su foto definitiva cuando estén disponibles; el
-        marcado (grid, tamaños, animación) no necesita cambiar para eso.
+        Las 4 fotos son generadas con IA (mismo criterio ya usado para
+        `hero-quirofano.jpg`), cada una representando un área distinta de
+        la clínica en vez de repetir la misma imagen: quirófano, UCI,
+        cateterismo cardiaco (cardiología) y neonatología/UCIN. Se eligieron
+        estas 4 porque cubren especialidades/servicios ya mencionados en el
+        trust-strip de arriba (quirófanos · UCI · UCIN) y en el listado de
+        especialidades confirmado (Cardiología/Cateterismo Cardiaco,
+        Pediatría y Neonatología) — ver MEMORIA.md sección 6.1. Son fotos
+        generadas, no de la clínica real: reemplazar por fotos reales de
+        las instalaciones cuando estén disponibles.
     --}}
     <div class="cb-hero-side hidden xl:block" aria-hidden="true">
         <div class="cb-hero-photo-grid">
@@ -48,13 +53,13 @@
                 <img src="{{ asset('images/hero-quirofano.jpg') }}" alt="" loading="lazy">
             </div>
             <div class="cb-hero-photo-item">
-                <img src="{{ asset('images/hero-quirofano.jpg') }}" alt="" loading="lazy">
+                <img src="{{ asset('images/hero-uci.jpg') }}" alt="" loading="lazy">
             </div>
             <div class="cb-hero-photo-item">
-                <img src="{{ asset('images/hero-quirofano.jpg') }}" alt="" loading="lazy">
+                <img src="{{ asset('images/hero-cardiologia.jpg') }}" alt="" loading="lazy">
             </div>
             <div class="cb-hero-photo-item">
-                <img src="{{ asset('images/hero-quirofano.jpg') }}" alt="" loading="lazy">
+                <img src="{{ asset('images/hero-neonatologia.jpg') }}" alt="" loading="lazy">
             </div>
         </div>
     </div>
