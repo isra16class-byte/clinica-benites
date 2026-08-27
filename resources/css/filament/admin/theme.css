@@ -230,22 +230,30 @@
 }
 
 /*
- * Tarjetas presionables — dirección A "expande hacia abajo" (26 ago 2026,
- * ver el comentario de clase de IndicadoresGerencialesWidget.php para el
- * mecanismo completo de Alpine/HtmlString). Este bloque cubre solo la
- * parte de CSS.
+ * Tarjetas presionables — dirección C "popover flotante" (26 ago 2026,
+ * reemplaza a la dirección A "expande hacia abajo" que se había
+ * implementado antes — el usuario pidió probar C para comparar cuál
+ * queda mejor; ver MEMORIA.md para el historial de ambas). Este bloque
+ * cubre solo la parte de CSS — el mecanismo de Alpine/HtmlString está en
+ * el comentario de clase de `IndicadoresGerencialesWidget.php`.
  *
- * `[x-cloak]` (26 ago 2026): confirmado clonando el código fuente
- * completo de `filamentphp/filament` (todos los paquetes, no solo
- * widgets) que Filament usa `x-cloak` en varios componentes propios
- * (dropdown, tabs, sidebar) pero NUNCA define la regla CSS
- * `[x-cloak] { display: none }` en ninguno de sus `.css` — depende de que
- * el proyecto consumidor la traiga (convención estándar documentada por
- * Alpine.js, no un descuido). Como este `theme.css` nunca la había
- * necesitado hasta ahora (nada usaba `x-cloak` en el proyecto), se agrega
- * acá para no depender de que ya exista en algún lado no verificado —
- * evita el parpadeo del bloque de detalle antes de que Alpine inicialice
- * en la carga de la página.
+ * A diferencia de A, acá la tarjeta NO cambia de tamaño: el detalle vive
+ * en un panel flotante posicionado con la directiva `x-anchor` (plugin
+ * `@alpinejs/anchor`, basado en Floating UI) — confirmado clonando
+ * Livewire 4.4.1 real (`js/lifecycle.js`, `Alpine.plugin(anchor)`) que
+ * viene registrado globalmente, igual que `x-collapse` en la dirección A,
+ * así que tampoco hace falta instalar nada nuevo. La ventaja sobre
+ * calcular la posición a mano en CSS: Floating UI reposiciona el panel
+ * solo (`flip`/`shift`) si no entra en la pantalla — relevante acá porque
+ * la tarjeta "Ocupación de camas" es la última de la fila de 4 y un panel
+ * fijo hacia la derecha se saldría del viewport en pantallas angostas.
+ *
+ * `[x-cloak]` (26 ago 2026, se mantiene igual que en la dirección A):
+ * confirmado clonando el código fuente completo de `filamentphp/filament`
+ * que Filament usa `x-cloak` en varios componentes propios pero NUNCA
+ * define la regla CSS `[x-cloak] { display: none }` en ninguno de sus
+ * `.css` — depende de que el proyecto consumidor la traiga. Se agrega acá
+ * para evitar el parpadeo del panel antes de que Alpine inicialice.
  */
 [x-cloak] {
     display: none !important;
@@ -265,14 +273,13 @@
 
 /*
  * El número (`.fi-wi-stats-overview-stat-value`) ahora envuelve, además
- * de la cifra, la flecha y el bloque de detalle (ver
- * `valorConDetalle()`) — se pasa de bloque simple a `flex` para que la
- * cifra y la flecha queden en la misma línea, y el detalle (que sigue
- * siendo un bloque, `display:block` por defecto) caiga debajo.
+ * de la cifra, la flecha indicadora de que es presionable (el panel en sí
+ * NO va acá dentro del flujo — al ser `x-anchor`, se posiciona con
+ * `position: absolute` calculado por Floating UI, así que no empuja
+ * ningún contenido de la tarjeta).
  */
 .fi-wi-stats-overview-stat-value {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem;
 }
@@ -294,26 +301,41 @@
 }
 
 /*
- * Bloque de detalle: mismo ancho completo de la tarjeta (`flex-basis:
- * 100%` para que, al estar dentro de un contenedor `flex` con `flex-wrap`,
- * pase a su propia línea en vez de intentar compartir la fila con la
- * cifra y la flecha), tipografía reducida a la misma escala que la
- * descripción de la tarjeta (no la cifra grande, heredada si no se
- * resetea acá) y un separador sutil arriba para distinguirlo del número.
+ * Panel flotante del detalle. Mismo lenguaje visual que
+ * `.fi-dropdown-panel` de Filament (confirmado en
+ * `packages/support/resources/css/components/dropdown/index.css` de la
+ * v5.7.6: `bg-white shadow-lg ring-1 ring-gray-950/5 rounded-lg`,
+ * traducido acá a CSS plano en vez de reutilizar la clase original —
+ * evita acoplarse al JS propio del dropdown de Filament, que no tiene
+ * relación con `x-anchor`). El ancho fijo (`16rem`) más un `max-width`
+ * acotado al viewport es solo un piso razonable: el `shift` de Floating
+ * UI ya se encarga de que nunca quede recortado por un borde de pantalla,
+ * así que acá no hace falta ningún cálculo de posición propio.
  */
-.cb-stat-detalle {
-    flex-basis: 100%;
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid rgb(226 232 240);
+.cb-stat-popover {
+    z-index: 20;
+    width: 16rem;
+    max-width: min(20rem, calc(100vw - 2rem));
+    border-radius: 0.5rem;
+    background-color: rgb(255 255 255);
+    padding: 1rem;
     font-size: 0.875rem;
     font-weight: 400;
     color: rgb(100 116 139);
+    cursor: default;
+    box-shadow:
+        0 10px 15px -3px rgb(0 0 0 / 0.1),
+        0 4px 6px -4px rgb(0 0 0 / 0.1),
+        0 0 0 1px rgb(9 9 11 / 0.05);
 }
 
-.dark .cb-stat-detalle {
-    border-top-color: rgb(51 65 85);
+.dark .cb-stat-popover {
+    background-color: rgb(17 24 39);
     color: rgb(148 163 184);
+    box-shadow:
+        0 10px 15px -3px rgb(0 0 0 / 0.3),
+        0 4px 6px -4px rgb(0 0 0 / 0.3),
+        0 0 0 1px rgb(255 255 255 / 0.1);
 }
 
 .cb-stat-detalle-texto,
@@ -339,31 +361,6 @@
 
 .cb-stat-detalle-lista li + li {
     margin-top: 0.25rem;
-}
-
-/*
- * El problema que la propuesta original no había anticipado (ver
- * comentario de clase en IndicadoresGerencialesWidget.php): las 4
- * tarjetas comparten fila en un grid con `align-items: stretch` (heredado
- * de `.fi-wi-stats-overview-stat` con `h-full` de fábrica, ver
- * `stats-overview-widget.css` de Filament). Si se deja ese stretch activo
- * mientras una tarjeta está expandida, la fila entera crece a la altura
- * de la tarjeta expandida y las otras 3 se estiran con aire vacío abajo —
- * mismo tipo de problema, por otro mecanismo, que hizo descartar la
- * dirección "C" del pulido visual (ver MEMORIA.md). Pero sacar el stretch
- * siempre rompería a "Por cobrar" (`cb-stat-destacado`), que depende de
- * ese mismo stretch para verse pareja con las otras 3 pese a su padding
- * extra, ya confirmado por el usuario en el entorno real. Con `:has()`
- * (soportado en todos los navegadores modernos desde 2023 — Chrome/Edge
- * 105+, Safari 15.4+, Firefox 121+), se apunta al contenedor del widget
- * (`.fi-wi-stats-overview`, ancestro de las 4 tarjetas) y se desactiva el
- * stretch de las 4 SOLO mientras alguna tiene la clase `cb-stat-expanded`
- * (agregada por Alpine vía `:class`, ver `atributosExpandible()`) — en
- * reposo (nada expandido) el comportamiento queda exactamente como antes.
- */
-.fi-wi-stats-overview:has(.cb-stat-expanded) .fi-wi-stats-overview-stat {
-    height: auto;
-    align-self: start;
 }
 
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {

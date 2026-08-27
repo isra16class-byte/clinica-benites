@@ -34,44 +34,48 @@ use Illuminate\Support\HtmlString;
  * y, si hubiera, el del gráfico de fondo), de ahí la necesidad de esta
  * clase aparte.
  *
- * Tarjetas presionables — dirección A "expande hacia abajo" (26 ago 2026,
- * a pedido del usuario: "que las tarjetas sean presionables... y muestre
- * más detalles"). Se descartaron 2 alternativas antes de elegir esta (ver
- * MEMORIA.md): B (la tarjeta crece en ANCHO, empujando a las otras) tenía
- * más riesgo de CSS nuevo sin poder probarlo en vivo; C (popover flotante)
- * no se sentía como "la tarjeta se transforma", que era el pedido.
+ * Tarjetas presionables — dirección C "popover flotante" (26 ago 2026,
+ * reemplaza a la dirección A "expande hacia abajo", implementada en una
+ * sesión anterior — el usuario pidió probar C para comparar cuál queda
+ * mejor, ver MEMORIA.md para el historial completo de ambas). Se había
+ * descartado C originalmente porque "no se sentía como que la tarjeta se
+ * transforma", que era el pedido literal — pero es la opción más robusta
+ * de las 3 propuestas (A expande hacia abajo, B crece en ancho empujando
+ * a las otras, C panel flotante sin tocar el tamaño de la tarjeta).
  *
- * Mecanismo (confirmado contra el código fuente real de Filament 5.7.6 y
- * Livewire 4.4.1, no contra documentación de comunidad):
+ * Mecanismo (confirmado contra el código fuente real de Filament 5.7.6,
+ * Livewire 4.4.1 y el plugin `@alpinejs/anchor` que trae bundleado, no
+ * contra documentación de comunidad):
  * - `Stat::value()` acepta `string|Htmlable|Closure` (no solo string) —
  *   confirmado en el constructor de `Stat.php` — así que en vez de pasar
  *   el número como texto plano, se pasa un `HtmlString` que envuelve el
- *   número + un bloque de detalle oculto, todo dentro del mismo
- *   `<div class="fi-wi-stats-overview-stat-value">` que ya trae el Blade
- *   (nunca forkeado). El bloque de detalle usa `x-show="expanded"` +
- *   `x-collapse` para animar el alto en vez de aparecer de golpe.
- * - `x-collapse` NO lo registra Filament — lo registra Livewire 4.4.1
- *   globalmente (`js/lifecycle.js`, `Alpine.plugin(collapse)`), confirmado
- *   clonando el repo de Livewire en el tag instalado (`composer.lock`).
- *   Ya está disponible sin instalar nada nuevo; mismo mecanismo que ya usa
- *   el propio sidebar colapsable de Filament.
+ *   número + una flecha indicadora + el panel de detalle, todo dentro del
+ *   mismo `<div class="fi-wi-stats-overview-stat-value">` que ya trae el
+ *   Blade (nunca forkeado).
+ * - El panel de detalle se posiciona con la directiva `x-anchor`
+ *   (`@alpinejs/anchor`, basada en Floating UI) en vez de calcular la
+ *   posición a mano en CSS — confirmado clonando Livewire 4.4.1 real
+ *   (`js/lifecycle.js`, `Alpine.plugin(anchor)`) que viene registrado
+ *   globalmente, igual que `x-collapse` en la dirección A anterior. No
+ *   hace falta instalar nada nuevo. La ventaja sobre CSS a mano: Floating
+ *   UI reposiciona el panel solo (`flip`/`shift`) si no entra en la
+ *   pantalla — relevante para "Ocupación de camas", la última tarjeta de
+ *   la fila, donde un panel fijo hacia la derecha se saldría del viewport
+ *   en pantallas angostas.
  * - El clic/teclado (`x-data`, `@click`, `@keydown`) vive en el `<div>`
  *   exterior de la tarjeta vía `extraAttributes()` — confirmado en
  *   `HasExtraAttributes.php` que ese método admite cualquier atributo, no
- *   solo `class`, y no lo escapa.
- * - **Problema no anticipado en la propuesta original, resuelto en
- *   `theme.css`**: `.fi-wi-stats-overview-stat` trae `h-full` de fábrica
- *   dentro de un grid con `align-items: stretch` (confirmado en
- *   `stats-overview-widget.css` de Filament) — si una tarjeta crece, la
- *   fila entera se estira y las otras 3 quedarían con aire vacío abajo
- *   (mismo tipo de problema que hizo descartar la dirección "C" del
- *   pulido visual, aunque por otro mecanismo). Sacar el `stretch` siempre
- *   rompería a "Por cobrar" (`cb-stat-destacado`), que hoy depende de ese
- *   mismo stretch para verse pareja con las otras 3 pese a su padding
- *   extra — ya confirmado por el usuario en el entorno real. Se usa
- *   `:has()` en `theme.css` para desactivar el stretch SOLO mientras hay
- *   una tarjeta expandida, dejando el comportamiento normal intacto en
- *   reposo.
+ *   solo `class`, y no lo escapa. Ese mismo `<div>` también lleva
+ *   `@click.outside="open = false"` (Alpine core, sin plugin extra) para
+ *   cerrar el panel al hacer clic afuera, y `x-ref="stat"` para que el
+ *   panel (`x-anchor="$refs.stat"`) sepa a qué elemento anclarse.
+ * - **A diferencia de la dirección A, acá no hace falta ningún ajuste al
+ *   `align-items: stretch` del grid de 4 columnas**: como el panel se
+ *   posiciona con `position: absolute` (calculado por Floating UI, fuera
+ *   del flujo normal), la tarjeta nunca cambia de alto — el problema que
+ *   había obligado a un `:has()` en `theme.css` para la dirección A
+ *   simplemente no existe acá. Uno de los motivos por los que esta
+ *   dirección es más robusta.
  */
 class IndicadoresGerencialesWidget extends BaseWidget
 {
@@ -103,18 +107,30 @@ class IndicadoresGerencialesWidget extends BaseWidget
      * ya arma hoy (acento de color + `cb-stat-destacado` si aplica) — se
      * agrega tal cual, sin tocar esa lógica existente.
      *
+     * `x-ref="stat"` es lo que le permite al panel flotante (ver
+     * `valorConPopover()`) anclarse a esta tarjeta vía `x-anchor="$refs.stat"`
+     * — ambos viven dentro del mismo `x-data`, así que el ref queda
+     * scopeado a esta tarjeta únicamente (no colisiona con las otras 3).
+     * `@click.outside` cierra el panel al clickear afuera de la tarjeta
+     * (Alpine core, sin plugin extra) — puesto acá y no en el panel mismo
+     * para que un clic en cualquier parte de la tarjeta (incluido el
+     * panel, que es descendiente) cuente como "adentro" y no se cierre
+     * solo al abrirse.
+     *
      * @return array<string, string>
      */
-    private function atributosExpandible(string $clases): array
+    private function atributosPopover(string $clases): array
     {
         return [
             'class' => $clases,
-            'x-data' => '{ expanded: false }',
-            '@click' => 'expanded = !expanded',
-            '@keydown.enter' => 'expanded = !expanded',
-            '@keydown.space.prevent' => 'expanded = !expanded',
-            ':class' => "{ 'cb-stat-expanded': expanded }",
-            ':aria-expanded' => 'expanded',
+            'x-data' => '{ open: false }',
+            'x-ref' => 'stat',
+            '@click' => 'open = ! open',
+            '@keydown.enter' => 'open = ! open',
+            '@keydown.space.prevent' => 'open = ! open',
+            '@keydown.escape.window' => 'open = false',
+            '@click.outside' => 'open = false',
+            ':aria-expanded' => 'open',
             'role' => 'button',
             'tabindex' => '0',
         ];
@@ -123,18 +139,30 @@ class IndicadoresGerencialesWidget extends BaseWidget
     /**
      * Arma el contenido del `<div class="fi-wi-stats-overview-stat-value">`
      * (ver `stat.blade.php` de Filament): el número de siempre + una
-     * flecha que indica que es presionable + el bloque de detalle, oculto
-     * hasta que `expanded` (definido en `atributosExpandible()`, mismo
-     * `x-data` de la tarjeta que envuelve este value) sea `true`.
+     * flecha que indica que es presionable + el panel de detalle
+     * flotante, oculto hasta que `open` (definido en `atributosPopover()`,
+     * mismo `x-data` de la tarjeta que envuelve este value) sea `true`.
      * `$detalleHtml` ya viene armado (con sus propios valores escapados
-     * con `e()`) por cada `desglose*()` de abajo.
+     * con `e()`) por cada `desglose*()` de abajo — mismo contenido/HTML
+     * que usaba la dirección A, solo cambia el contenedor que lo muestra.
+     *
+     * `x-anchor.bottom-start.offset.8="$refs.stat"`: ancla el panel a la
+     * tarjeta (ver `atributosPopover()`), lo abre 8px por debajo del
+     * borde inferior izquierdo, y por defecto permite `flip` (se voltea
+     * arriba si no entra abajo) + `shift` con `padding: 5` (se corre
+     * lateralmente si no entra a los costados) — confirmado en el código
+     * fuente real de `@alpinejs/anchor` (`src/index.js`) que esos 2
+     * comportamientos vienen activados salvo que se agregue el modificador
+     * `.noflip`, que acá no hace falta. `@click.stop` en el panel evita
+     * que un clic adentro (ej. sobre el texto) burbujee hasta el `@click`
+     * de la tarjeta y la cierre al toque de abrirla.
      */
-    private function valorConDetalle(string $valor, string $detalleHtml): HtmlString
+    private function valorConPopover(string $valor, string $detalleHtml): HtmlString
     {
         return new HtmlString(
             '<span>'.e($valor).'</span>'
-            .'<svg class="cb-stat-chevron" :class="{ \'cb-stat-chevron-abierto\': expanded }" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd" /></svg>'
-            .'<div x-show="expanded" x-collapse.duration.200ms x-cloak class="cb-stat-detalle">'
+            .'<svg class="cb-stat-chevron" :class="{ \'cb-stat-chevron-abierto\': open }" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd" /></svg>'
+            .'<div x-show="open" x-cloak x-transition.origin.top x-anchor.bottom-start.offset.8="$refs.stat" @click.stop class="cb-stat-popover" role="tooltip">'
             .$detalleHtml
             .'</div>'
         );
@@ -305,7 +333,7 @@ class IndicadoresGerencialesWidget extends BaseWidget
             $icono = null;
         }
 
-        $valor = $this->valorConDetalle(
+        $valor = $this->valorConPopover(
             '$'.number_format($ingresosMesActual, 2),
             $this->desgloseIngresosMes($ingresosMesActual, $ingresosMesAnterior),
         );
@@ -314,7 +342,7 @@ class IndicadoresGerencialesWidget extends BaseWidget
             ->description($descripcion)
             ->descriptionIcon($icono)
             ->color($color)
-            ->extraAttributes($this->atributosExpandible("cb-stat-accent-{$color}"));
+            ->extraAttributes($this->atributosPopover("cb-stat-accent-{$color}"));
     }
 
     /**
@@ -348,7 +376,7 @@ class IndicadoresGerencialesWidget extends BaseWidget
         $color = $porCobrar > 0 ? 'warning' : 'success';
         $clases = $porCobrar > 0 ? "cb-stat-accent-{$color} cb-stat-destacado" : "cb-stat-accent-{$color}";
 
-        $valor = $this->valorConDetalle(
+        $valor = $this->valorConPopover(
             '$'.number_format($porCobrar, 2),
             $this->desglosePorCobrar($porCobrar),
         );
@@ -356,7 +384,7 @@ class IndicadoresGerencialesWidget extends BaseWidget
         return Stat::make('Por cobrar', $valor)
             ->description('Facturado y aún sin pagar')
             ->color($color)
-            ->extraAttributes($this->atributosExpandible($clases));
+            ->extraAttributes($this->atributosPopover($clases));
     }
 
     /**
@@ -378,12 +406,12 @@ class IndicadoresGerencialesWidget extends BaseWidget
             ->where('estado', 'atendida')
             ->count();
 
-        $valor = $this->valorConDetalle((string) $hoy, $this->desgloseAreaCitasHoy());
+        $valor = $this->valorConPopover((string) $hoy, $this->desgloseAreaCitasHoy());
 
         return Stat::make('Citas atendidas hoy', $valor)
             ->description("{$semana} atendidas esta semana")
             ->color('info')
-            ->extraAttributes($this->atributosExpandible('cb-stat-accent-info'));
+            ->extraAttributes($this->atributosPopover('cb-stat-accent-info'));
     }
 
     /**
@@ -409,11 +437,11 @@ class IndicadoresGerencialesWidget extends BaseWidget
         $porcentaje = round(($ocupadas / $total) * 100);
         $color = $porcentaje >= 90 ? 'danger' : ($porcentaje >= 70 ? 'warning' : 'success');
 
-        $valor = $this->valorConDetalle("{$ocupadas} / {$total}", $this->desgloseTipoCamas());
+        $valor = $this->valorConPopover("{$ocupadas} / {$total}", $this->desgloseTipoCamas());
 
         return Stat::make('Ocupación de camas', $valor)
             ->description("{$porcentaje}% ocupado")
             ->color($color)
-            ->extraAttributes($this->atributosExpandible("cb-stat-accent-{$color}"));
+            ->extraAttributes($this->atributosPopover("cb-stat-accent-{$color}"));
     }
 }
