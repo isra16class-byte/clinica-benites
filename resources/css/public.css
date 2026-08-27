@@ -220,11 +220,24 @@
        (7rem, casi pegada al nav fijo) — ahora arranca a la altura del
        título, no de entrada al cargar la sección. Solo desde xl (1280px):
        antes de eso el texto todavía ocupa suficiente ancho como para que
-       esto se le monte encima. */
+       esto se le monte encima.
+       `right`: a pedido del usuario, tras confirmar en su entorno real que
+       la columna derecha del grid quedaba cortada por el borde de la
+       pantalla — el `-1.5rem` venía de la foto única anterior, que sí
+       estaba pensada "a sangre" (se funde con el fondo vía máscara). Un
+       grid de 4 fotos con esquinas redondeadas no tiene ese recurso: si se
+       corta, se ve incompleto, no intencional. En vez de un número fijo a
+       ojo (que se corta distinto según el ancho de pantalla), se calcula
+       para que el borde derecho del grid quede exactamente alineado con
+       el borde derecho *interno* del contenedor de texto (`max-w-7xl` +
+       `lg:px-16` = 80rem + 4rem) — la misma cuenta que hace Tailwind
+       internamente para centrar ese contenedor, así que en cualquier
+       ancho de pantalla (1280px hasta un monitor 4K) el grid termina
+       exactamente donde termina el resto del contenido, nunca más allá. */
     .cb-hero-side {
         position: absolute;
         top: 12.5rem;
-        right: -1.5rem;
+        right: max(4rem, calc((100vw - 80rem) / 2 + 4rem));
         width: min(26rem, 32vw);
         pointer-events: none;
     }
