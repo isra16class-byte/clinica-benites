@@ -181,7 +181,19 @@ class IndicadoresGerencialesWidget extends BaseWidget
 
         $texto = $cantidad === 1 ? '1 factura pendiente' : "{$cantidad} facturas pendientes";
 
-        $dias = Carbon::parse($masAntigua->fecha)->diffInDays();
+        // Bug encontrado por el usuario en el entorno real (captura de
+        // pantalla, "hace 316.95005496735 dias."): en Carbon 2, diffInDays()
+        // devolvía int; en Carbon 3.13.2 (versión real instalada, confirmado
+        // en composer.lock) el tipo de retorno cambió a float (mide precisión
+        // de microsegundos, no solo días de calendario) — confirmado clonando
+        // el código fuente real de nesbot/carbon tag 3.13.2
+        // (Traits/Difference.php). Eso rompía 2 cosas a la vez: el match(true)
+        // de abajo con === estricto nunca matcheaba un float contra los int
+        // 0/1, y el string interpolado imprimía todos los decimales sin
+        // redondear. alertas-operativas-widget.blade.php ya tenía este mismo
+        // caso resuelto con (int) round(...) — se aplica acá el mismo criterio
+        // para que quede consistente en todo el proyecto.
+        $dias = (int) round(Carbon::parse($masAntigua->fecha)->diffInDays());
         $antiguedad = match (true) {
             $dias === 0 => 'hoy',
             $dias === 1 => 'hace 1 día',

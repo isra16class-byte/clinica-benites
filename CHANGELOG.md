@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Fix: antigüedad de factura mostraba número decimal sin redondear
+
+- El usuario reportó, con captura de pantalla real del Escritorio, que el detalle de "Por cobrar" (agregado en la entrada de abajo, tarjetas de KPI presionables) mostraba **"La más antigua, hace 316.95005496735 dias."** en vez de un número entero legible.
+- **Causa raíz**: `IndicadoresGerencialesWidget::desglosePorCobrar()` usaba `Carbon::parse($masAntigua->fecha)->diffInDays()` asumiendo que devuelve `int` (comportamiento de Carbon 2). Confirmado clonando el código fuente real de `nesbot/carbon` tag `3.13.2` (versión real instalada, según `composer.lock`) que **en Carbon 3, `diffInDays()` cambió su tipo de retorno a `float`** (mide precisión de microsegundos, no solo días de calendario) — confirmado en `src/Carbon/Traits/Difference.php`, firma `diffInDays($date = null, bool $absolute = false, bool $utc = false): float`.
+- Esto rompía dos cosas a la vez: el `match(true)` con `===` estricto nunca matcheaba el `float` contra los `int` `0`/`1` de los casos "hoy"/"hace 1 día" (siempre caía al `default`), y el string interpolado (`"hace {$dias} días"`) imprimía el float completo con todos los decimales.
+- **Este mismo caso ya estaba resuelto en otro archivo del proyecto** — `alertas-operativas-widget.blade.php` usa `(int) round(now()->diffInDays(...))` en sus 3 usos de `diffInDays()` (lotes por vencer, facturas vencidas, camas ocupadas hace mucho) — solo `IndicadoresGerencialesWidget.php` (pieza más nueva) no había aplicado ese mismo patrón.
+- **Solución**: se envuelve el resultado con `(int) round(...)`, igual que en `alertas-operativas-widget.blade.php`, para que quede consistente en todo el proyecto.
+- Verificado con `php -l` (sin errores de sintaxis). **Aún sin confirmar por el usuario en el entorno real** — sin acceso a Sail/npm en esta sesión para correr `sail npm run build` y probarlo en el navegador (aunque este fix es solo PHP, no toca CSS/JS, así que no necesita recompilación de assets — alcanza con que el usuario recargue la página tras aplicar el patch).
+
+---
+
 ## [2026-08-26] Tarjetas de KPI presionables — dirección A "expande hacia abajo"
 
 - A pedido del usuario ("que las tarjetas sean presionables... y muestre más detalles"), retomando una propuesta de una sesión anterior que se quedó sin créditos justo tras elegir la dirección A (de 3: A expande hacia abajo/bajo riesgo, B expande hacia el costado/más riesgo, C popover — descartadas).
