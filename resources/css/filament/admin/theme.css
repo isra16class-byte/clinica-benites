@@ -229,6 +229,35 @@
     padding-bottom: 2rem;
 }
 
+/*
+ * Grid asimétrico — fondo condicional de "Por cobrar" (26 ago 2026,
+ * dirección C de MEMORIA.md/DISEÑO.md, sobre el `columnSpan` de 2
+ * unidades ya aplicado en IndicadoresGerencialesWidget.php). Mismo
+ * condicional que `cb-stat-destacado`/`cb-stat-accent-warning`: esta
+ * clase solo se agrega cuando hay deuda > 0, así que no hace falta
+ * repetir esa condición acá en CSS. Se usa `color-mix()` sobre la
+ * MISMA variable real de Filament ya confirmada y en uso para el borde
+ * de acento (`--color-warning-600`, ver `.cb-stat-accent-warning` más
+ * arriba) en vez de introducir un token nuevo o un hex adivinado —
+ * mismo criterio de "no asumir de memoria" de DISEÑO.md. El porcentaje
+ * de mezcla es bajo a propósito (6% en claro, 14% en oscuro, donde un
+ * mismo % se ve más tenue sobre fondo oscuro) para que el tinte separe
+ * la tarjeta sin competir con el borde de acento ni con el texto.
+ * `color-mix()` tiene soporte amplio en navegadores actuales (Chrome/
+ * Edge 111+, Firefox 113+, Safari 16.4+) — aceptable para un panel
+ * administrativo interno, no una landing pública con soporte legacy.
+ * **Sin confirmar en el entorno real** (mismo caso que el resto de esta
+ * sesión, sin acceso a Sail/npm) — pendiente ver cómo se ve realmente
+ * el tinte sobre el fondo gris-azulado de `.fi-main` ya aplicado.
+ */
+.cb-stat-asimetrico {
+    background-color: color-mix(in srgb, var(--color-warning-600) 6%, transparent);
+}
+
+.dark .cb-stat-asimetrico {
+    background-color: color-mix(in srgb, var(--color-warning-600) 14%, transparent);
+}
+
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
     background-color: rgb(12 68 124) !important;
 }

@@ -52,6 +52,22 @@ class IngresosPorMesChartWidget extends ChartWidget
      * Las 2 series son siempre montos en dólares, así que a diferencia
      * de FacturacionPorAreaChartWidget (donde el formato solo aplica en
      * una de las 2 métricas) acá se aplica siempre, sin condicional.
+     *
+     * Grilla del eje Y más suave (26 ago 2026, dirección C de
+     * MEMORIA.md/DISEÑO.md, "para que las barras respiren más"):
+     * confirmado en el JS real del ChartWidget de Filament 5.7.6
+     * (`packages/widgets/resources/js/components/chart.js`,
+     * `applyChartColors()`) que `options.scales.y.grid.color` — si se
+     * define acá — tiene prioridad sobre el gris de grilla por defecto
+     * del framework (`this.userYGridColor ?? gridColor`); el eje X ya
+     * viene con su grilla oculta de fábrica
+     * (`options.scales.x.grid.display ??= false` en el mismo archivo),
+     * así que solo hace falta tocar Y. Se usa un gris neutro de marca a
+     * baja opacidad (mismo tono `rgb(100 116 139 / …)` ya usado en otras
+     * partes de este archivo, ej. el badge de rol "Recepción") en vez de
+     * un color nuevo — el gris-200 por defecto de Filament ya era
+     * bastante sutil, esto lo aclara un poco más sin quitar la
+     * referencia visual del eje.
      */
     protected function getOptions(): RawJs
     {
@@ -61,6 +77,9 @@ class IngresosPorMesChartWidget extends ChartWidget
                     y: {
                         ticks: {
                             callback: (value) => '$' + value.toLocaleString('es-EC'),
+                        },
+                        grid: {
+                            color: 'rgb(100 116 139 / 0.08)',
                         },
                     },
                 },

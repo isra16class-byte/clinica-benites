@@ -8,6 +8,20 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Confirmado + dirección C — grid asimétrico en el Dashboard gerencial
+
+- El usuario confirmó en el entorno real que el acento de color en las 4 tarjetas de KPI (entrada anterior) se ve bien. Con eso, la dirección A + el pedido de generalizar el acento quedan cerrados y confirmados.
+- Se implementó la **dirección C — grid asimétrico** (tercera de las 3 propuestas para "Refinar tarjetas y gráficos", ver `MEMORIA.md`/`DISEÑO.md`), como una vuelta extra sobre el mismo pulido visual, no un reemplazo de A:
+  - `IndicadoresGerencialesWidget::getColumns()`: de `int 4` a `['default' => 1, 'lg' => 5]`. "Por cobrar" (`statPorCobrar()`) gana `->columnSpan(['default' => 1, 'lg' => 2])`; las otras 3 tarjetas quedan en su span por defecto (1) — fila exacta 2+1+1+1=5, sin sobrantes ni huecos, desde `lg` (1024px+); por debajo sigue apilado en 1 columna.
+  - Confirmado en el código fuente real de Filament 5.7.6 (`packages/support/src/Concerns/CanSpanColumns.php`, `Filament\Schemas\Concerns\HasColumns`) que `Stat` sí soporta `->columnSpan()` y que el `int` fijo anterior se resolvía como `'lg' => 4` con el mobile ya en 1 columna — el array nuevo mantiene ese mismo comportamiento responsivo, no lo pierde.
+  - `theme.css`: clase nueva `cb-stat-asimetrico` — fondo con tinte sutil de warning vía `color-mix()` sobre `--color-warning-600` (misma variable ya usada para el borde de acento), aplicada solo cuando hay deuda > 0 (mismo condicional que `cb-stat-destacado`).
+  - `IngresosPorMesChartWidget` y `FacturacionPorAreaChartWidget`: grilla del eje Y suavizada (`scales.y.grid.color` en el `RawJs` de `getOptions()`), confirmado contra el JS real de Filament (`chart.js`, `applyChartColors()`) que ese valor tiene prioridad sobre el gris por defecto. Eje X no se tocó (ya viene sin grilla de fábrica).
+  - El radio/sombra unificado de tarjetas y gráficos (también parte de la dirección C) ya estaba resuelto desde la dirección A — no hizo falta CSS nuevo para eso.
+- Verificado con `php -l` (PHP 8.3.6 CLI) sobre los 3 archivos PHP tocados, sin errores; balance de llaves del CSS verificado a mano.
+- **Aún sin confirmar por el usuario en el entorno real** — sin acceso a Sail/npm en esta sesión.
+
+---
+
 ## [2026-08-26] Confirmado + mejora — acento de color en las 4 tarjetas de KPI
 
 - El usuario confirmó que la línea quedó resuelta, y pidió extender el acento de borde izquierdo de "Por cobrar" a las otras 3 tarjetas, cada una con su color real.

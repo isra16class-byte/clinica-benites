@@ -32,6 +32,26 @@ use Illuminate\Support\Carbon;
  * de la v5.7.6 — solo alimenta el color del ícono/texto de la descripción
  * y, si hubiera, el del gráfico de fondo), de ahí la necesidad de esta
  * clase aparte.
+ *
+ * Grid asimétrico (26 ago 2026, dirección C de MEMORIA.md/DISEÑO.md,
+ * tercera de las 3 direcciones propuestas para "Refinar tarjetas y
+ * gráficos" — A y el pedido de generalizar el acento ya están resueltos y
+ * confirmados): "Por cobrar" pasa a ocupar 2 unidades de un grid de 5 (en
+ * vez de 1 de 4), los otros 3 KPIs quedan en 1 unidad cada uno — filas
+ * exactas: 2+1+1+1 = 5, sin sobrantes ni huecos. Confirmado contra
+ * `Stat.php`/`CanSpanColumns.php` de Filament 5.7.6 que `Stat` SÍ soporta
+ * `->columnSpan()` (hereda de `Component`, que usa el trait
+ * `CanSpanColumns` — no es un método propio de formularios nada más). A
+ * diferencia de la dirección A (int fijo `4`, que Filament resuelve como
+ * `'lg' => 4` con el mobile ya en 1 columna por defecto, confirmado en
+ * `Filament\Schemas\Concerns\HasColumns::getAllColumns()`), acá se pasa el
+ * array explícito para no perder ese comportamiento responsivo ya
+ * correcto: en mobile/tablet (por debajo de `lg`) sigue en 1 columna
+ * apilada, y recién en `lg` (1024px+) es donde entra el grid de 5 con
+ * "Por cobrar" ocupando 2. Mismo cuidado en el `columnSpan` de la propia
+ * tarjeta (ver `statPorCobrar()`): span 1 por debajo de `lg`, span 2 solo
+ * desde `lg` — así el span de 2 nunca compite con un grid que todavía no
+ * llegó a 5 columnas.
  */
 class IndicadoresGerencialesWidget extends BaseWidget
 {
@@ -42,9 +62,12 @@ class IndicadoresGerencialesWidget extends BaseWidget
         return Auth::user()?->isAdmin() ?? false;
     }
 
-    protected function getColumns(): int
+    protected function getColumns(): array
     {
-        return 4;
+        return [
+            'default' => 1,
+            'lg' => 5,
+        ];
     }
 
     protected function getStats(): array
@@ -119,6 +142,16 @@ class IndicadoresGerencialesWidget extends BaseWidget
      * `statIngresosDelMes()`) para que el color de acento sea siempre
      * consistente con el color real del stat, incluso cuando no hay
      * deuda (estado "success", sin `cb-stat-destacado`).
+     *
+     * Grid asimétrico (26 ago 2026, dirección C): además de las clases de
+     * arriba, esta tarjeta gana `->columnSpan(['default' => 1, 'lg' => 2])`
+     * (2 unidades del grid de 5 de `getColumns()`, solo desde `lg`; 1 unidad
+     * por debajo, donde el grid entero sigue apilado en 1 columna) y, SOLO
+     * cuando hay deuda > 0, la clase `cb-stat-asimetrico` (ver theme.css)
+     * con un tinte de fondo sutil en el mismo warning que ya tiene el
+     * acento del borde — mismo condicional de "destacar solo si aplica"
+     * que ya se usa en `cb-stat-destacado`, para no teñir de warning una
+     * tarjeta en $0 (estado "success", sin deuda).
      */
     private function statPorCobrar(): Stat
     {
@@ -127,11 +160,14 @@ class IndicadoresGerencialesWidget extends BaseWidget
             ->sum('monto');
 
         $color = $porCobrar > 0 ? 'warning' : 'success';
-        $clases = $porCobrar > 0 ? "cb-stat-accent-{$color} cb-stat-destacado" : "cb-stat-accent-{$color}";
+        $clases = $porCobrar > 0
+            ? "cb-stat-accent-{$color} cb-stat-destacado cb-stat-asimetrico"
+            : "cb-stat-accent-{$color}";
 
         return Stat::make('Por cobrar', '$'.number_format($porCobrar, 2))
             ->description('Facturado y aún sin pagar')
             ->color($color)
+            ->columnSpan(['default' => 1, 'lg' => 2])
             ->extraAttributes(['class' => $clases]);
     }
 
