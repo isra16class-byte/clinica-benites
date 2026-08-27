@@ -16,7 +16,7 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 - **Alcance**: se priorizaron los duplicados que sí generan confusión real — mismo grupo del sidebar, uno al lado del otro. Eso deja 2 grupos a resolver: **Atención al paciente** (Pacientes/Citas/Historia Clínicas, los 3 con el mismo ícono) y **Administración** (Áreas/Médicos). Internamiento (Infraestructura) e Item Inventario/Orden de Estudio (Infraestructura vs. Inventario, grupos distintos) no se tocaron por no compartir grupo con otro Resource del mismo ícono.
 - Cambios: `PacienteResource` → `OutlinedIdentification`; `CitaResource` → `OutlinedCalendarDays`; `HistoriaClinicaResource` → `OutlinedClipboardDocumentList`; `AreaResource` → `OutlinedSquares2x2`; `MedicoResource` → `OutlinedUserCircle` (distinto de `OutlinedUsers`, ya usado por Usuarios).
 - Verificado con `php -l` (sin errores, los 5 archivos modificados) y cada nombre de ícono confirmado con `grep` contra el enum real clonado.
-- Cambio puramente de un valor de propiedad estática (`$navigationIcon`) en cada Resource — no toca lógica, permisos, ni ningún otro comportamiento. **Aún sin confirmar por el usuario en el entorno real** — sin acceso a Sail/npm en esta sesión.
+- Cambio puramente de un valor de propiedad estática (`$navigationIcon`) en cada Resource — no toca lógica, permisos, ni ningún otro comportamiento. **Confirmado por el usuario en el entorno real**, con 2 capturas de pantalla mostrando los grupos "Atención al paciente" y "Administración" ya con íconos distinguibles ("creo que si").
 
 ---
 
