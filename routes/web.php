@@ -4,7 +4,7 @@ use App\Http\Controllers\FacturaPdfController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
 
 // Descarga del comprobante de una factura en PDF. Vive fuera de /admin

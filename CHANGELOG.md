@@ -8,6 +8,20 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Sitio web público — arranca con la Portada/Hero
+
+- Arranca la otra mitad del proyecto (ver sección 1 de `MEMORIA.md`): hasta ahora solo existía el panel interno de Filament. Se construye la primera sección del sitio público, a pedido explícito del usuario ("VIP plus", con animaciones).
+- Archivos nuevos: `resources/css/public.css` (paleta/tipografía/animaciones, nuevo entrypoint de Vite), `resources/views/components/layouts/public.blade.php` (layout base), `resources/views/partials/nav.blade.php` (navegación fija, menú móvil sin JS vía checkbox+CSS), `resources/views/sections/hero.blade.php` (portada), `resources/views/home.blade.php` (compone todo, punto de entrada para sumar futuras secciones).
+- `routes/web.php`: `/` ahora devuelve `view('home')` en vez de `view('welcome')` (el default de Laravel queda sin usar, no se borró). `vite.config.js`: se agregó `resources/css/public.css` a los entrypoints.
+- Paleta: reutiliza los 2 colores de marca ya confirmados en el panel (navy `#0C447C`, verde azulado `#0F6E56`), suma un acento dorado/champán nuevo y exclusivo del sitio público. Tipografía: Space Grotesk (titulares) e Instrument Sans (cuerpo) — ambas ya eran dependencias del proyecto, no se sumó ninguna familia nueva.
+- No sigue `DISEÑO.md` (ese prompt es explícitamente para el panel Filament, no para una landing) — se tomó el pedido del usuario como brief de diseño nuevo, documentado en la sección 8.5 de `MEMORIA.md`.
+- Elemento distintivo: línea de pulso SVG animada (se dibuja como plano técnico al cargar + un pulso dorado en loop vía `offset-path`, con `@supports` de respaldo) — resto de animaciones (aparición escalonada, aura de fondo) deliberadamente discreto. Respeta `prefers-reduced-motion`.
+- Contenido tomado tal cual de `Servicios_CB_2026.pdf` (26+ especialidades, quirófanos, UCI/UCIN, ambulancia, emergencias) — sin inventar datos no confirmados (horario, año de fundación, dirección).
+- **Placeholders sin reemplazar**: número de WhatsApp/teléfono (`593000000000`, marcado `TODO` en 4 lugares) — no está confirmado en ninguna fuente real, hay que reemplazarlo antes de publicar.
+- Verificado a mano: balance de llaves/paréntesis de `public.css` (script) y balance heurístico de etiquetas HTML/Blade (script). **Sin acceso a Sail/npm/composer en esta sesión** — nada de esto se vio corrido en un navegador real todavía, pendiente confirmar por el usuario tras `npm run build`/`npm run dev`.
+
+---
+
 ## [2026-08-26] Íconos diferenciados en el sidebar para Resources que compartían el genérico
 
 - Pendiente desde la sección 8.4 (agrupar el menú lateral), que había quedado sin resolver por no tener `vendor/` disponible para confirmar el enum real `Filament\Support\Icons\Heroicon`.

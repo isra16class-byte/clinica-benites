@@ -2,7 +2,9 @@
 
 Este archivo es un resumen de contexto para retomar el desarrollo en cualquier momento (por ti mismo o pegándoselo a una IA). Explica qué es el proyecto, cómo está armado, qué decisiones se tomaron y por qué, y qué falta.
 
-Última actualización: 26 de agosto de 2026 — **confirmado por el usuario en el entorno real**, con 2 capturas de pantalla (grupo "Atención al paciente" y grupo "Administración"): los 5 íconos nuevos (entrada de abajo) se ven bien y ya distinguen cada Resource dentro de su grupo — Pacientes/Citas/Historia Clínicas por un lado, Áreas/Médicos por el otro (Usuarios ya tenía el suyo). Con esto, el pendiente de la sección 8.4 queda cerrado y confirmado de punta a punta.
+Última actualización: 27 de agosto de 2026 — a pedido del usuario, arranca el **sitio web público** (hasta ahora solo existía el panel interno de Filament; el proyecto siempre tuvo dos partes, ver sección 1, pero la parte pública no se había empezado). Se construyó la **primera sección: la Portada/Hero** — el resto de secciones (Especialidades, Servicios, Sobre la clínica, Contacto) quedan para próximas sesiones, ya con el patrón armado para sumarlas sin tocar lo existente. Detalle completo en la nueva sección **8.5**. Puntos clave: (1) es contenido de cara al público, con objetivo distinto al panel interno, así que **no** sigue la dirección de diseño de `DISEÑO.md` (esa es explícitamente para el panel Filament) — se abrió una hoja de estilos nueva (`resources/css/public.css`) en vez de tocar `theme.css`; (2) reutiliza los 2 colores de marca ya confirmados en el panel (navy `#0C447C`, verde azulado `#0F6E56`) y la tipografía ya instalada en el proyecto (Space Grotesk, Instrument Sans) para que el sitio público y el panel se sientan la misma marca, sin sumar dependencias nuevas; (3) el número de WhatsApp/teléfono de recepción **no está confirmado en ninguna fuente real** (no está en `Servicios_CB_2026.pdf` ni se mencionó en ninguna sesión) — se dejaron placeholders (`593000000000`) marcados con `TODO` en 4 lugares (nav desktop, nav mobile, botón WhatsApp y botón llamar del hero) que hay que reemplazar antes de publicar; no se inventó un número real para no arriesgar que alguien llame/escriba a un número equivocado. **Sin acceso a Sail/npm/composer en esta sesión** (mismo caso que sesiones anteriores) — el CSS se verificó a mano (balance de llaves/paréntesis con script, mismo criterio que `theme.css`) y el HTML/Blade con un chequeo heurístico de balance de etiquetas, pero **nada de esto se vio corrido en un navegador real todavía** — pendiente confirmar por el usuario tras `npm run build` (o `npm run dev`).
+
+Última actualización anterior: 26 de agosto de 2026 — **confirmado por el usuario en el entorno real**, con 2 capturas de pantalla (grupo "Atención al paciente" y grupo "Administración"): los 5 íconos nuevos (entrada de abajo) se ven bien y ya distinguen cada Resource dentro de su grupo — Pacientes/Citas/Historia Clínicas por un lado, Áreas/Médicos por el otro (Usuarios ya tenía el suyo). Con esto, el pendiente de la sección 8.4 queda cerrado y confirmado de punta a punta.
 
 Última actualización anterior: 26 de agosto de 2026 — se resolvió el pendiente que había quedado abierto en la sección 8.4 (agrupar el menú lateral): diferenciar los Resources que compartían el ícono genérico `OutlinedRectangleStack` en el sidebar. Se instaló PHP CLI en este entorno para poder correr `php -l`, y se clonó el código fuente real de **Filament 5.7.6** (`filamentphp/filament`, tag `v5.7.6`) para confirmar contra el enum real (`packages/support/src/Icons/Heroicon.php`) qué nombres de ícono existen antes de usarlos — la limitación que había frenado este pendiente (sin `vendor/` para verificar el enum) ya no aplica. **Hallazgo al revisar el código real**: el pendiente original (sección 8.4) decía que 6 Resources compartían el ícono (Áreas, Citas, Facturas, Historia Clínicas, Médicos, Pacientes) — al confirmar contra el código, en realidad son 7 (también Internamiento) y además hay un segundo duplicado no documentado: Item Inventario y Orden de Estudio comparten `OutlinedBeaker`. **Alcance de este fix**: se priorizaron los duplicados que sí generan confusión real — los que caen en el **mismo grupo del sidebar** (se ven uno al lado del otro), que es el motivo original de este pendiente ("distinguirlos de un vistazo dentro de cada grupo"). Eso deja 2 grupos con conflicto: **Atención al paciente** (Pacientes/Citas/Historia Clínicas, los 3 con el mismo ícono) y **Administración** (Áreas/Médicos, Usuarios ya tenía uno propio). Internamiento (grupo Infraestructura) e Item Inventario/Orden de Estudio (grupos distintos, Infraestructura e Inventario) no se tocaron — no comparten grupo con otro Resource que use el mismo ícono, así que no generan la confusión que este pendiente buscaba resolver; quedan documentados acá por si en el futuro se quiere una pasada más exhaustiva. Cambios (los 5 Resources ya tenían `use Filament\Support\Icons\Heroicon;` importado, no hizo falta agregarlo): `PacienteResource` → `Heroicon::OutlinedIdentification` (ficha/documento de identidad, coherente con que el modelo tiene `cedula`); `CitaResource` → `Heroicon::OutlinedCalendarDays` (agenda); `HistoriaClinicaResource` → `Heroicon::OutlinedClipboardDocumentList` (historia clínica como planilla/registro médico); `AreaResource` → `Heroicon::OutlinedSquares2x2` (categorías/departamentos); `MedicoResource` → `Heroicon::OutlinedUserCircle` (persona, distinto de `OutlinedUsers` que ya usa Usuarios). Verificado con `php -l` (sin errores, los 5 archivos) y cada nombre de ícono confirmado con `grep` contra el enum real clonado — ningún nombre inventado de memoria. Cambio puramente de un valor de propiedad estática (`$navigationIcon`), no toca lógica ni permisos. **Confirmado por el usuario en el entorno real** (ver entrada de arriba).
 
@@ -472,7 +474,16 @@ clinica-benites/
       ..._create_servicios_ambulancia_table.php    # Completa — traslados (sección 6.2)
       ..._add_origen_prioridad_to_citas_table.php  # Alter — cubre "Emergencias" sin tabla propia (sección 6.2)
   resources/
+    css/
+      public.css                  # Paleta/tipografía/animaciones del sitio público (sección 8.5)
     views/
+      home.blade.php              # Vista de "/" — compone layout + nav + secciones del sitio público (sección 8.5)
+      components/layouts/
+        public.blade.php          # Layout base del sitio público (sección 8.5)
+      partials/
+        nav.blade.php              # Navegación fija del sitio público (sección 8.5)
+      sections/
+        hero.blade.php             # Portada del sitio público — única sección hecha hasta ahora (sección 8.5)
       pdf/
         factura.blade.php       # Plantilla del comprobante de factura (CSS simple, para dompdf)
       filament/
@@ -868,6 +879,7 @@ Se crearon 2 `ChartWidget` nuevos (extienden `Filament\Widgets\ChartWidget`, tip
 - [x] ~~**Locale español + timezone Guayaquil**~~ (fechas en inglés y Dashboard sin citas de hoy después de las 19:00) — resuelto, ver sección 5 para el detalle. **Pendiente confirmar en el entorno real** — recordar actualizar el `.env` real (no se actualiza solo) y correr `config:clear`.
 - [x] ~~**Botón "Cancelar" → "Atrás" en las pantallas de Editar**~~ — resuelto y **confirmado funcionando por el usuario en el entorno real**, ver sección 8.3 para el detalle.
 - [x] ~~**Diferenciar íconos del sidebar** (varios Resources compartían `OutlinedRectangleStack`)~~ — resuelto y **confirmado funcionando por el usuario en el entorno real** (2 capturas: grupo "Atención al paciente" y grupo "Administración"), ver sección 8.4 para el detalle.
+- [ ] **Sitio web público** — arrancado (27 ago 2026): Portada/Hero lista, ver sección 8.5. Faltan: Especialidades, Servicios, Sobre la clínica, Contacto/ubicación. **Pendiente reemplazar el número de WhatsApp/teléfono placeholder** antes de publicar (ver sección 8.5). **Pendiente confirmar en el entorno real.**
 
 ## 8. Plan para la próxima sesión — pulir UX del sistema interno
 
@@ -995,6 +1007,40 @@ El usuario compartió el logo oficial de la clínica (imagen suelta + embebido e
 **Resuelto (26 ago 2026, ver la entrada correspondiente en la parte de arriba de este archivo)**: se instaló PHP CLI en el entorno de trabajo y se clonó el código fuente real de Filament 5.7.6 para confirmar los nombres de ícono contra el enum real, quitando la limitación de arriba. Se priorizaron los 2 grupos donde el ícono compartido sí generaba confusión real (mismo grupo del sidebar): Atención al paciente (Pacientes/Citas/Historia Clínicas) y Administración (Áreas/Médicos). **Confirmado por el usuario en el entorno real**, con 2 capturas de pantalla mostrando ambos grupos con íconos ya distinguibles entre sí.
 
 **Confirmado funcionando por el usuario en el entorno real** (los 5 grupos aparecen colapsados en el sidebar, con los ítems correctos en cada uno — ver captura compartida). El orden explícito (`navigationGroups()`) se agregó después, aún sin confirmar visualmente por el usuario.
+
+## 8.5 Sitio público — Portada (Hero)
+
+Primer paso del **sitio web público** (la otra mitad del proyecto, ver sección 1 — hasta el 26 de agosto de 2026 solo existía el panel interno). Se construyó solo la sección de **Portada**; el resto queda para próximas sesiones.
+
+**Por qué no sigue `DISEÑO.md`**: ese prompt está escrito explícitamente para el panel Filament ("no es una landing page ni un producto de consumo... priorizá siempre claridad por encima de originalidad llamativa"). El sitio público es lo opuesto — es exactamente el tipo de página de cara al público donde "sorprender y deleitar" sí es el objetivo (el propio `DISEÑO.md` lo aclara en su sección "Por qué está armado así"). Por eso el pedido del usuario ("que se vea VIP plus", "quiero animaciones") se tomó como brief nuevo, no como excepción a `DISEÑO.md`.
+
+**Archivos nuevos:**
+```
+resources/
+  css/
+    public.css                       # Paleta, tipografía y animaciones del sitio público (nuevo entrypoint de Vite)
+  views/
+    components/layouts/
+      public.blade.php                # Layout base (<head>, fuentes, @vite) — convención de componente anónimo de Laravel (<x-layouts.public>)
+    partials/
+      nav.blade.php                   # Navegación fija, menú móvil sin JS (checkbox + CSS)
+    sections/
+      hero.blade.php                  # Portada — única sección construida hasta ahora
+    home.blade.php                    # Compone layout + nav + hero; acá se van sumando las próximas secciones
+```
+`routes/web.php`: la ruta `/` ahora devuelve `view('home')` en vez de `view('welcome')` (el `welcome.blade.php` default de Laravel queda sin usar, no se borró). `vite.config.js`: se agregó `resources/css/public.css` a la lista de entrypoints.
+
+**Paleta** (definida en `@theme` de `public.css`, utilidades tipo `bg-cb-navy-950` vía Tailwind 4): navy `#0C447C` y verde azulado `#0F6E56` son los mismos 2 colores de marca ya confirmados en el panel (`AdminPanelProvider.php` y `IngresosPorMesChartWidget.php` respectivamente) — se reutilizan tal cual para que panel y sitio público se sientan la misma marca. Se agregó un tercer acento **dorado/champán** (`#C6A15B`/`#DDC48C`), usado con moderación (líneas finas, texto de eyebrow, un detalle en botones) — esnuevo y **exclusivo del sitio público**, no se tocó la paleta del panel (`->colors()` de Filament sigue intacta).
+
+**Tipografía**: Space Grotesk para titulares — ya era una dependencia del proyecto sin usar en el sitio público (`@fontsource/space-grotesk`, instalada desde antes y ya en uso en `theme.css` del panel para sus encabezados) y se reaprovechó en vez de sumar una familia nueva. Instrument Sans para texto de cuerpo/navegación — misma fuente que ya carga el proyecto vía `@fonts` (bunny fonts, `vite.config.js`).
+
+**Elemento distintivo (el "signature" de la sección, ver `frontend-design` skill)**: una línea de pulso SVG animada que atraviesa el hero — combina "precisión quirúrgica" (se dibuja como un plano técnico al cargar, con `stroke-dasharray`/`stroke-dashoffset` y el atributo `pathLength="1"` para no depender de medir a mano la longitud real del trazo) y "calidez humana" (un pulso dorado que la recorre en loop con `offset-path`, envuelto en `@supports` para degradar sin romper nada en navegadores que no lo soporten). Es la única animación realmente protagonista — el resto (aparición escalonada del texto al cargar, aura de fondo con 2 blobs difuminados en navy/dorado, textura tipo plano técnico de fondo) es deliberadamente discreto para no competirle, mismo criterio de restraint que ya se documentó para el panel en `DISEÑO.md` aunque acá el objetivo estético sea otro. Todas las animaciones respetan `prefers-reduced-motion: reduce` (se desactivan/saltan al estado final).
+
+**Menú móvil sin JavaScript**: `resources/js/app.js` está vacío en este proyecto (no hay Alpine ni ninguna librería cargada fuera del panel de Filament, que trae la suya propia solo en `/admin`). En vez de sumar una dependencia nueva solo para un menú hamburguesa, se resolvió con la técnica de checkbox + CSS (`#cb-nav-toggle:checked ~ ...`) — cero JS, cero riesgo de romperse por un bundle mal cargado.
+
+**Contenido**: los datos reales (26+ especialidades, quirófanos, UCI, UCIN, ambulancia, atención de emergencias) salen tal cual de `Servicios_CB_2026.pdf` (compartido por el usuario el 24 de agosto). **No se inventó ningún dato que no estuviera confirmado** — ni "24/7" (el PDF lista "Emergencias" como servicio pero no especifica horario), ni año de fundación, ni dirección. El número de WhatsApp/teléfono de recepción tampoco está confirmado en ninguna fuente — se dejaron 4 placeholders `593000000000` marcados con `TODO` (nav desktop, nav mobile, CTA de WhatsApp y CTA de llamada del hero) que hay que reemplazar a mano antes de publicar.
+
+**Pendiente para la próxima sesión**: construir las secciones que faltan (Especialidades — las 27 listadas en el PDF —, Servicios, Sobre la clínica, Contacto/ubicación), sumándolas en `home.blade.php` con el mismo patrón (`resources/views/sections/*.blade.php` + `@include`). Los anchors de la navegación (`#especialidades`, `#servicios`, `#contacto`) ya están conectados en `nav.blade.php` a la espera de esas secciones. **Sin confirmar visualmente en el entorno real** — sin acceso a Sail/npm en esta sesión (ver entrada de arriba en la cabecera de este archivo).
 
 ## 9. Propuesta de funciones futuras (investigadas, no priorizadas aún)
 
