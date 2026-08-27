@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Confirmado + mejora — acento de color en las 4 tarjetas de KPI
+
+- El usuario confirmó que la línea quedó resuelta, y pidió extender el acento de borde izquierdo de "Por cobrar" a las otras 3 tarjetas, cada una con su color real.
+- Como el color de cada stat es dinámico (depende de los datos, ver `getStats()`), se generalizó a nivel PHP: cada método `stat*()` de `IndicadoresGerencialesWidget.php` ahora pasa `extraAttributes(['class' => "cb-stat-accent-{$color}"])` usando el mismo `$color` que ya le pasaba a `->color()` — sin duplicar esa lógica.
+- Confirmado en el código fuente real de Filament 5.7.6 (`packages/widgets/src/StatsOverviewWidget/Stat.php`) que `->color()` no pinta la tarjeta por sí solo — de ahí la necesidad de la clase aparte.
+- `theme.css`: el borde izquierdo (antes solo en `.cb-stat-destacado`) pasa a una regla base en `.fi-wi-stats-overview-stat` + 5 clases `cb-stat-accent-{success,danger,warning,info,gray}`, todas con las variables reales de Filament (`--color-{color}-600`/`--color-gray-400`). `.cb-stat-destacado` queda solo con el aire extra abajo (lo único que sigue siendo exclusivo de "Por cobrar").
+- Sin cambios de estructura ni de grid.
+- **Aún sin confirmar por el usuario en el entorno real** — sin acceso a PHP/Sail/npm en esta sesión.
+
+---
+
 ## [2026-08-26] Fix definitivo — se saca el box-shadow del todo (cualquier sombra simétrica se lee como línea)
 
 - El usuario reportó que, tras el fix anterior (blur → blur+ring), la línea empezó a verse **también arriba** de la fila de 4 KPIs, además de seguir abajo — de forma uniforme.

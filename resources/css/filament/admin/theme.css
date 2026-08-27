@@ -130,12 +130,60 @@
 }
 
 /*
+ * Acento de color por tarjeta (26 ago 2026, a pedido del usuario tras
+ * ver el borde izquierdo de "Por cobrar" — dirección A original — en
+ * el entorno real: "me gustó, se lo puedes poner a los demás con su
+ * respectivo color?"). El borde izquierdo que antes vivía solo en
+ * `.cb-stat-destacado` (ver más abajo) se generaliza acá para las 4
+ * tarjetas de KPI: base `border-left` transparente + `padding-left`
+ * ajustado para que el contenido no se corra cuando el borde se pinta,
+ * y una clase `cb-stat-accent-{color}` por cada color semántico de
+ * Filament que le pone el color real (mismo `->color()` que ya usa cada
+ * stat, ver `IndicadoresGerencialesWidget.php`). Todas usan las
+ * variables reales de Filament (`--color-{success,danger,warning,info,
+ * gray}-600`, confirmadas en `packages/support/resources/css/index.css`
+ * de la v5.7.6) en vez de hex adivinados, para que sea exactamente el
+ * mismo color que ya se ve en el ícono/texto de la descripción de cada
+ * tarjeta. Es un acento de un solo lado a propósito (no una sombra
+ * simétrica) — ver el FIX 4 de `.cb-stat-destacado` más abajo para el
+ * motivo: cualquier efecto simétrico sobre esta fila se lee como una
+ * línea que toca a todas las tarjetas.
+ */
+.fi-wi-stats-overview-stat {
+    border-left: 3px solid transparent;
+    padding-left: calc(1.5rem - 3px);
+}
+
+.cb-stat-accent-success {
+    border-left-color: var(--color-success-600);
+}
+
+.cb-stat-accent-danger {
+    border-left-color: var(--color-danger-600);
+}
+
+.cb-stat-accent-warning {
+    border-left-color: var(--color-warning-600);
+}
+
+.cb-stat-accent-info {
+    border-left-color: var(--color-info-600);
+}
+
+.cb-stat-accent-gray {
+    border-left-color: var(--color-gray-400);
+}
+
+/*
  * "Por cobrar" destacado (solo cuando hay deuda > 0, ver
  * `extraAttributes()` condicional en IndicadoresGerencialesWidget.php):
  * ocupa más espacio visual que las otras 3 tarjetas de KPI — más aire
- * abajo y una sombra levemente más marcada para que se note sin
- * competir en color con el resto del Dashboard (mismo objetivo de
- * "confianza, no sorpresa" de DISEÑO.md).
+ * abajo, para que se note sin competir en color con el resto del
+ * Dashboard (mismo objetivo de "confianza, no sorpresa" de DISEÑO.md).
+ * El acento de color (antes exclusivo de esta tarjeta) ahora es
+ * compartido por las 4 vía `cb-stat-accent-{color}` (ver arriba); acá
+ * solo queda lo que sigue siendo específico de "Por cobrar": el aire
+ * extra abajo.
  *
  * FIX (26 ago 2026, mismo reporte que arriba): antes forzaba
  * `padding: 1.5rem !important` en las 4 direcciones. Con el padding
@@ -147,8 +195,7 @@
  * que las 4 tarjetas comparten el mismo padding de arriba/costados
  * (heredado, sin tocar), acá solo se agrega aire EXTRA abajo — el
  * contenido sigue arrancando a la misma altura que las otras 3, pero la
- * tarjeta queda más alta/espaciosa igual, y la sombra baja de
- * intensidad para no repetir el efecto de línea marcada.
+ * tarjeta queda más alta/espaciosa igual.
  *
  * FIX 2 (26 ago 2026, mismo reporte del usuario): esta tarjeta además
  * tenía la cifra en un tamaño de fuente mayor (2.75rem) que las otras 3
@@ -156,42 +203,30 @@
  * archivo) — el usuario lo notó como inconsistente, no como jerarquía
  * intencional, y pidió que quede uniforme. Se quita esa diferencia de
  * tamaño; la jerarquía de esta tarjeta queda solo en el aire extra
- * abajo y la sombra, sin tocar la tipografía de la cifra.
+ * abajo, sin tocar la tipografía de la cifra.
+ *
  * FIX 3 (26 ago 2026, mismo reporte: el usuario confirmó que la
  * tipografía ya quedó uniforme, pero la línea bajo la fila de KPIs
  * seguía viéndose igual en una captura tomada después del FIX/FIX 2 de
- * arriba). Esta sombra usaba las mismas 2 capas con blur puro que la
- * regla compartida de `.fi-section`/`.fi-wi-stats-overview-stat` (ver
- * el fix de esa regla más arriba en este archivo) — sin componente
- * sólido tipo `ring`, así que aportaba a la misma franja borrosa bajo
- * la fila, con más fuerza todavía por ser una sombra más intensa. Se
- * corrige con el mismo patrón: 1 sombra suave con blur chico + 1 borde
- * nítido de 1px (spread, blur 0), algo más marcado que el de las otras
- * 3 tarjetas para que "Por cobrar" se siga notando, pero sin blur
- * adicional que genere la franja.
+ * arriba). Esta tarjeta tenía una sombra propia, más intensa que la de
+ * las otras 3, que aportaba a la misma franja borrosa bajo la fila.
  *
- * FIX 4 (26 ago 2026, mismo reporte: el usuario notó que, tras el
- * FIX 3, la línea empezó a verse TAMBIÉN arriba de la fila, uniforme,
- * además de seguir abajo). Causa real (ver el fix de la regla
- * compartida más arriba en este archivo, mismo día): un `ring` se
- * aplica por igual en los 4 lados, así que sobre una fila de tarjetas
- * alineadas cualquier sombra/borde simétrico se lee como una línea que
- * las toca a todas — no es un problema de blur vs. ring, es inherente a
- * poner ese efecto en una fila pareja. Se saca el `box-shadow` del
- * todo (igual que en la regla compartida) y la jerarquía de "Por
- * cobrar" pasa a un acento de un solo lado (borde izquierdo). Usa la
- * variable real `--color-warning-600` que expone Filament (confirmada
- * en `packages/support/resources/css/index.css` de la v5.7.6) en vez de
- * un hex adivinado, para que sea exactamente el mismo naranja que ya
- * usa esta tarjeta en su descripción (`->color('warning')` en
- * `statPorCobrar()`) — no es simétrico, así que no puede repetir el
- * efecto de línea sobre la fila.
+ * FIX 4 (26 ago 2026, mismo reporte: el usuario notó que, tras cambiar
+ * esa sombra de blur puro a blur+ring, la línea empezó a verse TAMBIÉN
+ * arriba de la fila, uniforme, además de seguir abajo). Causa real (ver
+ * el fix de la regla compartida `.fi-section`/`.fi-wi-stats-overview-stat`
+ * más arriba en este archivo, mismo día): un `ring` se aplica por igual
+ * en los 4 lados, así que sobre una fila de tarjetas alineadas
+ * cualquier sombra/borde simétrico se lee como una línea que las toca a
+ * todas — no es un problema de blur vs. ring, es inherente a poner ese
+ * efecto en una fila pareja. Se saca el `box-shadow` propio del todo
+ * (la regla compartida ya la deja en `none`) y la jerarquía de color
+ * pasa a ser el acento de un solo lado de arriba, generalizado luego
+ * (26 ago 2026, ver el bloque de arriba) a las otras 3 tarjetas — no es
+ * simétrico, así que no puede repetir el efecto de línea sobre la fila.
  */
 .cb-stat-destacado {
     padding-bottom: 2rem;
-    padding-left: calc(1.5rem - 3px);
-    border-left: 3px solid var(--color-warning-600);
-    box-shadow: none !important;
 }
 
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {

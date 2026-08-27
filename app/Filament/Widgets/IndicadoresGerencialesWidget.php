@@ -19,6 +19,19 @@ use Illuminate\Support\Carbon;
  * Visible solo para el rol admin (mismo patrón ->visible()/canView() usado
  * en el resto del panel, ver sección 10 de MEMORIA.md), y ubicado arriba de
  * CitasDeHoyWidget (sort 1) gracias a $sort = 0.
+ *
+ * Acento de color (26 ago 2026, a pedido del usuario tras ver el borde
+ * izquierdo de "Por cobrar" en el entorno real: "me gustó, se lo puedes
+ * poner a los demás con su respectivo color?"): las 4 tarjetas pasan una
+ * clase `cb-stat-accent-{color}` (ver theme.css) calculada a partir del
+ * MISMO color que ya se le pasa a `->color()` en cada stat — así el borde
+ * de acento siempre coincide con el color real del stat
+ * (success/danger/warning/info/gray), sin mantener esa lógica duplicada en
+ * dos lugares. `->color()` de Filament NO pinta la tarjeta ni su borde por
+ * sí solo (confirmado en `packages/widgets/src/StatsOverviewWidget/Stat.php`
+ * de la v5.7.6 — solo alimenta el color del ícono/texto de la descripción
+ * y, si hubiera, el del gráfico de fondo), de ahí la necesidad de esta
+ * clase aparte.
  */
 class IndicadoresGerencialesWidget extends BaseWidget
 {
@@ -81,7 +94,8 @@ class IndicadoresGerencialesWidget extends BaseWidget
         return Stat::make('Ingresos del mes', '$'.number_format($ingresosMesActual, 2))
             ->description($descripcion)
             ->descriptionIcon($icono)
-            ->color($color);
+            ->color($color)
+            ->extraAttributes(['class' => "cb-stat-accent-{$color}"]);
     }
 
     /**
@@ -97,6 +111,14 @@ class IndicadoresGerencialesWidget extends BaseWidget
      * "success", sin deuda pendiente), destacarla pierde sentido, así
      * que la jerarquía queda condicional al monto, tal como se anticipó
      * como riesgo al proponer esta dirección.
+     *
+     * FIX (26 ago 2026, mismo reporte): esta tarjeta es la única que ya
+     * llevaba `cb-stat-destacado`, que hoy es la que pinta el borde
+     * izquierdo de acento (ver theme.css) — se le suma también
+     * `cb-stat-accent-{color}` (mismo mecanismo que las otras 3, ver
+     * `statIngresosDelMes()`) para que el color de acento sea siempre
+     * consistente con el color real del stat, incluso cuando no hay
+     * deuda (estado "success", sin `cb-stat-destacado`).
      */
     private function statPorCobrar(): Stat
     {
@@ -104,10 +126,13 @@ class IndicadoresGerencialesWidget extends BaseWidget
             ->where('estado_pago', 'pendiente')
             ->sum('monto');
 
+        $color = $porCobrar > 0 ? 'warning' : 'success';
+        $clases = $porCobrar > 0 ? "cb-stat-accent-{$color} cb-stat-destacado" : "cb-stat-accent-{$color}";
+
         return Stat::make('Por cobrar', '$'.number_format($porCobrar, 2))
             ->description('Facturado y aún sin pagar')
-            ->color($porCobrar > 0 ? 'warning' : 'success')
-            ->extraAttributes($porCobrar > 0 ? ['class' => 'cb-stat-destacado'] : []);
+            ->color($color)
+            ->extraAttributes(['class' => $clases]);
     }
 
     /**
@@ -131,7 +156,8 @@ class IndicadoresGerencialesWidget extends BaseWidget
 
         return Stat::make('Citas atendidas hoy', (string) $hoy)
             ->description("{$semana} atendidas esta semana")
-            ->color('info');
+            ->color('info')
+            ->extraAttributes(['class' => 'cb-stat-accent-info']);
     }
 
     /**
@@ -150,13 +176,16 @@ class IndicadoresGerencialesWidget extends BaseWidget
 
         if ($total === 0) {
             return Stat::make('Ocupación de camas', 'Sin camas registradas')
-                ->color('gray');
+                ->color('gray')
+                ->extraAttributes(['class' => 'cb-stat-accent-gray']);
         }
 
         $porcentaje = round(($ocupadas / $total) * 100);
+        $color = $porcentaje >= 90 ? 'danger' : ($porcentaje >= 70 ? 'warning' : 'success');
 
         return Stat::make('Ocupación de camas', "{$ocupadas} / {$total}")
             ->description("{$porcentaje}% ocupado")
-            ->color($porcentaje >= 90 ? 'danger' : ($porcentaje >= 70 ? 'warning' : 'success'));
+            ->color($color)
+            ->extraAttributes(['class' => "cb-stat-accent-{$color}"]);
     }
 }
