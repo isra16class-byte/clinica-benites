@@ -8,6 +8,18 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-26] Íconos diferenciados en el sidebar para Resources que compartían el genérico
+
+- Pendiente desde la sección 8.4 (agrupar el menú lateral), que había quedado sin resolver por no tener `vendor/` disponible para confirmar el enum real `Filament\Support\Icons\Heroicon`.
+- Se instaló PHP CLI en el entorno de trabajo y se clonó el código fuente real de **Filament 5.7.6** (tag `v5.7.6`) para confirmar cada nombre de ícono contra `packages/support/src/Icons/Heroicon.php` antes de usarlo — ninguno se puso de memoria.
+- **Hallazgo al revisar el código real**: el pendiente original decía 6 Resources compartiendo `OutlinedRectangleStack` (Áreas, Citas, Facturas, Historia Clínicas, Médicos, Pacientes); en realidad son 7 (también Internamiento), y hay un segundo duplicado no documentado: Item Inventario y Orden de Estudio comparten `OutlinedBeaker`.
+- **Alcance**: se priorizaron los duplicados que sí generan confusión real — mismo grupo del sidebar, uno al lado del otro. Eso deja 2 grupos a resolver: **Atención al paciente** (Pacientes/Citas/Historia Clínicas, los 3 con el mismo ícono) y **Administración** (Áreas/Médicos). Internamiento (Infraestructura) e Item Inventario/Orden de Estudio (Infraestructura vs. Inventario, grupos distintos) no se tocaron por no compartir grupo con otro Resource del mismo ícono.
+- Cambios: `PacienteResource` → `OutlinedIdentification`; `CitaResource` → `OutlinedCalendarDays`; `HistoriaClinicaResource` → `OutlinedClipboardDocumentList`; `AreaResource` → `OutlinedSquares2x2`; `MedicoResource` → `OutlinedUserCircle` (distinto de `OutlinedUsers`, ya usado por Usuarios).
+- Verificado con `php -l` (sin errores, los 5 archivos modificados) y cada nombre de ícono confirmado con `grep` contra el enum real clonado.
+- Cambio puramente de un valor de propiedad estática (`$navigationIcon`) en cada Resource — no toca lógica, permisos, ni ningún otro comportamiento. **Aún sin confirmar por el usuario en el entorno real** — sin acceso a Sail/npm en esta sesión.
+
+---
+
 ## [2026-08-26] Fix: diamante del popover desalineado verticalmente con el texto
 
 - El usuario reportó, con captura de pantalla real del Escritorio (popover de "Ocupación de camas", entrada de abajo), que los 3 diamantes (Hospitalización/UCIN/UCI) se veían pegados arriba de cada línea, no alineados con el centro vertical del texto.

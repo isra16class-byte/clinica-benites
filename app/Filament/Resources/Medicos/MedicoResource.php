@@ -22,7 +22,7 @@ class MedicoResource extends Resource
 {
     protected static ?string $model = Medico::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserCircle;
 
     protected static string|UnitEnum|null $navigationGroup = 'Administración';
 
