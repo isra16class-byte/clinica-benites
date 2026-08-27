@@ -8,6 +8,20 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Logo horizontal blanco reemplazado por versión generada con IA (Gemini)
+
+- El usuario compartió una imagen del logo generada con Gemini (JPG, 1833×560), con más calidad/detalle 3D que el archivo actual, y pidió integrarla al sistema y al sitio público.
+- La imagen original no se podía usar tal cual: sin transparencia (fondo navy horneado) y con ícono+texto pegados en una sola composición horizontal.
+- Se separó el fondo con una máscara de transparencia basada en luminosidad (histograma confirmó dos clusters bien separados: fondo oscuro vs. blanco del arte) — resultado sin halos, verificado componiendo el recorte tanto sobre fondo claro como sobre el navy real de marca (`#0C447C`).
+- **Hallazgo**: al probarlo sobre fondo claro, el arte (blanco con sombra 3D) queda casi invisible — es funcionalmente una versión "para fondo oscuro", igual que la familia `*-white.png` ya existente, no un reemplazo de la familia navy (`logo.png`/`logo-horizontal.png`, usadas sobre fondo claro en el sidebar del panel y el PDF de factura). Esas dos quedaron intactas.
+- Se reemplazó únicamente `public/images/logo-horizontal-white.png` (único uso real: `resources/views/partials/nav.blade.php`, el nav del sitio público sobre el hero navy) por coincidir en composición (horizontal, ícono izq. + texto der.) con la imagen nueva. `logo-white.png` (composición vertical, sin uso activo en el código) no se tocó — forzar ahí una imagen horizontal la habría deformado.
+- El archivo se recortó (margen transparente sobrante) y se redimensionó de 1833×560 a 1056×260 (de sobra para retina al tamaño real que se muestra, `h-8`/`h-9` en el nav) — bajó de 746KB a 146KB.
+- El archivo anterior se conservó en `public/images/_legacy/logo-horizontal-white-anterior.png`, mismo criterio que el logo placeholder viejo.
+- Ningún archivo `.php`/`.blade.php` cambió — el nav ya apuntaba a ese nombre de archivo, solo se reemplazó el binario de la imagen.
+- **Pendiente confirmar por el usuario en el entorno real** — al ser un archivo estático (no CSS/JS), alcanza con recargar la página, no hace falta recompilar assets.
+
+---
+
 ## [2026-08-27] Azul de marca real, medido de la fachada física y el PDF de servicios
 
 - El usuario compartió una foto real de la fachada de la clínica (Google Street View) y preguntó por qué se habían elegido esos colores, sugiriendo acercar el azul del sitio al que usa la clínica de verdad (comparando con la portada de `Servicios_CB_2026.pdf`).
