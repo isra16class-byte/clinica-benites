@@ -8,6 +8,20 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Compresión vertical del hero — trust-strip cortado por el fold en laptops comunes
+
+- El usuario reportó una conversación anterior (sesión sin créditos) donde sospechaba que, al 100% de zoom del navegador, la franja de confianza (trust-strip: +26 especialidades / Quirófanos·UCI·UCIN / Ambulancia propia / Atención de emergencias) no se alcanzaba a ver sin hacer scroll — compartió una captura recortada mostrándola.
+- **Medido antes de tocar nada** (no se asumió, se confirmó con Playwright + el CSS real compilado con `@tailwindcss/cli`): se armó una vista previa estática con el HTML real del nav+hero y se midió la posición del trust-strip en 5 tamaños de viewport representativos. Resultado: el contenido fijo del hero medía **~830px**, de los cuales **440px eran solo márgenes/paddings** (más de la mitad). En laptops comunes (1366×768, 1440×900, 1536×864 — las 3 resoluciones más frecuentes en la región), con la altura real de viewport ya descontando la barra del navegador (~648-780px), el trust-strip quedaba cortado hasta **178px** por debajo del fold en el peor caso. En monitores grandes (1920×1080) sí entraba.
+- **Solución aplicada**: se movió el `pt-32 pb-20` (Tailwind, fijo) del contenedor de contenido del hero a una clase nueva, `.cb-hero-content`, y se agregaron dos escalones de compresión por `@media (max-height: 900px)` y `@media (max-height: 700px)` que reducen únicamente paddings/márgenes verticales (nunca tamaños de fuente ni el diseño) entre los bloques del hero. Por encima de 900px de alto de viewport, no cambia nada — se ve exactamente igual que antes.
+- **Dos efectos secundarios encontrados y corregidos en el mismo cambio** (also medidos, no a ojo):
+  1. En el escalón más agresivo, el `padding-top` no puede bajar de `6rem` porque el nav fijo mide **86px reales** (medido con Playwright) — con menos, el "eyebrow" (`Clínica privada · Guayaquil`) quedaba tapado detrás del nav. Se dejó `6rem` como piso y se compensó el espacio recortando otros márgenes más abajo en el flujo.
+  2. El indicador "Conocer la clínica ↓" (`.cb-scroll-cue`, `position: absolute; bottom: 2rem`) se solapaba con el trust-strip en el rango 720-900px de alto, porque su umbral de aparición (`@media (min-height: 720px)`) no coincidía con el nuevo umbral de compresión (900px). Se subió el umbral a `901px` — el indicador ahora solo aparece en pantallas donde el hero no está comprimido; en las comprimidas, el trust-strip ya llega hasta el borde y comunica "hay más" sin necesitar la flecha.
+- **Verificado** con Playwright en 5 resoluciones desktop (1366×768, 1440×900, 1536×864, 1920×1080 con barra de navegador, 1920×1080 con ventana no maximizada): las 5 muestran el trust-strip completo sin scroll tras el cambio (antes, 3 de las 5 lo cortaban). También se verificó que el grid 2x2 de fotos (que depende de un `top` fijo, no del padding comprimido) sigue alineado con el título sin superponerse, y que el comportamiento mobile (donde el trust-strip usa grid de 2 columnas y ya requería scroll antes, algo esperable en mobile) no se vio afectado.
+- Se descartó del commit un cambio accidental en `package-lock.json` (diferencias de metadata por la versión de npm del entorno de trabajo, no un cambio real de dependencias).
+- **Pendiente confirmar por el usuario en su propio entorno real** (recompilar CSS y probar con DevTools en modo responsive, o achicando la ventana, en las resoluciones mencionadas).
+
+---
+
 ## [2026-08-27] Foto real del quirófano junto al emblema técnico del hero
 
 - El usuario compartió una foto (generada con IA, estilo fotorrealista, tono azul/navy) de un quirófano en uso y pidió ponerla en el espacio de la columna derecha del hero donde ya estaba el emblema técnico, "arribita", de forma que se siguiera viendo parte de la animación del emblema al lado de la foto.

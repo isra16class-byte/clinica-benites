@@ -279,6 +279,16 @@
         object-position: 60% 45%;
     }
 
+    /* Espaciado vertical del contenido del hero (pt/pb de la sección +
+       márgenes entre bloques). Valores base pensados para pantallas altas;
+       se comprimen en @media (max-height) más abajo — ver nota en el
+       Blade sobre por qué (trust-strip cortado por el fold en laptops
+       comunes). */
+    .cb-hero-content {
+        padding-top: 8rem;
+        padding-bottom: 5rem;
+    }
+
     .cb-eyebrow {
         display: inline-flex;
         align-items: center;
@@ -468,6 +478,73 @@
         color: rgb(255 255 255 / 62%);
     }
 
+    /* ---------- Compresión vertical del hero en pantallas de poca altura ----------
+       El contenido fijo del hero (título + pulso + bajada + CTA + trust-strip,
+       con el espaciado "base" de arriba) mide ~830px. En viewports con menos
+       de ~900px de alto útil (la mayoría de laptops: 1366x768, 1440x900,
+       1536x864 — medido con Playwright antes de este cambio) el trust-strip
+       quedaba cortado por el fold al 100% de zoom. Estas reglas comprimen
+       únicamente pt/pb/gaps (nunca tamaños de fuente ni el diseño en sí) en
+       dos escalones, por debajo de 900px y, más agresivo, por debajo de
+       700px (el caso más ajustado medido, 1366x768 con barra de navegador,
+       ~648px reales). Por encima de 900px de alto, nada de esto aplica —
+       la sección se ve exactamente igual que antes del cambio. */
+    @media (max-height: 900px) {
+        .cb-hero-content {
+            padding-top: 6rem;
+            padding-bottom: 3rem;
+        }
+
+        .cb-headline {
+            margin-top: 0.75rem;
+        }
+
+        .cb-pulse-wrap {
+            margin-top: 1.5rem;
+        }
+
+        .cb-subheadline {
+            margin-top: 1rem;
+        }
+
+        .cb-cta-row {
+            margin-top: 1.75rem;
+        }
+
+        .cb-trust-strip {
+            margin-top: 2.25rem;
+            padding-top: 1.5rem;
+        }
+    }
+
+    @media (max-height: 700px) {
+        /* padding-top no puede bajar de ~6rem: el nav fijo mide ~86px de
+           alto real (medido) y con menos de eso el "eyebrow" queda tapado
+           detrás del nav — mismo tipo de bug que ya se había resuelto antes
+           en esta sección, no repetirlo acá. */
+        .cb-hero-content {
+            padding-top: 6rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .cb-pulse-wrap {
+            margin-top: 1rem;
+        }
+
+        .cb-subheadline {
+            margin-top: 0.75rem;
+        }
+
+        .cb-cta-row {
+            margin-top: 1rem;
+        }
+
+        .cb-trust-strip {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+        }
+    }
+
     /* ---------- Indicador de scroll ---------- */
 
     .cb-scroll-cue {
@@ -487,7 +564,14 @@
         transition: color 0.2s ease;
     }
 
-    @media (min-height: 720px) {
+    /* Mismo umbral que la compresión de `.cb-hero-content` (@media max-height:
+       900px, más arriba): con pantallas más bajas que eso, el trust-strip ya
+       queda pegado al borde inferior del viewport (a propósito, para que no
+       se corte por el fold) y este indicador —posicionado `absolute` sobre
+       ese borde— pasaría a superponerse con él. Se oculta directamente en
+       vez de reposicionarlo, ya es redundante ahí: el trust-strip visible
+       hasta el borde ya comunica que "hay más" sin necesitar la flecha. */
+    @media (min-height: 901px) {
         .cb-scroll-cue {
             display: flex;
         }

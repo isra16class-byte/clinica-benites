@@ -59,7 +59,20 @@
         </div>
     </div>
 
-    <div class="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 pt-32 pb-20 sm:px-10 lg:px-16">
+    {{--
+        Espaciado vertical (pt/pb/gaps entre bloques) movido a la clase
+        `.cb-hero-content` en vez de utilidades Tailwind fijas (pt-32/pb-20):
+        en pantallas de poca altura (laptops 1366x768, 1440x900, 1536x864 —
+        las 3 resoluciones más comunes en la región, medido con Playwright)
+        el contenido fijo del hero (~830px) no entraba en el viewport real
+        (~650-780px, descontando la barra del navegador) y la franja de
+        confianza (trust-strip) quedaba cortada por el fold al 100% de zoom
+        — reportado por el usuario, confirmado con medición real antes de
+        tocar el CSS. `.cb-hero-content` comprime los mt/pt del bloque con
+        `@media (max-height: ...)` (ver public.css) para esos casos, sin
+        afectar pantallas altas donde ya entraba bien.
+    --}}
+    <div class="cb-hero-content relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 sm:px-10 lg:px-16">
         <p class="cb-eyebrow cb-reveal" style="animation-delay:.05s">
             Clínica privada &middot; Guayaquil
         </p>
