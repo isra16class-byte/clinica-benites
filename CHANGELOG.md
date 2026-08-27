@@ -8,6 +8,13 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Confirmado por el usuario en el entorno real — fotos del grid del hero
+
+- El usuario confirmó ("si funciono") que las 3 fotos nuevas (UCI, cateterismo cardiaco, neonatología) se ven bien junto al quirófano en su entorno real, sin fotos repetidas.
+- Con esto, el pendiente que había quedado abierto desde que se construyó el grid 2x2 (reemplazar las 3 fotos placeholder por fotos reales distintas) queda cerrado y confirmado de punta a punta.
+
+---
+
 ## [2026-08-27] Las 3 fotos placeholder del grid del hero, reemplazadas por 3 fotos reales distintas
 
 - El grid 2x2 de fotos del hero repetía `hero-quirofano.jpg` en las 4 celdas desde que se construyó (placeholder explícito, ver entrada del changelog correspondiente). El usuario pidió reemplazar las 3 repetidas por fotos distintas.
