@@ -8,6 +8,22 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-28] Séptima vuelta: cambio de técnica — de `mask-image` a un overlay
+
+Tras 3 vueltas ajustando `mask-image` (todas verificadas correctas matemáticamente y contra una imagen estática), el usuario compartió una segunda captura de su entorno real sin ningún cambio visible, y además el CSS compilado real (Response de Network) — que confirmó que el build **sí** tenía el fix correcto. No era build ni caché.
+
+**Causa real**: `mask-image` no es confiable sobre `<video>` en todos los navegadores/GPUs, especialmente con decodificación acelerada por hardware (Chrome/Windows, el caso normal). El navegador puede pintar los frames del video por una vía que no respeta el mask del contenedor — pero sí lo respeta sobre una imagen estática. Por eso nunca se detectó antes: este entorno de trabajo no reproduce el `.mp4` en vivo, todas las verificaciones anteriores fueron contra la foto de respaldo.
+
+**`resources/css/public.css`**: se saca `mask-image`/`-webkit-mask-image` de `.cb-hero-slideshow`, se agrega `.cb-hero-slideshow::after` — un overlay (no un recorte) con el mismo `radial-gradient` (transparente en el centro, `var(--color-cb-navy-950)` sólido en los bordes, `farthest-corner` + centro al medio) pintado ENCIMA del video.
+
+**Verificado con el `.mp4` real reproduciéndose** (vía Playwright, no la foto sustituta): desvanecido parejo en los 4 bordes.
+
+**Nota pendiente**: el color final es sólido (navy-950), no transparencia real, así que no calza pixel-perfecto con el `linear-gradient` real del fondo en cualquier punto exacto de la página — aproximación aceptada, a confirmar si se nota.
+
+**Pendiente confirmar por el usuario en su entorno real, con el video reproduciéndose.**
+
+---
+
 ## [2026-08-28] Sexta vuelta: el filo seguía ahí — había que centrar el degradado, no solo agrandarlo
 
 El usuario reportó, con captura de su entorno real, que la vuelta anterior no cambió nada visible: seguía el filo recto, sobre todo arriba/derecha.

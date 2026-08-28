@@ -348,72 +348,64 @@
         aspect-ratio: 4 / 3;
         overflow: hidden;
         opacity: 0;
-        /* 28 ago 2026 (cuarta vuelta) — a pedido del usuario tras confirmar
-           que le gustó el tamaño/posición nuevos ("si me gusto, pero puedes
-           desvanecer mas el marco del video?"): la elipse crece de 72%/72%
-           a 85%/85% y el punto donde empieza a desvanecerse (el stop de
-           `#000`) baja de 60% a 22% — antes el centro se mantenía sólido
-           hasta bastante cerca del borde y el desvanecido real quedaba
-           apretado en una franja angosta (se notaba, sobre todo en el
-           borde derecho e inferior, más cerca del borde del contenedor por
-           el `right:1.5rem` de la vuelta anterior). Con la elipse más
-           grande y el desvanecido arrancando mucho antes, la transición es
-           gradual en los 4 bordes, no solo arriba/izquierda.
-           28 ago 2026 (quinta vuelta) — el usuario reportó que, con la
-           elipse de tamaño fijo (85% 85%), todavía se notaba una línea
-           recta en las esquinas: un tamaño de elipse en porcentaje no
-           tiene por qué coincidir con la esquina real del rectángulo
-           (que además no es cuadrado — el contenedor es 4:3 y el centro
-           está corrido a 55%/42%, no al medio), así que el `transparent
-           100%` podía caer *antes* de llegar a la esquina, dejando ese
-           pedacito de esquina sin desvanecer del todo — se veía como el
-           borde recto de la caja asomando. Cambiado el tamaño de la
-           elipse de `85% 85%` (fijo) a la palabra clave `farthest-corner`
-           (nativa de `radial-gradient`, sin fallback necesario): en vez
-           de un porcentaje arbitrario, el navegador calcula la elipse
-           que pasa exactamente por la esquina más lejana del centro del
-           degradado — así el `transparent 100%` cae siempre justo en esa
-           esquina (y, por construcción, en una posición proporcional en
-           las otras 3), sin importar el aspect-ratio real del contenedor
-           ni dónde esté corrido el centro. Los otros 2 valores (`#000
-           22%` y el centro `55% 42%`) no se tocaron — la mecánica es la
-           misma, solo cambia cómo se calcula el tamaño de la elipse. */
-        /* 28 ago 2026 (sexta vuelta) — el usuario reportó, con captura de
-           su entorno real, que el fix anterior (`farthest-corner`) no
-           cambió nada visible: seguía el filo recto arriba/derecha.
-           Causa real (medida con el mismo método de canal alfa que la
-           vuelta anterior, esta vez en las 4 esquinas, no solo la más
-           lejana): `farthest-corner` solo garantiza transparencia total
-           en LA esquina más lejana del centro del degradado — con el
-           centro descentrado a `55% 42%` (más cerca de la esquina
-           superior-derecha que de las otras 3), esa era la esquina
-           inferior-izquierda (~1% de opacidad ahí, remedio real), pero
-           las otras 3 quedaban con opacidad real de sobra para notarse:
-           superior-izquierda ~17%, inferior-derecha ~12% y, la peor,
-           **superior-derecha ~30%** — justo la zona (arriba/derecha del
-           marco) donde el usuario seguía viendo el borde recto. Esto es
-           geométricamente inevitable con un centro descentrado: en un
-           rectángulo, las 4 esquinas solo quedan a la misma distancia
-           del centro del degradado cuando ese centro coincide con el
-           centro real de la caja (donde se cruzan las diagonales) — para
-           cualquier otro punto, unas esquinas quedan más cerca (menos
-           desvanecidas) que otras. Por eso el centro del `radial-
-           gradient` pasa de `55% 42%` a `50% 50%` — nota: esto es
-           independiente del encuadre del video en sí, que sigue
-           mostrando el mismo punto de interés (`object-position: 60%
-           45%` en `.cb-hero-video`, sin tocar) — solo cambia dónde está
-           centrado el desvanecido de la máscara, no qué parte del video
-           se ve nítida. Con el centro en el medio real de la caja, las 4
-           esquinas quedan verificadas a la misma distancia y por lo
-           tanto se desvanecen por igual (las 4 en ~1%, igual que ya
-           lograba la esquina inferior-izquierda antes). El tamaño
-           (`farthest-corner`) y el stop sólido (`#000 22%`) no
-           cambiaron. */
-        mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, #000 22%, transparent 100%);
-        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, #000 22%, transparent 100%);
+        /* Historial resumido de los ajustes del desvanecido de bordes
+           (28 ago 2026, vueltas 4 a 6, ver CHANGELOG.md para el detalle
+           completo de cada una): se usó `mask-image` con un
+           `radial-gradient` para desvanecer los 4 bordes del video hacia
+           el navy, con varias vueltas afinando el tamaño de la elipse
+           (72%/72% → 85%/85% → `farthest-corner`) y el centro del
+           degradado (55%/42% → 50%/50%, para que las 4 esquinas quedaran
+           igual de desvanecidas). Cada vuelta se verificó matemáticamente
+           (medición del canal alfa) y visualmente contra una imagen
+           estática — y cada vez el resultado fue correcto ahí. Pero
+           ninguna cambió nada visible en el entorno real del usuario,
+           con el video realmente reproduciéndose.
+           28 ago 2026 (séptima vuelta) — causa real: `mask-image` sobre
+           un elemento `<video>` no es confiable entre navegadores/GPUs
+           — es una propiedad relativamente nueva (Baseline recién desde
+           fines de 2023) y, sobre todo con video por hardware
+           (aceleración de decodificación, el caso normal en Chrome/
+           Windows), el navegador puede pintar los frames reales del
+           video por una vía que no respeta el `mask-image` del
+           contenedor, aunque si lo respeta sobre una imagen estática (por
+           eso nunca se detectó acá: este sandbox no reproduce el `.mp4`
+           en vivo, todas las verificaciones anteriores fueron contra la
+           foto de respaldo). **Cambio de técnica, no de fórmula**: se
+           saca el `mask-image`/`-webkit-mask-image` de acá (ya no se
+           intenta "recortar" el video) y se agrega un pseudo-elemento
+           `::after` (ver más abajo) que pinta ENCIMA del video un
+           degradado radial transparente en el centro y navy sólido en
+           los bordes — un overlay, no un recorte. Esto es una técnica
+           mucho más vieja y compatible (un simple `background` con
+           `radial-gradient` sobre un `div`), sin ninguna dependencia de
+           que el navegador sepa aplicar `mask` sobre `<video>`. */
         animation: cb-hero-photo-fade-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         animation-delay: 0.55s;
     }
+
+    /* Overlay que reemplaza al `mask-image` (ver comentario arriba): un
+       degradado radial pintado ENCIMA del video (por eso `::after`, que
+       en el orden de pintado va después/arriba de los hijos reales como
+       `.cb-hero-video`), transparente en el centro (`transparent 22%`,
+       mismo punto de arranque que ya tenía el mask) y sólido en
+       `--color-cb-navy-950` desde el 100% (`farthest-corner` + centro al
+       medio, mismo cálculo geométrico ya verificado en la vuelta 6, para
+       que las 4 esquinas se desvanezcan por igual). Como el color final
+       es sólido (no transparente-de-verdad como el mask), no calza
+       pixel-perfecto con el `linear-gradient` real del fondo del hero en
+       cualquier punto exacto de la página (ese fondo varía entre
+       navy-950 y navy-900 según la altura) — aproximación aceptada,
+       mismo criterio que ya usaban los comentarios anteriores al hablar
+       genéricamente de "fundirse con el navy". `pointer-events: none`
+       ya lo hereda de `.cb-hero-side` (la sección entera es
+       `aria-hidden`/decorativa). */
+    .cb-hero-slideshow::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse farthest-corner at 50% 50%, transparent 22%, var(--color-cb-navy-950) 100%);
+    }
+
 
     /* `.cb-hero-video` (el <video> real, visible por defecto) y
        `.cb-hero-video-poster` (la foto fija de respaldo, oculta por
