@@ -975,10 +975,67 @@
 
     /* ============================================================
        Especialidades — directorio editorial
+       ============================================================
+       Rediseño 28 ago 2026 (ver especialidades.blade.php para el porqué
+       de cada pieza y docs/PLAN_SITIO_PUBLICO.md para la investigación):
+       watermark "27" + rail de letras + marcador de grupo + línea de
+       hover trazada con gradiente (en vez de solo cambiar el color del
+       borde). Todo con transform/opacity donde hay animación, para que
+       corra en el compositor.
        ============================================================ */
 
-    .cb-directory {
+    /* Watermark: número real (27 especialidades), en trazo — no relleno,
+       para que se lea como marca de agua tipográfica y no como un dato
+       compitiendo con el contenido real. Recorta con overflow:hidden del
+       <section> padre (ya tiene overflow-hidden en el Blade). */
+    .cb-directory-watermark {
+        position: absolute;
+        top: -2.5rem;
+        right: -0.5rem;
+        z-index: 0;
+        margin: 0;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: clamp(9rem, 22vw, 17rem);
+        line-height: 1;
+        color: transparent;
+        -webkit-text-stroke: 1.5px rgb(74 168 140 / 25%);
+        user-select: none;
+        pointer-events: none;
+    }
+
+    .cb-directory-wrap {
         margin-top: 3.5rem;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0 2.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .cb-directory-wrap {
+            grid-template-columns: 3.25rem 1fr;
+        }
+    }
+
+    /* Rail de letras: índice real (las letras con las que arrancan las 27
+       especialidades), no decoración inventada — mismo criterio que el
+       resto del sitio de no inventar estructura que no está en los datos. */
+    .cb-directory-rail {
+        flex-direction: column;
+        border-right: 1px solid rgb(255 255 255 / 10%);
+        padding-right: 1.1rem;
+    }
+
+    .cb-directory-rail-letter {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 0.8125rem;
+        letter-spacing: 0.06em;
+        color: rgb(255 255 255 / 32%);
+        padding: 0.6rem 0;
+    }
+
+    .cb-directory {
         display: grid;
         grid-template-columns: 1fr;
         gap: 0 3rem;
@@ -995,25 +1052,55 @@
         flex-direction: column;
     }
 
+    /* Marcador de letra: rompe el bloque largo de "C" (11 de 27
+       especialidades) sin fingir una taxonomía que no viene confirmada. */
+    .cb-directory-group-letter {
+        display: block;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        color: var(--color-cb-teal-400);
+        padding: 1.1rem 0 0.35rem;
+    }
+
+    .cb-directory-col > .cb-directory-group-letter:first-child {
+        padding-top: 0;
+    }
+
     .cb-directory-row {
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
-        padding: 1.15rem 0;
-        border-bottom: 1px solid rgb(255 255 255 / 12%);
-        transition:
-            padding-left 0.25s ease,
-            border-color 0.25s ease;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgb(255 255 255 / 10%);
     }
 
-    .cb-directory-col:first-child .cb-directory-row:first-child {
-        border-top: 1px solid rgb(255 255 255 / 12%);
+    .cb-directory-col:first-child > .cb-directory-group-letter:first-child + .cb-directory-row {
+        border-top: 1px solid rgb(255 255 255 / 10%);
     }
 
-    .cb-directory-row:hover {
-        padding-left: 0.5rem;
-        border-color: var(--color-cb-gold-300);
+    /* Línea de hover trazada (gradiente teal→dorado→teal, misma paleta
+       del pulso del hero) en vez de solo cambiar el color del borde —
+       ecuación deliberada con la firma visual del hero. scaleX en vez de
+       width para que corra en el compositor. */
+    .cb-directory-row::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 1px;
+        background: linear-gradient(90deg, var(--color-cb-teal-400), var(--color-cb-gold-300) 55%, var(--color-cb-teal-400));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cb-directory-row:hover::before {
+        transform: scaleX(1);
     }
 
     .cb-directory-name {
@@ -1021,11 +1108,14 @@
         font-weight: 500;
         font-size: 1.0625rem;
         color: rgb(255 255 255 / 85%);
-        transition: color 0.25s ease;
+        transition:
+            color 0.25s ease,
+            transform 0.25s ease;
     }
 
     .cb-directory-row:hover .cb-directory-name {
         color: #fff;
+        transform: translateX(3px);
     }
 
     .cb-directory-arrow {
@@ -1309,7 +1399,8 @@
             transition: none;
         }
 
-        .cb-directory-row {
+        .cb-directory-row::before,
+        .cb-directory-name {
             transition: none;
         }
     }

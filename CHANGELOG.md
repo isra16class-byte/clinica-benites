@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Rediseño Especialidades + plan de contenido/flujo del sitio público
+
+El usuario marcó que las 4 secciones nuevas se veían genéricas comparadas con el Hero. Se investigó (best practices de sitios de clínica, referencia local Clínica Kennedy, dirección de iconos/fondos, animaciones) y se documentó todo en `docs/PLAN_SITIO_PUBLICO.md`. Se validó el enfoque con un preview HTML de Especialidades antes de tocar código real, y ya se implementó: rail de letras A-U (`especialidades.blade.php`), watermark "27" en trazo, marcador de grupo por letra, línea dorada trazada en hover (gradiente teal→dorado→teal, misma paleta del pulso del hero) en vez de solo cambiar el color del borde. Estilos nuevos en `public.css` (sección "Especialidades — directorio editorial"). Pendiente: mismo tratamiento para Servicios, Sobre nosotros, Contacto, y al final el fix de animación a `animation-timeline: view()` (scroll-driven, CSS puro) — ver brief cerrado en la sección 6 del plan.
+
 ## [2026-08-28] Sitio público: secciones Especialidades, Servicios, Sobre nosotros y Contacto
 
 Se completaron las 4 secciones que faltaban del sitio público (`resources/views/sections/`) + un footer nuevo (`partials/footer.blade.php`), conectadas en `home.blade.php` y `nav.blade.php` (se agregó el link "Nosotros"). Especialidades usa las 27 reales de `AreaSeeder.php` como directorio alfabetizado; Servicios arma un mosaico con las 5 fotos reales ya existentes en `public/images/`; Sobre nosotros es la única sección clara (ivory) del sitio; Contacto no incluye formulario, dirección ni mapa (no confirmados por el cliente). Estilos nuevos agregados como bloque propio al final de `public.css`, sin tocar las reglas del hero ni sumar paleta nueva.
