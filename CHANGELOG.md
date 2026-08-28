@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Hero: nombre de la clínica agregado al H1
+
+El usuario notó que "Clínica Benites" solo aparecía como `alt` del logo (chico, en el nav) — ningún texto legible de la página nombraba la clínica. Se agregó `Clínica Benites` como línea propia arriba del eslogan dentro del mismo `<h1>` (`hero.blade.php`), con clase nueva `.cb-headline-brand` en `public.css` (tamaño bastante menor que el eslogan, blanco al 78% opacidad) para no competir con "Precisión quirúrgica. Calidez humana.", que sigue siendo el momento visual fuerte del hero. Pendiente confirmar en entorno real (mismo caveat de fuentes/`vite build` que el resto de ajustes visuales).
+
 ## [2026-08-28] Especialidades: ícono por fila + fondo blanco
 
 A pedido del usuario: la sección pasa de `cb-section--dark` a `cb-section--light` (mismo tratamiento que "Sobre nosotros"), con overrides de color en `public.css` para watermark/cifra/divisores/nombre/flecha sobre fondo claro. Cada fila del directorio suma un ícono de trazo fino (`especialidades.blade.php`, array `$iconos`) agrupado por sistema/órgano clínico real (ej. Cardiología y Cateterismo Cardiaco comparten el corazón) en vez de un ícono distinto sin criterio por cada una de las 27. Verificado con una vista previa HTML renderizada con Playwright (CSS real compilado vía `vite build`, sin la fuente Bunny por falta de red en el sandbox) antes de dar el cambio por cerrado — el ícono de Neurología pasó de un cerebro de dos lóbulos (no se leía a 20px) a un rayo de impulso nervioso, más claro a ese tamaño.
