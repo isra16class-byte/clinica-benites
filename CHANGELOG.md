@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Rediseño Servicios: fondo grounded en foto real (reemplaza el orb plano)
+
+Se quitó el `cb-orb-teal` (blob de color plano) de `servicios.blade.php` — es justo el cliché "gradiente healthcare tech abstracto" que `docs/PLAN_SITIO_PUBLICO.md` marca a evitar. En su lugar: `cb-hero-grid` reutilizado con máscara en la esquina opuesta a la de Especialidades, y un glow ambiental (`filter: blur`, clase nueva `.cb-services-glow` en `public.css`) hecho con la misma foto real que ya usa el tile de Quirófanos (`hero-quirofano.jpg`), mismo mecanismo que `.cb-hero-video-glow` del hero. El mosaico (bento grid) y el hover-scale de las fotos no se tocaron — el plan es explícito en que ya tienen suficiente movimiento propio. Pendiente confirmar visualmente en entorno real (mismo caveat que el resto de ajustes visuales, sin `vite build` completo en este sandbox).
+
 ## [2026-08-28] Rediseño Especialidades + plan de contenido/flujo del sitio público
 
 El usuario marcó que las 4 secciones nuevas se veían genéricas comparadas con el Hero. Se investigó (best practices de sitios de clínica, referencia local Clínica Kennedy, dirección de iconos/fondos, animaciones) y se documentó todo en `docs/PLAN_SITIO_PUBLICO.md`. Se validó el enfoque con un preview HTML de Especialidades antes de tocar código real, y ya se implementó: rail de letras A-U (`especialidades.blade.php`), watermark "27" en trazo, marcador de grupo por letra, línea dorada trazada en hover (gradiente teal→dorado→teal, misma paleta del pulso del hero) en vez de solo cambiar el color del borde. Estilos nuevos en `public.css` (sección "Especialidades — directorio editorial"). Pendiente: mismo tratamiento para Servicios, Sobre nosotros, Contacto, y al final el fix de animación a `animation-timeline: view()` (scroll-driven, CSS puro) — ver brief cerrado en la sección 6 del plan.

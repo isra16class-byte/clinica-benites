@@ -244,12 +244,17 @@ que retome el trabajo no tenga que repreguntar nada.
 4. **Fix de animación (`.cb-reveal` → scroll-driven `view()`)**: confirmado,
    pero **pendiente** — se aplica al final, junto con el resto de las
    secciones, no ahora. No implementar todavía.
+5. **Servicios**: implementado (28 ago 2026, tercera entrada) — se quitó el
+   `cb-orb-teal` (color plano) y se reemplazó por `cb-hero-grid` con máscara
+   propia + glow ambiental hecho con la foto real de Quirófanos
+   (`.cb-services-glow`). El mosaico y el hover-scale de las fotos no se
+   tocaron (ver CHANGELOG.md, entrada del 28 ago 2026).
 
 ### Siguiente paso pendiente
 
-Rediseño de **Servicios** (el bento grid), con el mismo criterio ya validado
-en Especialidades: un elemento propio grounded en contenido real (no
-decoración porque sí), presentado primero como preview antes de tocar el
-Blade/CSS real — mismo flujo que se siguió acá. Después: Sobre nosotros,
-Contacto, y por último el fix de animación (punto 4) aplicado a todo el
-sitio de una vez.
+Rediseño de **Sobre nosotros** y **Contacto**, mismo criterio ya validado en
+Especialidades y Servicios: un elemento propio grounded en contenido real
+(no decoración porque sí), presentado primero como preview antes de tocar el
+Blade/CSS real — mismo flujo que se siguió en las dos secciones anteriores.
+Por último, el fix de animación (punto 4) aplicado a todo el sitio de una
+vez.

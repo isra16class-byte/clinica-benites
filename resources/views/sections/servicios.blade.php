@@ -14,9 +14,30 @@
     Los textos de cada tile describen qué hace la especialidad en términos
     generales (no cifras, no promesas puntuales) — mismo criterio de no
     inventar datos que el resto del sitio.
+
+    Rediseño (28 ago 2026, mismo criterio ya validado en Especialidades —
+    ver docs/PLAN_SITIO_PUBLICO.md sección 4 y 6): se quitó el
+    `cb-orb-teal` (blob de color plano) que tenía la sección — es
+    exactamente el cliché "gradiente healthcare tech abstracto" que el
+    plan marca como algo a evitar activamente. En su lugar:
+    - `cb-hero-grid` (el mismo plano técnico del hero), con una máscara
+      en la esquina opuesta a la de Especialidades (arriba-izquierda acá,
+      abajo-derecha allá) — mismo motivo reutilizado en dosis distinta
+      por sección, no un fondo repetido idéntico.
+    - Un glow ambiental detrás del encabezado, hecho con la misma foto
+      real que ya usa el tile de Quirófanos (`hero-quirofano.jpg`), no
+      un color inventado — mismo mecanismo (`filter: blur`, opacidad
+      baja) que ya usa `.cb-hero-video-glow` en el hero, aplicado acá a
+      una imagen estática. Queda grounded en contenido real, como pide
+      el criterio de la sección 4 del plan ("glow/blur de las fotos
+      reales... en vez de un orb de color plano").
+    El mosaico y el hover-scale de las fotos no se tocaron: el plan
+    (sección 5.5) es explícito en que ya tienen suficiente movimiento
+    propio y no hace falta sumarles más.
 --}}
 <section id="servicios" class="cb-section cb-section--dark relative overflow-hidden">
-    <div class="cb-orb cb-orb-teal" style="top:auto; bottom:-10rem; right:-10rem; left:auto;" aria-hidden="true"></div>
+    <div class="cb-hero-grid" aria-hidden="true" style="mask-image: radial-gradient(ellipse 55% 50% at 10% 0%, black, transparent 70%); -webkit-mask-image: radial-gradient(ellipse 55% 50% at 10% 0%, black, transparent 70%);"></div>
+    <img src="{{ asset('images/hero-quirofano.jpg') }}" alt="" aria-hidden="true" class="cb-services-glow">
 
     <div class="relative z-10 mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
         <div class="cb-section-head cb-reveal">

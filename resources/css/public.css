@@ -1137,6 +1137,26 @@
        Servicios — mosaico (bento grid) con fotografía real
        ============================================================ */
 
+    /* Glow ambiental detrás del encabezado, con la misma foto real del
+       tile de Quirófanos (no un color inventado) — mismo mecanismo que
+       `.cb-hero-video-glow`, aplicado acá a una imagen estática detrás
+       del texto en vez de detrás del video. Reemplaza al `cb-orb-teal`
+       plano que tenía la sección antes (ver comentario en
+       servicios.blade.php). */
+    .cb-services-glow {
+        position: absolute;
+        top: -6rem;
+        left: -6rem;
+        z-index: 0;
+        width: 34rem;
+        height: 34rem;
+        max-width: 60vw;
+        object-fit: cover;
+        filter: blur(70px);
+        opacity: 0.22;
+        pointer-events: none;
+    }
+
     .cb-services-grid {
         margin-top: 3.5rem;
         display: grid;
