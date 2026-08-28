@@ -2,10 +2,8 @@
     Navegación fija del sitio público. El menú móvil se resuelve sin JS
     (checkbox + CSS, `resources/css/public.css`) porque `resources/js/app.js`
     está vacío en este proyecto — evita sumar una dependencia (Alpine, etc.)
-    solo para esto. Los links a #especialidades / #servicios / #contacto son
-    anclas a secciones que todavía no existen (se arman en próximas sesiones,
-    ver MEMORIA.md) — quedan ya conectadas para no tener que volver a tocar
-    este partial cuando se agreguen.
+    solo para esto. Los links a #especialidades / #servicios / #nosotros /
+    #contacto apuntan a las secciones correspondientes en `home.blade.php`.
 --}}
 <header class="cb-nav">
     <input type="checkbox" id="cb-nav-toggle" class="cb-nav-checkbox">
@@ -23,6 +21,7 @@
             <a href="#inicio" class="cb-nav-link">Inicio</a>
             <a href="#especialidades" class="cb-nav-link">Especialidades</a>
             <a href="#servicios" class="cb-nav-link">Servicios</a>
+            <a href="#nosotros" class="cb-nav-link">Nosotros</a>
             <a href="#contacto" class="cb-nav-link">Contacto</a>
         </nav>
 
@@ -48,6 +47,7 @@
         <a href="#inicio" class="cb-nav-link">Inicio</a>
         <a href="#especialidades" class="cb-nav-link">Especialidades</a>
         <a href="#servicios" class="cb-nav-link">Servicios</a>
+        <a href="#nosotros" class="cb-nav-link">Nosotros</a>
         <a href="#contacto" class="cb-nav-link">Contacto</a>
         <a href="https://wa.me/593000000000?text=Hola%2C%20deseo%20agendar%20una%20cita%20en%20Cl%C3%ADnica%20Benites." class="cb-btn-primary mt-3 justify-center" target="_blank" rel="noopener">
             Agendar por WhatsApp

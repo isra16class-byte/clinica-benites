@@ -123,7 +123,18 @@ Ya resuelto: especialidades (27, ver `Servicios_CB_2026.pdf`), no se agenda cita
 - Tipografía: Space Grotesk (titulares) + Instrument Sans (cuerpo).
 - Elemento distintivo: línea de pulso SVG animada (plano técnico + pulso dorado en loop), respeta `prefers-reduced-motion`.
 - Video de fondo del hero (reemplazó a un slideshow de fotos): solución final aplicada — `hero.blade.php` agrega una imagen de glow detrás del video; `public.css` la amplía y desenfoca, deja `::after` sin fondo y aplica una máscara alfa transparente directamente al video y al poster para que los bordes dejen ver el fondo real. El video quedó ligeramente más grande y más abajo, con los breakpoints responsive ajustados. **Confirmado visualmente por el usuario**.
-- **Pendiente**: secciones de Especialidades, Servicios, Sobre la clínica, Contacto/ubicación (anchors ya conectados en `nav.blade.php`, solo falta construir el contenido). Reemplazar 4 placeholders de teléfono/WhatsApp (`593000000000`) antes de publicar.
+- **Las 5 secciones están completas**: Portada (Hero), Especialidades, Servicios, Sobre nosotros, Contacto + Footer (28 ago 2026, ver detalle en sección 8.1 abajo).
+- **Pendiente**: reemplazar 6 placeholders de teléfono/WhatsApp (`593000000000`) antes de publicar — nav (2), hero (2), contacto (2). Confirmar en entorno real (no solo Playwright/capturas) que el mosaico de Servicios y el directorio de Especialidades se ven bien con las fuentes reales cargadas (acá se verificó contra una build estática de Tailwind, sin poder correr `vite build` completo por falta de red a `fonts.bunny.net` en este sandbox).
+
+### 7.1 Detalle: secciones nuevas del sitio público (28 ago 2026)
+
+- **Especialidades** (`sections/especialidades.blade.php`): directorio editorial de las 27 especialidades reales (`AreaSeeder.php`, única fuente), alfabetizado en 3 columnas — se descartó agrupar por categoría (quirúrgica/clínica/diagnóstico) por no venir confirmada esa taxonomía en el material del cliente.
+- **Servicios** (`sections/servicios.blade.php`): mosaico (bento grid) con las 5 fotos reales que ya estaban en `public/images/hero-*.jpg` pero solo se usaba una (quirófano) en el hero — ahora las 5 tienen uso. Tile de Quirófanos como ancla (2×2), franja final de "ambulancia propia" (dato ya confirmado, no nuevo).
+- **Sobre nosotros** (`sections/sobre.blade.php`, id `#nosotros`): única sección clara (ivory) del sitio, sin fotografía — bloque tipográfico + 3 pilares, todos datos ya confirmados en otras partes del sitio (nada nuevo inventado).
+- **Contacto** (`sections/contacto.blade.php`): sin formulario (ya confirmado: no se agenda desde la web) y sin dirección/horario/mapa — no están confirmados por el cliente, no se inventaron.
+- **Footer** (`partials/footer.blade.php`): nuevo, logo + nav + WhatsApp + copyright.
+- `nav.blade.php` y `home.blade.php` actualizados para conectar las 4 secciones + footer, en orden. Se agregó el link "Nosotros" al nav (desktop y móvil).
+- CSS nuevo agregado como bloque propio al final de `public.css` (no intercalado en las reglas del hero, para no arriesgar lo ya confirmado) — reutiliza toda la paleta/tipografía ya definida, sin tokens nuevos.
 
 ## 8. Funciones futuras propuestas (investigadas, no priorizadas ni construidas)
 
@@ -157,11 +168,10 @@ Médico ve solo "sus" registros (Citas, Historias Clínicas, Dashboard) vía `me
 
 ## 11. Roadmap inmediato
 
-1. Terminar secciones del sitio público (Especialidades, Servicios, Sobre la clínica, Contacto).
-2. Confirmar en entorno real el último fix del video del hero (overlay).
-3. Reemplazar placeholders de teléfono/WhatsApp antes de publicar.
-4. Asignar `medico_id` a usuarios médico existentes.
-5. Entrevista formal con el dueño — resolver preguntas de la sección 6.
+1. Confirmar en entorno real el sitio público completo (las 5 secciones), en particular el video del hero (overlay) y el mosaico de Servicios con las fuentes reales cargadas.
+2. Reemplazar placeholders de teléfono/WhatsApp antes de publicar (6 ocurrencias: nav, hero, contacto).
+3. Asignar `medico_id` a usuarios médico existentes.
+4. Entrevista formal con el dueño — resolver preguntas de la sección 6 (incluida dirección/horario real para la sección Contacto, hoy sin ese dato).
 
 ## 12. Cómo mantener este archivo (a partir de ahora)
 

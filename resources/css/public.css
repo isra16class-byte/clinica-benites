@@ -919,3 +919,398 @@
         }
     }
 }
+
+/*
+ * ============================================================================
+ * Secciones: Especialidades, Servicios, Sobre la clínica, Contacto, Footer
+ * ============================================================================
+ * Bloque nuevo (28 ago 2026) — se agrega como su propio `@layer components`
+ * al final del archivo en vez de intercalarse en el bloque del hero, para no
+ * arriesgar tocar reglas ya confirmadas por el usuario. Reutiliza los tokens
+ * de color/tipografía del bloque `@theme` de arriba y clases ya existentes
+ * (.cb-eyebrow, .cb-headline, .cb-btn-primary/ghost, .cb-reveal, .cb-orb,
+ * .cb-hero-grid) — nada de paleta nueva.
+ * ============================================================================
+ */
+
+@layer components {
+    /* ---------- Wrapper genérico de sección ---------- */
+
+    .cb-section {
+        padding-top: 7rem;
+        padding-bottom: 7rem;
+    }
+
+    .cb-section--dark {
+        background-color: var(--color-cb-navy-950);
+    }
+
+    .cb-section--light {
+        background-color: var(--color-cb-ivory-50);
+    }
+
+    .cb-section-head {
+        max-width: 42rem;
+    }
+
+    .cb-headline--section {
+        font-size: clamp(2.1rem, 2.6vw + 1rem, 3.25rem);
+        margin-top: 0.75rem;
+    }
+
+    .cb-section-lede {
+        margin-top: 1.5rem;
+        max-width: 34rem;
+        font-size: 1.0625rem;
+        line-height: 1.7;
+        color: rgb(255 255 255 / 68%);
+    }
+
+    /* Variante del eyebrow para fondo claro (sección "Sobre la clínica"):
+       el dorado 300 (#ddc48c) pierde contraste sobre ivory — se usa el
+       dorado 500, más oscuro, solo ahí. */
+    .cb-eyebrow--light {
+        color: var(--color-cb-gold-500);
+    }
+
+    /* ============================================================
+       Especialidades — directorio editorial
+       ============================================================ */
+
+    .cb-directory {
+        margin-top: 3.5rem;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0 3rem;
+    }
+
+    @media (min-width: 768px) {
+        .cb-directory {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    .cb-directory-col {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .cb-directory-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.15rem 0;
+        border-bottom: 1px solid rgb(255 255 255 / 12%);
+        transition:
+            padding-left 0.25s ease,
+            border-color 0.25s ease;
+    }
+
+    .cb-directory-col:first-child .cb-directory-row:first-child {
+        border-top: 1px solid rgb(255 255 255 / 12%);
+    }
+
+    .cb-directory-row:hover {
+        padding-left: 0.5rem;
+        border-color: var(--color-cb-gold-300);
+    }
+
+    .cb-directory-name {
+        font-family: var(--font-display);
+        font-weight: 500;
+        font-size: 1.0625rem;
+        color: rgb(255 255 255 / 85%);
+        transition: color 0.25s ease;
+    }
+
+    .cb-directory-row:hover .cb-directory-name {
+        color: #fff;
+    }
+
+    .cb-directory-arrow {
+        flex-shrink: 0;
+        color: var(--color-cb-gold-300);
+        opacity: 0;
+        transform: translateX(-4px);
+        transition:
+            opacity 0.25s ease,
+            transform 0.25s ease;
+    }
+
+    .cb-directory-row:hover .cb-directory-arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* ============================================================
+       Servicios — mosaico (bento grid) con fotografía real
+       ============================================================ */
+
+    .cb-services-grid {
+        margin-top: 3.5rem;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-auto-rows: 14rem;
+        gap: 1rem;
+    }
+
+    @media (max-width: 767px) {
+        .cb-services-grid {
+            grid-template-columns: 1fr;
+            grid-auto-rows: 16rem;
+        }
+
+        .cb-service-tile--lg {
+            grid-column: auto;
+            grid-row: auto;
+        }
+    }
+
+    .cb-service-tile--lg {
+        grid-column: span 2;
+        grid-row: span 2;
+    }
+
+    .cb-service-tile--sm {
+        grid-column: span 2;
+        grid-row: span 1;
+    }
+
+    @media (min-width: 768px) {
+        .cb-service-tile--sm {
+            grid-column: span 1;
+        }
+    }
+
+    .cb-service-tile {
+        position: relative;
+        overflow: hidden;
+        border-radius: 1.25rem;
+        border: 1px solid rgb(255 255 255 / 10%);
+    }
+
+    .cb-service-tile-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cb-service-tile:hover .cb-service-tile-img {
+        transform: scale(1.06);
+    }
+
+    .cb-service-tile-scrim {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgb(0 31 95 / 0%) 35%, rgb(0 31 95 / 88%) 100%);
+    }
+
+    .cb-service-tile-content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 1.5rem;
+    }
+
+    .cb-service-tile--lg .cb-service-tile-content {
+        padding: 2rem;
+    }
+
+    .cb-service-tile-eyebrow {
+        font-family: var(--font-display);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--color-cb-gold-300);
+    }
+
+    .cb-service-tile-title {
+        margin-top: 0.35rem;
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #fff;
+    }
+
+    .cb-service-tile--lg .cb-service-tile-title {
+        font-size: 1.5rem;
+    }
+
+    .cb-service-tile-text {
+        margin-top: 0.4rem;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        color: rgb(255 255 255 / 78%);
+        max-width: 26rem;
+    }
+
+    .cb-service-tile--sm .cb-service-tile-text {
+        display: none;
+    }
+
+    @media (min-width: 1024px) {
+        .cb-service-tile--sm .cb-service-tile-text {
+            display: block;
+        }
+    }
+
+    .cb-services-strip {
+        margin-top: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        padding: 1.25rem 1.5rem;
+        border-radius: 1rem;
+        background: rgb(255 255 255 / 5%);
+        border: 1px solid rgb(255 255 255 / 10%);
+        color: var(--color-cb-gold-300);
+    }
+
+    .cb-services-strip p {
+        color: rgb(255 255 255 / 80%);
+        font-size: 0.9375rem;
+    }
+
+    /* ============================================================
+       Sobre la clínica — bloque tipográfico claro
+       ============================================================ */
+
+    .cb-about-lede {
+        margin-top: 1.25rem;
+        font-family: var(--font-display);
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        line-height: 1.3;
+        font-size: clamp(1.5rem, 1.6vw + 1rem, 2.1rem);
+        color: var(--color-cb-navy-950);
+    }
+
+    .cb-about-body {
+        margin-top: 1.5rem;
+        max-width: 34rem;
+        font-size: 1.0625rem;
+        line-height: 1.75;
+        color: rgb(0 31 95 / 68%);
+    }
+
+    .cb-pillars {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .cb-pillar {
+        display: flex;
+        gap: 1.1rem;
+    }
+
+    .cb-pillar-mark {
+        flex-shrink: 0;
+        margin-top: 0.5rem;
+        height: 1px;
+        width: 2rem;
+        background: var(--color-cb-teal-600);
+    }
+
+    .cb-pillar-title {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: var(--color-cb-navy-950);
+    }
+
+    .cb-pillar-text {
+        margin-top: 0.35rem;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        color: rgb(0 31 95 / 62%);
+        max-width: 24rem;
+    }
+
+    /* ============================================================
+       Contacto
+       ============================================================ */
+
+    .cb-contact-location {
+        margin-top: 2.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: rgb(255 255 255 / 72%);
+        font-size: 0.9375rem;
+    }
+
+    .cb-contact-location svg {
+        color: var(--color-cb-gold-300);
+        flex-shrink: 0;
+    }
+
+    .cb-contact-panel {
+        position: relative;
+        padding: 2.5rem;
+        border-radius: 1.5rem;
+        background: rgb(255 255 255 / 5%);
+        border: 1px solid rgb(255 255 255 / 12%);
+        color: var(--color-cb-gold-300);
+    }
+
+    .cb-contact-panel-title {
+        margin-top: 1.25rem;
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 1.25rem;
+        color: #fff;
+    }
+
+    .cb-contact-panel-text {
+        margin-top: 0.6rem;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        color: rgb(255 255 255 / 70%);
+        max-width: 22rem;
+    }
+
+    /* ============================================================
+       Footer
+       ============================================================ */
+
+    .cb-footer {
+        background-color: var(--color-cb-navy-950);
+        border-top: 1px solid rgb(255 255 255 / 10%);
+    }
+
+    .cb-footer-link {
+        font-size: 0.875rem;
+        color: rgb(255 255 255 / 65%);
+        transition: color 0.2s ease;
+    }
+
+    .cb-footer-link:hover {
+        color: var(--color-cb-gold-300);
+    }
+
+    .cb-footer-bottom {
+        border-top: 1px solid rgb(255 255 255 / 8%);
+        padding: 1.5rem 0;
+        text-align: center;
+        font-size: 0.8125rem;
+        color: rgb(255 255 255 / 45%);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .cb-service-tile-img {
+            transition: none;
+        }
+
+        .cb-directory-row {
+            transition: none;
+        }
+    }
+}
