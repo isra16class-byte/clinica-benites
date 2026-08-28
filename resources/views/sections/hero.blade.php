@@ -116,11 +116,10 @@
     --}}
     <div class="cb-hero-content relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 sm:px-10 lg:px-16">
         <p class="cb-eyebrow cb-reveal" style="animation-delay:.05s">
-            Clínica privada &middot; Guayaquil
+            Clínica Benites &middot; Guayaquil
         </p>
 
         <h1 class="cb-headline cb-reveal" style="animation-delay:.18s">
-            <span class="cb-headline-brand block">Clínica Benites &middot; Guayaquil</span>
             <span class="block">Precisión quirúrgica.</span>
             <span class="cb-headline-accent block">Calidez humana.</span>
         </h1>

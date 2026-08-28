@@ -4,9 +4,9 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
-## [2026-08-28] Hero: nombre de la clínica agregado al H1
+## [2026-08-28] Hero: eyebrow pasa de "Clínica privada" a "Clínica Benites"
 
-El usuario notó que "Clínica Benites" solo aparecía como `alt` del logo (chico, en el nav) — ningún texto legible de la página nombraba la clínica. Se agregó `Clínica Benites · Guayaquil` como línea propia arriba del eslogan dentro del mismo `<h1>` (`hero.blade.php`), con clase nueva `.cb-headline-brand` en `public.css` (tamaño bastante menor que el eslogan, blanco al 78% opacidad) para no competir con "Precisión quirúrgica. Calidez humana.", que sigue siendo el momento visual fuerte del hero. Pendiente confirmar en entorno real (mismo caveat de fuentes/`vite build` que el resto de ajustes visuales).
+El usuario notó que "Clínica Benites" solo aparecía como `alt` del logo (chico, en el nav) — ningún texto legible de la página nombraba la clínica. Primer intento: agregarla como línea propia dentro del `<h1>` — descartado por el usuario al revisarlo. Solución final: el eyebrow arriba del titular (`cb-eyebrow` en `hero.blade.php`) cambia de "Clínica privada · Guayaquil" a "Clínica Benites · Guayaquil", sin agregar elementos nuevos ni tocar `public.css` (la clase `.cb-headline-brand` del intento descartado se quitó). El eslogan ("Precisión quirúrgica. Calidez humana.") queda intacto.
 
 ## [2026-08-28] Especialidades: ícono por fila + fondo blanco
 

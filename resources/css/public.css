@@ -475,23 +475,6 @@
         opacity: 0.7;
     }
 
-    /* Nombre de la clínica dentro del propio H1 — 28 ago 2026, a pedido
-       del usuario: antes "Clínica Benites" solo vivía como alt del logo
-       en el nav (chico, arriba de todo), y el H1 era puro eslogan
-       ("Precisión quirúrgica. Calidez humana.") sin nombrar la clínica
-       en ningún texto legible de la página. Se agrega como línea propia
-       arriba del eslogan, con tamaño/peso deliberadamente menor: el
-       eslogan sigue siendo el "momento audaz" ya confirmado del hero,
-       esto es reconocimiento de marca, no compite con él. */
-    .cb-headline-brand {
-        display: block;
-        font-size: clamp(1.05rem, 1vw + 0.75rem, 1.375rem);
-        font-weight: 600;
-        letter-spacing: 0.01em;
-        color: rgb(255 255 255 / 78%);
-        margin-bottom: 0.5rem;
-    }
-
     .cb-headline {
         font-family: var(--font-display);
         font-weight: 700;
