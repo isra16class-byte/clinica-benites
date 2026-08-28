@@ -437,8 +437,14 @@
         height: 100%;
         object-fit: cover;
         object-position: 60% 45%;
-        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 18%, transparent 78%);
-        mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 18%, transparent 78%);
+        /* 28 ago 2026 (ajuste tras ver el video real corriendo, no solo la
+           foto de respaldo): el área "sólida" de la máscara pasa de
+           18%→78% a 32%→92% — se ve más video antes de que arranque el
+           desvanecido hacia los bordes, en vez de que casi toda la mitad
+           derecha se lea borrosa. Sigue desvaneciendo las 4 esquinas
+           (nunca vuelve a ser un recorte duro tipo tarjeta). */
+        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 32%, transparent 92%);
+        mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 32%, transparent 92%);
     }
 
     .cb-hero-video-poster {
@@ -887,9 +893,14 @@
        ago 2026), el marco ya no es una tarjeta opaca — el fade-in de
        entrada ahora lleva a un estado semitransparente, no a full opacidad,
        para que se siga leyendo "de fondo" también al terminar de aparecer. */
+    /* 28 ago 2026 (mismo ajuste que la máscara arriba, ver comentario en
+       .cb-hero-video): opacidad final sube de 0.72 a 0.88 — con el video
+       real corriendo se leía demasiado tenue/lavado. Sigue sin llegar a
+       1 (opaco del todo): el criterio de "es de fondo, no una foto
+       pegada encima del título" se mantiene, solo se corrige cuánto. */
     @keyframes cb-hero-photo-fade-in {
         to {
-            opacity: 0.72;
+            opacity: 0.88;
         }
     }
 

@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Hero: video más visible (menos lavado)
+
+El usuario confirmó en su entorno real que el video se veía demasiado tenue/borroso — las verificaciones anteriores fueron contra la foto de respaldo estática, no contra el video corriendo. Dos ajustes en `public.css`: la máscara radial del `<video>` pasa de `black 18%, transparent 78%` a `black 32%, transparent 92%` (se ve más video antes de que arranque el desvanecido hacia los bordes) y la opacidad final del keyframe `cb-hero-photo-fade-in` sube de 0.72 a 0.88. Sigue sin llegar a opaco del todo — el criterio de "video de fondo, no tarjeta pegada al título" no cambia, solo cuánto se ve.
+
 ## [2026-08-28] Copy público: se sacan las rayas (—) del texto visible
 
 A pedido del usuario ("se ve como IA"). Se reescribieron sin em-dash las 3 frases del sitio público que lo usaban: el lede de "Sobre nosotros" (`sobre.blade.php`, "atención — no uno a costa del otro" → "atención, sin que uno vaya a costa del otro"), el lede de "Contacto" (`contacto.blade.php`, "por teléfono — sin pasos de más" → "por teléfono, sin pasos de más") y el `<meta name="description">` (`components/layouts/public.blade.php`, cambia a dos puntos). No se tocaron los comentarios de desarrollo (uso interno, no visibles en la web) ni el separador `—` del panel admin (`alertas-operativas-widget.blade.php`, es un patrón de lista distinto).
