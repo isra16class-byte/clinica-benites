@@ -437,14 +437,21 @@
         height: 100%;
         object-fit: cover;
         object-position: 60% 45%;
-        /* 28 ago 2026 (ajuste tras ver el video real corriendo, no solo la
-           foto de respaldo): el área "sólida" de la máscara pasa de
-           18%→78% a 32%→92% — se ve más video antes de que arranque el
-           desvanecido hacia los bordes, en vez de que casi toda la mitad
-           derecha se lea borrosa. Sigue desvaneciendo las 4 esquinas
-           (nunca vuelve a ser un recorte duro tipo tarjeta). */
-        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 32%, transparent 92%);
-        mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 32%, transparent 92%);
+        /* 28 ago 2026 (corrección tras reporte del usuario: "se ven los
+           bordes del video, antes no se veían"): el intento anterior movió
+           el punto `transparent` de 78% a 92% para que se viera más video
+           — pero 78% no era arbitrario (ver comentario grande más arriba,
+           validado con medición del canal alfa en varias vueltas): es el
+           punto mínimo necesario para que el desvanecido termine ANTES de
+           llegar a los bordes medios del rectángulo (que en un radial-
+           gradient "farthest-corner" sobre una caja no cuadrada quedan
+           geométricamente más cerca del centro que las esquinas, así que
+           con 92% todavía no habían terminado de desvanecerse ahí — eso
+           es la línea dura que se vio). Fix correcto: agrandar el NÚCLEO
+           sólido (`black`, de 18% a 40%) para mostrar más video nítido en
+           el centro, pero dejar `transparent` en el 78% ya validado. */
+        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 40%, transparent 78%);
+        mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 40%, transparent 78%);
     }
 
     .cb-hero-video-poster {

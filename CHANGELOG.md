@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Hero: corrección — bordes del video visibles tras el ajuste anterior
+
+El ajuste anterior (ensanchar la máscara a `black 32%, transparent 92%`) provocó que los bordes medios del video se vieran como línea dura — el punto `transparent` de 78% no era arbitrario (validado con medición del canal alfa en rondas previas): es el mínimo necesario para que el desvanecido termine antes de los bordes medios del rectángulo (más cerca del centro que las esquinas, en un radial-gradient "farthest-corner" sobre una caja no cuadrada). Fix: `transparent` vuelve a 78%, y en su lugar se agranda el núcleo sólido (`black` de 18% a 40%) para mostrar más video nítido en el centro sin tocar el punto ya validado.
+
 ## [2026-08-28] Hero: video más visible (menos lavado)
 
 El usuario confirmó en su entorno real que el video se veía demasiado tenue/borroso — las verificaciones anteriores fueron contra la foto de respaldo estática, no contra el video corriendo. Dos ajustes en `public.css`: la máscara radial del `<video>` pasa de `black 18%, transparent 78%` a `black 32%, transparent 92%` (se ve más video antes de que arranque el desvanecido hacia los bordes) y la opacidad final del keyframe `cb-hero-photo-fade-in` sube de 0.72 a 0.88. Sigue sin llegar a opaco del todo — el criterio de "video de fondo, no tarjeta pegada al título" no cambia, solo cuánto se ve.
