@@ -8,6 +8,26 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-28] Quinta vuelta: fix del filo recto en las esquinas del marco del video
+
+El usuario confirmó que le encantó la vuelta anterior, pero seguía viéndose el marco cuadrado del video en las esquinas, y sugirió el fix puntual: *"la máscara radial no llegaba a cero justo en los bordes/esquinas de la caja... puedes usar farthest-corner, que garantiza transparencia total exactamente en la esquina más lejana"*.
+
+**Causa**: el tamaño de elipse fijo (`85% 85%`) no coincide necesariamente con la esquina real de un contenedor no cuadrado (`4/3`) con el centro del degradado corrido (`55% 42%`) — el `transparent 100%` caía antes de esa esquina, dejando un resto de opacidad visible como filo recto.
+
+**`resources/css/public.css`** — solo `.cb-hero-slideshow`, el tamaño de la elipse:
+
+| | Antes | Ahora |
+|---|---|---|
+| Tamaño de elipse | `85% 85%` (fijo) | `farthest-corner` (calculado) |
+
+El resto (`#000 22%`, centro `55% 42%`) no cambió.
+
+**Verificado**: prueba aislada midiendo el canal alfa real con Python/PIL en la esquina más lejana del centro (la esquina inferior-izquierda, por geometría) — con `85% 85%` quedaba en ~8% de opacidad ahí (el filo reportado); con `farthest-corner` baja a <0.5%. Capturas con la foto real confirman que el escalón visible desaparece.
+
+**Pendiente confirmar por el usuario en su entorno real.**
+
+---
+
 ## [2026-08-28] Cuarta vuelta: más desvanecido en el marco del video
 
 El usuario confirmó que el tamaño/posición de la vuelta anterior le gustó y pidió un ajuste puntual: *"si me gusto, pero puedes desvanecer mas el marco del video?"*.

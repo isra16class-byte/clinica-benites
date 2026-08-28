@@ -358,9 +358,28 @@
            borde derecho e inferior, más cerca del borde del contenedor por
            el `right:1.5rem` de la vuelta anterior). Con la elipse más
            grande y el desvanecido arrancando mucho antes, la transición es
-           gradual en los 4 bordes, no solo arriba/izquierda. */
-        mask-image: radial-gradient(ellipse 85% 85% at 55% 42%, #000 22%, transparent 100%);
-        -webkit-mask-image: radial-gradient(ellipse 85% 85% at 55% 42%, #000 22%, transparent 100%);
+           gradual en los 4 bordes, no solo arriba/izquierda.
+           28 ago 2026 (quinta vuelta) — el usuario reportó que, con la
+           elipse de tamaño fijo (85% 85%), todavía se notaba una línea
+           recta en las esquinas: un tamaño de elipse en porcentaje no
+           tiene por qué coincidir con la esquina real del rectángulo
+           (que además no es cuadrado — el contenedor es 4:3 y el centro
+           está corrido a 55%/42%, no al medio), así que el `transparent
+           100%` podía caer *antes* de llegar a la esquina, dejando ese
+           pedacito de esquina sin desvanecer del todo — se veía como el
+           borde recto de la caja asomando. Cambiado el tamaño de la
+           elipse de `85% 85%` (fijo) a la palabra clave `farthest-corner`
+           (nativa de `radial-gradient`, sin fallback necesario): en vez
+           de un porcentaje arbitrario, el navegador calcula la elipse
+           que pasa exactamente por la esquina más lejana del centro del
+           degradado — así el `transparent 100%` cae siempre justo en esa
+           esquina (y, por construcción, en una posición proporcional en
+           las otras 3), sin importar el aspect-ratio real del contenedor
+           ni dónde esté corrido el centro. Los otros 2 valores (`#000
+           22%` y el centro `55% 42%`) no se tocaron — la mecánica es la
+           misma, solo cambia cómo se calcula el tamaño de la elipse. */
+        mask-image: radial-gradient(ellipse farthest-corner at 55% 42%, #000 22%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 55% 42%, #000 22%, transparent 100%);
         animation: cb-hero-photo-fade-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         animation-delay: 0.55s;
     }
