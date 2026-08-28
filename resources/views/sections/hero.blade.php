@@ -22,43 +22,42 @@
     <div class="cb-orb cb-orb-gold" aria-hidden="true"></div>
 
     {{--
-        Columna derecha del hero: slideshow con crossfade de las 5 fotos
-        reales (quirófano, UCI, cardiología, neonatología, centro de
-        imagen). Reemplaza al mosaico asimétrico ("molinete") anterior —
-        el usuario pidió algo más parecido a un video/gif con transición
-        de fotos, en la línea del bloque de video del hero de odoo.com/es,
-        porque el mosaico (posicionar 5 piezas por porcentaje, ajustando
-        proporciones a mano contra una referencia) resultó difícil de
-        mantener. Mismo espíritu visual ya establecido (sin marco blanco,
-        cinta ni texto a mano — ver DISEÑO.md), pero con un mecanismo de
-        composición mucho más simple: un solo marco (mismo `aspect-ratio`
-        4/5 y mismo `top`/`width`/breakpoints de `.cb-hero-side` que ya
-        estaban medidos y verificados contra el trust-strip — no se tocó
-        nada de eso) con las 5 fotos apiladas exactamente igual (`inset: 0`,
-        sin posiciones ni tamaños individuales) que se van alternando en
-        loop con un fundido cruzado + zoom lento (efecto "Ken Burns") vía
-        CSS puro — ver `.cb-hero-slideshow`/`.cb-hero-slide` en public.css.
-        Ventaja concreta sobre el mosaico: agregar/quitar una foto es
-        agregar/quitar un `<div class="cb-hero-slide">`, sin recalcular
-        ninguna proporción.
+        Columna derecha del hero: video único en loop (un solo plano
+        continuo), reemplaza al slideshow con crossfade de 5 fotos
+        anterior — plan definido desde que se hizo el slideshow (ver
+        MEMORIA.md): el usuario generó el video en otra plataforma y lo
+        subió. Mismo marco que ya tenía el slideshow (`.cb-hero-slideshow`
+        sin cambios: mismo `aspect-ratio` 4/5, mismo `top`/`width`/
+        breakpoints de `.cb-hero-side`, mismo `border-radius`/
+        `box-shadow` — no se tocó nada de eso, solo cambió qué hay
+        adentro del marco).
+        Requisitos técnicos del `<video>`: `muted` (obligatorio para que
+        `autoplay` funcione en todos los navegadores), `autoplay`,
+        `loop`, `playsinline` (evita que iOS lo abra en pantalla
+        completa), y `poster` (reutiliza `hero-quirofano.jpg`, la misma
+        foto que ya se usaba como primer slide) para que se vea algo
+        mientras el video carga.
+        `.cb-hero-video-poster` es un `<img>` con la misma foto, superpuesto
+        y oculto por CSS: no es redundante con el atributo `poster` del
+        video (ese solo se ve *antes* de que cargue/arranque) — sirve
+        para el caso `prefers-reduced-motion`, donde el video se oculta
+        del todo (`display: none`) y esta imagen fija lo reemplaza, mismo
+        criterio que ya usaba el slideshow (congelarse en la primera
+        foto) — sin necesitar JS para pausar el video (el sitio público
+        no tiene JS propio, es deliberadamente CSS puro, ver DISEÑO.md).
     --}}
     <div class="cb-hero-side hidden xl:block" aria-hidden="true">
         <div class="cb-hero-slideshow">
-            <div class="cb-hero-slide">
-                <img src="{{ asset('images/hero-quirofano.jpg') }}" alt="" loading="lazy">
-            </div>
-            <div class="cb-hero-slide">
-                <img src="{{ asset('images/hero-uci.jpg') }}" alt="" loading="lazy">
-            </div>
-            <div class="cb-hero-slide">
-                <img src="{{ asset('images/hero-cardiologia.jpg') }}" alt="" loading="lazy">
-            </div>
-            <div class="cb-hero-slide">
-                <img src="{{ asset('images/hero-neonatologia.jpg') }}" alt="" loading="lazy">
-            </div>
-            <div class="cb-hero-slide">
-                <img src="{{ asset('images/hero-centro-imagen.jpg') }}" alt="" loading="lazy">
-            </div>
+            <video
+                class="cb-hero-video"
+                src="{{ asset('videos/hero-clinica.mp4') }}"
+                poster="{{ asset('images/hero-quirofano.jpg') }}"
+                muted
+                autoplay
+                loop
+                playsinline
+            ></video>
+            <img class="cb-hero-video-poster" src="{{ asset('images/hero-quirofano.jpg') }}" alt="">
         </div>
     </div>
 

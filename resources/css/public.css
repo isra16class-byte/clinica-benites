@@ -242,33 +242,18 @@
         pointer-events: none;
     }
 
-    /* Mosaico de 5 fotos ("molinete") → slideshow con crossfade, a pedido
-       del usuario: el mosaico obligaba a medir/ajustar posición, ancho y
-       alto de cada una de las 5 piezas a mano contra una referencia
-       visual — fue el origen de varias iteraciones (incluida una que
-       requirió medir la referencia con Python/PIL para no ajustar "a
-       ojo"). El usuario vio el bloque de video del hero de odoo.com/es y
-       pidió algo en esa línea: un solo marco, con las fotos disolviéndose
-       una en otra en loop, en vez de piezas fijas.
-       El marco (`.cb-hero-slideshow`) ocupa exactamente el mismo lugar
-       que ocupaba el mosaico — mismo `aspect-ratio` 4/5, dentro del mismo
-       `.cb-hero-side` sin tocar ninguno de sus `top`/`width` (base ni los
-       2 escalones @media max-height ya medidos y verificados con
-       Playwright para no solaparse con el trust-strip, ver más abajo) —
-       así que todo lo ya resuelto sobre el espacio disponible sigue
-       valiendo sin cambios.
-       Adentro, las 5 fotos (`.cb-hero-slide`) están todas apiladas exacto
-       una encima de otra (`inset: 0`, sin posición/tamaño individual —
-       a diferencia del mosaico, agregar o quitar una foto acá es agregar
-       o quitar un `<div>`, nada de recalcular porcentajes) y se turnan en
-       loop infinito vía CSS puro (`cb-hero-slideshow-cycle`, ver
-       keyframes más abajo): cada una hace fundido de entrada + zoom lento
-       de salida ("Ken Burns", 1.06 → 1 → 0.99 de `scale`), se mantiene
-       fija un rato y se funde a la siguiente. 5 fotos × 5s cada una = 25s
-       de vuelta completa; el reparto del tiempo (offsets de
-       `animation-delay`, 0/5/10/15/20s) viene del orden en el que
-       aparecen los `<div>` en el Blade — no hace falta ninguna clase por
-       foto. */
+    /* Slideshow con crossfade de 5 fotos → video único en loop, plan que
+       ya estaba definido desde que se hizo el slideshow (ver MEMORIA.md):
+       el usuario generó el video en otra plataforma (un solo plano
+       continuo, no varios clips) y lo subió.
+       El marco (`.cb-hero-slideshow`) no cambió — mismo `aspect-ratio`
+       4/5, mismo `border-radius`/`box-shadow`/`outline`, mismo fade-in de
+       entrada, dentro del mismo `.cb-hero-side` sin tocar ninguno de sus
+       `top`/`width` (base ni los 2 escalones @media max-height ya
+       medidos y verificados con Playwright para no solaparse con el
+       trust-strip, ver más abajo) — solo cambió qué hay adentro: antes 5
+       `<div class="cb-hero-slide">` apilados con crossfade por CSS, ahora
+       un único `<video>`. */
     .cb-hero-slideshow {
         position: relative;
         width: 100%;
@@ -283,42 +268,25 @@
         animation-delay: 0.55s;
     }
 
-    .cb-hero-slide {
+    /* `.cb-hero-video` (el <video> real, visible por defecto) y
+       `.cb-hero-video-poster` (la foto fija de respaldo, oculta por
+       defecto — ver @media prefers-reduced-motion más abajo) ocupan
+       exactamente el mismo espacio, superpuestas, con el mismo recorte
+       (`object-fit: cover` + el mismo `object-position` que ya usaban
+       las fotos del slideshow, para no perder el encuadre ya afinado). */
+    .cb-hero-video,
+    .cb-hero-video-poster {
         position: absolute;
         inset: 0;
-        opacity: 0;
-        animation: cb-hero-slideshow-cycle 25s ease-in-out infinite backwards;
-    }
-
-    /* El orden de los `<div class="cb-hero-slide">` en el Blade define el
-       reparto: 5 fotos, cada una "dueña" de una franja de 5s dentro de la
-       vuelta de 25s. */
-    .cb-hero-slide:nth-child(1) {
-        animation-delay: 0s;
-    }
-
-    .cb-hero-slide:nth-child(2) {
-        animation-delay: 5s;
-    }
-
-    .cb-hero-slide:nth-child(3) {
-        animation-delay: 10s;
-    }
-
-    .cb-hero-slide:nth-child(4) {
-        animation-delay: 15s;
-    }
-
-    .cb-hero-slide:nth-child(5) {
-        animation-delay: 20s;
-    }
-
-    .cb-hero-slide img {
         display: block;
         width: 100%;
         height: 100%;
         object-fit: cover;
         object-position: 60% 45%;
+    }
+
+    .cb-hero-video-poster {
+        display: none;
     }
 
     /* Espaciado vertical del contenido del hero (pt/pb de la sección +
@@ -722,38 +690,6 @@
         }
     }
 
-    /* Ciclo de una foto del slideshow del hero dentro de su franja de 5s
-       (20% de la vuelta completa de 25s, ver `.cb-hero-slide`): entra con
-       fundido + zoom-out lento, se mantiene fija, y se funde de salida
-       antes de que empiece la siguiente. El resto de la vuelta (20%-100%)
-       queda en opacity:0 — ahí es cuando les toca a las otras 4 fotos. */
-    @keyframes cb-hero-slideshow-cycle {
-        0% {
-            opacity: 0;
-            transform: scale(1.06);
-        }
-
-        3% {
-            opacity: 1;
-            transform: scale(1.03);
-        }
-
-        17% {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        20% {
-            opacity: 0;
-            transform: scale(0.99);
-        }
-
-        100% {
-            opacity: 0;
-            transform: scale(0.99);
-        }
-    }
-
     @keyframes cb-bounce {
         0%,
         100% {
@@ -792,22 +728,22 @@
             display: none;
         }
 
-        /* Con movimiento reducido, el slideshow no rota ni hace zoom:
-           se congela mostrando la primera foto (quirófano) fija, en vez
-           de intentar "pausarlo" a mitad de una transición. */
+        /* Con movimiento reducido, el video se oculta del todo (no solo
+           se pausa: un <video autoplay> no se puede pausar por CSS) y se
+           reemplaza por la foto fija de respaldo — mismo criterio que ya
+           usaba el slideshow (congelarse en la primera foto) en vez de
+           dejar movimiento corriendo. */
         .cb-hero-slideshow {
             animation: none;
             opacity: 1;
         }
 
-        .cb-hero-slide {
-            animation: none;
-            opacity: 0;
-            transform: none;
+        .cb-hero-video {
+            display: none;
         }
 
-        .cb-hero-slide:first-child {
-            opacity: 1;
+        .cb-hero-video-poster {
+            display: block;
         }
     }
 }
