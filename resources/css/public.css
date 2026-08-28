@@ -1012,10 +1012,13 @@
        ============================================================
        Rediseño 28 ago 2026 (ver especialidades.blade.php para el porqué
        de cada pieza y docs/PLAN_SITIO_PUBLICO.md para la investigación):
-       watermark "27" + rail de letras + marcador de grupo + línea de
-       hover trazada con gradiente (en vez de solo cambiar el color del
-       borde). Todo con transform/opacity donde hay animación, para que
-       corra en el compositor.
+       watermark "27" + marcador de grupo + línea de hover trazada con
+       gradiente (en vez de solo cambiar el color del borde). Segundo
+       ajuste el mismo día (referencia: mobbin.com): cifra "27" grande en
+       primer plano (`cb-stat-callout`) + letras dispersas en los márgenes
+       (`cb-directory-scatter`), en reemplazo del rail vertical fijo. Todo
+       con transform/opacity donde hay animación, para que corra en el
+       compositor.
        ============================================================ */
 
     /* Watermark: número real (27 especialidades), en trazo — no relleno,
@@ -1039,34 +1042,70 @@
     }
 
     .cb-directory-wrap {
-        margin-top: 3.5rem;
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 0 2.5rem;
+        margin-top: 3rem;
     }
 
-    @media (min-width: 768px) {
-        .cb-directory-wrap {
-            grid-template-columns: 3.25rem 1fr;
-        }
+    /* ---------- Cifra grande (referencia: mobbin.com, 28 ago 2026) ----------
+       El "27" pasa a primer plano como número protagonista, mismo trato
+       tipográfico que la cifra grande de la referencia — al lado del
+       encabezado, no reemplazándolo. Sigue siendo el mismo dato real que ya
+       usa el lede y el watermark de fondo, solo con más peso visual. */
+    .cb-stat-callout {
+        margin-top: 3rem;
+        display: flex;
+        align-items: baseline;
+        gap: 1.1rem;
     }
 
-    /* Rail de letras: índice real (las letras con las que arrancan las 27
-       especialidades), no decoración inventada — mismo criterio que el
-       resto del sitio de no inventar estructura que no está en los datos. */
-    .cb-directory-rail {
-        flex-direction: column;
-        border-right: 1px solid rgb(255 255 255 / 10%);
-        padding-right: 1.1rem;
+    .cb-stat-number {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: clamp(3.5rem, 5vw + 1.5rem, 5.5rem);
+        line-height: 0.9;
+        background: linear-gradient(135deg, #fff, var(--color-cb-gold-300));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
     }
 
-    .cb-directory-rail-letter {
+    .cb-stat-label {
+        font-family: var(--font-display);
+        font-weight: 500;
+        font-size: 0.9375rem;
+        line-height: 1.35;
+        letter-spacing: 0.02em;
+        color: rgb(255 255 255 / 55%);
+        text-transform: uppercase;
+    }
+
+    /* ---------- Letras dispersas (reemplaza al rail vertical) ----------
+       Mismas letras reales del rail anterior (índice real del directorio),
+       ahora repartidas en los márgenes de la sección con la sensación de
+       dispersión de la referencia — posiciones calculadas por índice en el
+       Blade, no al azar. Decorativo puro: aria-hidden, sin interacción,
+       clip por el overflow-hidden de la sección. Solo desde xl porque con
+       menos margen lateral se ve amontonado contra el contenido. */
+    .cb-directory-scatter {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .cb-directory-scatter-letter {
+        position: absolute;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 999px;
+        border: 1px solid rgb(74 168 140 / 22%);
         font-family: var(--font-display);
         font-weight: 600;
         font-size: 0.8125rem;
-        letter-spacing: 0.06em;
-        color: rgb(255 255 255 / 32%);
-        padding: 0.6rem 0;
+        color: rgb(255 255 255 / 30%);
+        user-select: none;
     }
 
     .cb-directory {

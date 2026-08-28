@@ -27,7 +27,10 @@
       directorio real (las letras con las que arrancan las 27
       especialidades reales), no un elemento inventado — funciona como el
       "thumb index" de un libro de referencia. Oculto en mobile (no cabe
-      con el layout de 1 columna).
+      con el layout de 1 columna). **Superado por el "segundo ajuste" más
+      abajo** (28 ago 2026): el rail como columna fija se reemplazó por
+      esas mismas letras dispersas (`cb-directory-scatter`) — se deja esta
+      nota para no perder el porqué original de usar letras reales.
     - Marcador de letra inline antes de cada grupo dentro de cada columna:
       rompe visualmente el bloque de "C" (11 de las 27 especialidades
       empiezan con C) para que no se lea como una pared de texto.
@@ -40,15 +43,88 @@
       copiarla literal. Deliberadamente NO se numeró cada especialidad
       (01, 02, 03...): están alfabetizadas, no son una secuencia real.
 
-    `$letras`: letras únicas del array de especialidades (para el rail),
-    en el mismo orden en que aparecen. El marcador de grupo por columna se
-    calcula inline en el loop (`$letraAnterior`), sin precalcular una
+    Segundo ajuste (28 ago 2026, referencia visual: mobbin.com — pantalla
+    de inicio con logos dispersos alrededor de una cifra grande): el
+    usuario pidió traer la "sensación general" (dispersión + escala del
+    número), no el patrón literal (logos reales por ítem no aplica acá,
+    mismo motivo que ya se descartó arriba para íconos por especialidad).
+    Dos piezas nuevas, ambas grounded en el mismo dato real (27):
+    - `cb-stat-callout`: el "27" pasa a primer plano como cifra grande
+      (antes solo vivía como watermark de fondo en trazo fino) — mismo
+      tratamiento tipográfico que el "1,428 apps" de la referencia.
+    - `cb-directory-scatter`: el rail de letras (columna prolija a la
+      izquierda) se reemplaza por esas mismas letras reales dispersas en
+      los márgenes de la sección — posiciones calculadas (no al azar) a
+      partir del índice de cada letra, alternando lado/rotación, para que
+      no se amontonen. Decorativo (aria-hidden, pointer-events:none),
+      visible solo en xl+ (con menos ancho de margen no se ve limpio) —
+      antes el rail aparecía desde md, pero ese layout ya no existe.
+
+    `$letras`: letras únicas del array de especialidades (para el
+    scatter), en el mismo orden en que aparecen. El marcador de grupo por
+    columna se calcula inline en el loop (`$letraAnterior`), sin precalcular una
     estructura aparte — el array de especialidades sigue siendo la única
     fuente de datos, igual que antes.
 --}}
 <section id="especialidades" class="cb-section cb-section--dark relative overflow-hidden">
     <div class="cb-hero-grid" aria-hidden="true" style="mask-image: radial-gradient(ellipse 60% 55% at 85% 100%, black, transparent 70%); -webkit-mask-image: radial-gradient(ellipse 60% 55% at 85% 100%, black, transparent 70%);"></div>
     <p class="cb-directory-watermark" aria-hidden="true">27</p>
+
+    @php
+        $especialidades = [
+            'Anestesiología y Terapia del Dolor',
+            'Auditoría Médica',
+            'Cardiología',
+            'Cateterismo Cardiaco',
+            'Cirugía General y Digestiva',
+            'Cirugía Holep de Próstata',
+            'Cirugía Oncológica',
+            'Cirugía Pediátrica',
+            'Cirugía Plástica',
+            'Cirugía Torácica',
+            'Cirugía Vascular',
+            'Coloproctología',
+            'Cuidados Críticos',
+            'Endocrinología',
+            'Gastroenterología',
+            'Ginecología',
+            'Laparoscopía',
+            'Médico Ocupacional',
+            'Neurología',
+            'Nutrición Clínica',
+            'Nutricionista',
+            'Oncocirugía Traumatológica',
+            'Otorrinolaringología',
+            'Pediatría y Neonatología',
+            'Terapia Intensiva',
+            'Traumatología y Ortopedia',
+            'Urología',
+        ];
+        $columnas = array_chunk($especialidades, (int) ceil(count($especialidades) / 3));
+        $letras = array_values(array_unique(array_map(fn ($n) => mb_strtoupper(mb_substr($n, 0, 1)), $especialidades)));
+
+        // Posiciones del scatter: calculadas a partir del índice de cada
+        // letra (no al azar, para que el layout sea estable), repartidas
+        // 6%→94% de alto, alternando margen izquierdo/derecho y con
+        // rotación/offset que varían por índice para que no queden en
+        // línea recta — ver comentario arriba del archivo.
+        $totalLetras = max(count($letras) - 1, 1);
+        $scatter = collect($letras)->values()->map(function ($letra, $i) use ($totalLetras) {
+            return [
+                'letra' => $letra,
+                'top' => round(6 + ($i * (88 / $totalLetras)), 1),
+                'side' => $i % 2 === 0 ? 'left' : 'right',
+                'edge' => [1, 2.5, 4][$i % 3],
+                'rotate' => ($i % 2 === 0 ? -1 : 1) * (3 + ($i % 4) * 2),
+            ];
+        });
+    @endphp
+
+    <div class="cb-directory-scatter hidden xl:block" aria-hidden="true">
+        @foreach ($scatter as $s)
+            <span class="cb-directory-scatter-letter" style="top:{{ $s['top'] }}%; {{ $s['side'] }}:{{ $s['edge'] }}%; transform: rotate({{ $s['rotate'] }}deg);">{{ $s['letra'] }}</span>
+        @endforeach
+    </div>
 
     <div class="relative z-10 mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
         <div class="cb-section-head cb-reveal">
@@ -61,47 +137,12 @@
             </p>
         </div>
 
-        @php
-            $especialidades = [
-                'Anestesiología y Terapia del Dolor',
-                'Auditoría Médica',
-                'Cardiología',
-                'Cateterismo Cardiaco',
-                'Cirugía General y Digestiva',
-                'Cirugía Holep de Próstata',
-                'Cirugía Oncológica',
-                'Cirugía Pediátrica',
-                'Cirugía Plástica',
-                'Cirugía Torácica',
-                'Cirugía Vascular',
-                'Coloproctología',
-                'Cuidados Críticos',
-                'Endocrinología',
-                'Gastroenterología',
-                'Ginecología',
-                'Laparoscopía',
-                'Médico Ocupacional',
-                'Neurología',
-                'Nutrición Clínica',
-                'Nutricionista',
-                'Oncocirugía Traumatológica',
-                'Otorrinolaringología',
-                'Pediatría y Neonatología',
-                'Terapia Intensiva',
-                'Traumatología y Ortopedia',
-                'Urología',
-            ];
-            $columnas = array_chunk($especialidades, (int) ceil(count($especialidades) / 3));
-            $letras = array_values(array_unique(array_map(fn ($n) => mb_strtoupper(mb_substr($n, 0, 1)), $especialidades)));
-        @endphp
+        <div class="cb-stat-callout cb-reveal" style="animation-delay:.08s">
+            <span class="cb-stat-number">27</span>
+            <span class="cb-stat-label">especialidades<br>bajo un mismo techo</span>
+        </div>
 
-        <div class="cb-directory-wrap cb-reveal" style="animation-delay:.12s">
-            <div class="cb-directory-rail hidden md:flex" aria-hidden="true">
-                @foreach ($letras as $letra)
-                    <span class="cb-directory-rail-letter">{{ $letra }}</span>
-                @endforeach
-            </div>
-
+        <div class="cb-directory-wrap cb-reveal" style="animation-delay:.16s">
             <div class="cb-directory">
                 @foreach ($columnas as $columna)
                     @php($letraAnterior = null)
