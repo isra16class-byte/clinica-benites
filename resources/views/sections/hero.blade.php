@@ -120,7 +120,7 @@
         </p>
 
         <h1 class="cb-headline cb-reveal" style="animation-delay:.18s">
-            <span class="cb-headline-brand block">Clínica Benites</span>
+            <span class="cb-headline-brand block">Clínica Benites &middot; Guayaquil</span>
             <span class="block">Precisión quirúrgica.</span>
             <span class="cb-headline-accent block">Calidez humana.</span>
         </h1>
