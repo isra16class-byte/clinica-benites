@@ -242,20 +242,34 @@
         pointer-events: none;
     }
 
-    /* Grid 2x2 → collage asimétrico de 4 fotos, a pedido del usuario, que
-       compartió una referencia de collage tipo "scrapbook" (polaroids
-       torcidos + washi tape + texto a mano). Se rescata el concepto
-       (fotos de tamaños distintos, en cascada, con superposición) sin los
-       elementos que chocan con la identidad seria de la marca (nada de
-       marco blanco, cinta, rotación ni texto caligráfico) — ver DISEÑO.md.
-       Composición en 4 "escalones" diagonales (a → d, arriba-izquierda
-       hacia abajo-derecha), cada uno superpuesto ~12% con el siguiente en
-       una esquina, dando profundidad sin gap uniforme. z-index alterna
-       para que la superposición se lea como capas reales, no como un
-       simple orden de apilado. `aspect-ratio` en el contenedor (más alto
-       que ancho, 4/5) en vez de cuadrado como el grid anterior — deja
-       espacio vertical de sobra para la cascada sin acercarse al
-       trust-strip (verificado con Playwright, ver CHANGELOG). */
+    /* Collage de 4 fotos en escalera diagonal → mosaico de 5 fotos tipo
+       "molinete", a pedido del usuario, que compartió una nueva referencia
+       (5 piezas asimétricas: una ancha arriba, una alta a la izquierda, una
+       media a la derecha superpuesta entre ambas, y dos abajo) distinta a
+       la escalera diagonal que había antes (una esquina tras otra, siempre
+       en la misma dirección). Se mantiene el mismo lenguaje visual ya
+       establecido (sin marco blanco, cinta ni texto caligráfico — ver
+       DISEÑO.md): solo cambia la geometría de la composición, no el
+       estilo de cada pieza (mismo `border-radius`, `box-shadow` y
+       fade-in escalonado que ya tenía cada foto).
+       Se suma una 5ª foto (Ambulancia) — la única área del trust-strip
+       ("Ambulancia propia") que todavía no tenía foto propia, mismo
+       criterio ya usado para elegir las otras 4 (reforzar visualmente lo
+       que el texto ya promete). Composición: `a` (quirófano) ancha arriba;
+       `b` (UCI) alta a la izquierda, arrancando debajo del borde superior
+       de `a` y superpuesta con ella; `c` (cardiología) a la derecha,
+       superpuesta con el borde inferior de `a` y el borde derecho de `b`;
+       `d` (neonatología) abajo a la izquierda, superpuesta con `b`; `e`
+       (ambulancia, la más chica) abajo a la derecha, superpuesta con `c`
+       y `d` — mismo criterio de superposición ~10-15% en cada unión que
+       ya usaba la versión anterior, solo que ahora en patrón de molinete
+       en vez de escalera. z-index alterna (2/3) para que la superposición
+       se lea como capas reales. Se deja ~12% de aire libre en la parte
+       inferior del contenedor (ninguna foto llega al 100% de `height`) a
+       propósito — colchón para no repetir el bug ya resuelto de la última
+       foto casi tocando el trust-strip (ver CHANGELOG). Mismo
+       `aspect-ratio` 4/5 del contenedor que ya estaba probado con
+       Playwright en el resto de escalones de compresión de altura. */
     .cb-hero-collage {
         position: relative;
         width: 100%;
@@ -274,37 +288,46 @@
     .cb-hero-collage-item--a {
         top: 0;
         left: 0;
-        width: 66%;
-        height: 46%;
+        width: 68%;
+        height: 24%;
         z-index: 2;
-        animation-delay: 0.65s;
+        animation-delay: 0.55s;
     }
 
     .cb-hero-collage-item--b {
-        top: 34%;
-        left: 40%;
-        width: 60%;
-        height: 34%;
+        top: 18%;
+        left: 0;
+        width: 46%;
+        height: 38%;
         z-index: 3;
-        animation-delay: 0.8s;
+        animation-delay: 0.7s;
     }
 
     .cb-hero-collage-item--c {
-        top: 60%;
-        left: 0;
-        width: 48%;
-        height: 30%;
+        top: 20%;
+        left: 40%;
+        width: 60%;
+        height: 34%;
         z-index: 2;
-        animation-delay: 0.8s;
+        animation-delay: 0.7s;
     }
 
     .cb-hero-collage-item--d {
-        top: 78%;
-        left: 36%;
-        width: 56%;
-        height: 22%;
+        top: 52%;
+        left: 4%;
+        width: 54%;
+        height: 28%;
         z-index: 3;
-        animation-delay: 0.95s;
+        animation-delay: 0.85s;
+    }
+
+    .cb-hero-collage-item--e {
+        top: 64%;
+        left: 46%;
+        width: 50%;
+        height: 24%;
+        z-index: 2;
+        animation-delay: 1s;
     }
 
     .cb-hero-collage-item img {

@@ -36,14 +36,21 @@
         de verdad — ver max-w-7xl): antes de eso, el texto todavía ocupa
         suficiente ancho como para que esta columna se le monte encima.
 
-        Collage asimétrico de 4 fotos (quirófano, UCI, cardiología,
-        neonatología) — reemplaza al grid 2x2 uniforme anterior, a
-        pedido del usuario que compartió una referencia de collage tipo
-        scrapbook. Se rescató el concepto (tamaños distintos, cascada,
-        superposición) sin los elementos de esa referencia que chocan
-        con la identidad seria de la marca (sin marco blanco, cinta ni
-        texto a mano) — ver DISEÑO.md y `.cb-hero-collage` en public.css
-        para el detalle de la composición.
+        Mosaico asimétrico de 5 fotos (quirófano, UCI, cardiología,
+        neonatología, ambulancia) en patrón de "molinete" — reemplaza a
+        la escalera diagonal de 4 fotos anterior, a pedido del usuario
+        que compartió una nueva referencia visual (5 piezas, no 4, en
+        otra disposición). Mismo lenguaje visual ya establecido (sin
+        marco blanco, cinta ni texto a mano — ver DISEÑO.md) — ver
+        `.cb-hero-collage` en public.css para el detalle de la
+        composición.
+
+        TODO: hero-ambulancia.jpg es un placeholder temporal (reutiliza
+        hero-quirofano.jpg) hasta que el usuario genere la foto real de
+        Ambulancia con el mismo prompt/estilo que las otras 4 (navy,
+        cinematográfico, sin rostros identificables, degradado oscuro en
+        el borde izquierdo) y la suba — reemplazar el archivo cuando
+        esté lista, mismo flujo ya usado para UCI/cardiología/neonatología.
     --}}
     <div class="cb-hero-side hidden xl:block" aria-hidden="true">
         <div class="cb-hero-collage">
@@ -58,6 +65,9 @@
             </div>
             <div class="cb-hero-collage-item cb-hero-collage-item--d">
                 <img src="{{ asset('images/hero-neonatologia.jpg') }}" alt="" loading="lazy">
+            </div>
+            <div class="cb-hero-collage-item cb-hero-collage-item--e">
+                <img src="{{ asset('images/hero-quirofano.jpg') }}" alt="" loading="lazy">
             </div>
         </div>
     </div>

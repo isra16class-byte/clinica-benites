@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Collage en cascada (4 fotos) → mosaico en "molinete" de 5 fotos
+
+- El usuario compartió una nueva referencia visual: un mosaico de 5 piezas asimétricas (una ancha arriba, una alta a la izquierda, una media a la derecha superpuesta entre ambas, y dos abajo), distinto al patrón de escalera diagonal de 4 fotos que había hasta ahora.
+- Se sumó una 5ª foto: **Ambulancia** — asunción documentada (no confirmada aún con el usuario): es la única área del trust-strip ("Ambulancia propia") sin foto propia, mismo criterio ya usado para elegir las otras 4 (Quirófanos·UCI·UCIN del trust-strip + Cardiología y Neonatología del listado de especialidades confirmado en la sección 6.1 de `MEMORIA.md`).
+- **Implementado**: se reescribieron las 5 clases de posición del mosaico (`.cb-hero-collage-item--a` a `--e`), mismo mecanismo de posicionamiento absoluto por porcentajes dentro del contenedor `aspect-ratio: 4/5` ya probado, mismo `border-radius`/`box-shadow`/fade-in escalonado por foto — solo cambia la geometría (de escalera a molinete), no el estilo. Overlaps de ~10-15% en cada unión, z-index alternado, y ~12% de aire libre a propósito en la parte inferior del contenedor como colchón extra ante el bug de la entrada anterior (última foto casi tocando el trust-strip).
+- **La foto de Ambulancia es un placeholder temporal** (reutiliza `hero-quirofano.jpg`, con un TODO explícito en `hero.blade.php`) hasta que el usuario genere la imagen real con Gemini y la suba, mismo flujo ya usado para UCI/cardiología/neonatología.
+- **Verificado con Playwright**: matriz de 4 anchos (1280-1920px) × 8 alturas (600-1080px) — ningún caso con solape entre el mosaico y el trust-strip (peor caso: ~136px libres). Capturas en 1280×800, 1440×750 y 1920×1080 confirmaron visualmente el patrón de molinete; en 1280px (límite mínimo del breakpoint `xl`) queda la misma separación ajustada ya documentada como límite conocido en versiones anteriores — no es una regresión de este cambio.
+- **Pendiente**: confirmar por el usuario en su entorno real; confirmar si "Ambulancia" es el área correcta para la 5ª foto; generar y subir la foto real de Ambulancia.
+
+---
+
 ## [2026-08-27] Fix: la última foto del collage casi tocaba el trust-strip en pantallas de poca altura
 
 - El usuario confirmó que el collage en cascada (entrada de abajo) "sí estuvo bien" en su entorno real, pero pidió correrlo "un poco más arriba para que no toque lo de abajo" — compartió una captura de `localhost/#inicio` donde la última foto (`--d`) quedaba muy cerca de "Atención de emergencias" (último ítem del trust-strip).
