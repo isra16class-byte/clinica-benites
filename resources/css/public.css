@@ -378,8 +378,39 @@
            ni dónde esté corrido el centro. Los otros 2 valores (`#000
            22%` y el centro `55% 42%`) no se tocaron — la mecánica es la
            misma, solo cambia cómo se calcula el tamaño de la elipse. */
-        mask-image: radial-gradient(ellipse farthest-corner at 55% 42%, #000 22%, transparent 100%);
-        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 55% 42%, #000 22%, transparent 100%);
+        /* 28 ago 2026 (sexta vuelta) — el usuario reportó, con captura de
+           su entorno real, que el fix anterior (`farthest-corner`) no
+           cambió nada visible: seguía el filo recto arriba/derecha.
+           Causa real (medida con el mismo método de canal alfa que la
+           vuelta anterior, esta vez en las 4 esquinas, no solo la más
+           lejana): `farthest-corner` solo garantiza transparencia total
+           en LA esquina más lejana del centro del degradado — con el
+           centro descentrado a `55% 42%` (más cerca de la esquina
+           superior-derecha que de las otras 3), esa era la esquina
+           inferior-izquierda (~1% de opacidad ahí, remedio real), pero
+           las otras 3 quedaban con opacidad real de sobra para notarse:
+           superior-izquierda ~17%, inferior-derecha ~12% y, la peor,
+           **superior-derecha ~30%** — justo la zona (arriba/derecha del
+           marco) donde el usuario seguía viendo el borde recto. Esto es
+           geométricamente inevitable con un centro descentrado: en un
+           rectángulo, las 4 esquinas solo quedan a la misma distancia
+           del centro del degradado cuando ese centro coincide con el
+           centro real de la caja (donde se cruzan las diagonales) — para
+           cualquier otro punto, unas esquinas quedan más cerca (menos
+           desvanecidas) que otras. Por eso el centro del `radial-
+           gradient` pasa de `55% 42%` a `50% 50%` — nota: esto es
+           independiente del encuadre del video en sí, que sigue
+           mostrando el mismo punto de interés (`object-position: 60%
+           45%` en `.cb-hero-video`, sin tocar) — solo cambia dónde está
+           centrado el desvanecido de la máscara, no qué parte del video
+           se ve nítida. Con el centro en el medio real de la caja, las 4
+           esquinas quedan verificadas a la misma distancia y por lo
+           tanto se desvanecen por igual (las 4 en ~1%, igual que ya
+           lograba la esquina inferior-izquierda antes). El tamaño
+           (`farthest-corner`) y el stop sólido (`#000 22%`) no
+           cambiaron. */
+        mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, #000 22%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, #000 22%, transparent 100%);
         animation: cb-hero-photo-fade-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         animation-delay: 0.55s;
     }

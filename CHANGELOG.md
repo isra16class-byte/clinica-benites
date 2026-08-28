@@ -8,6 +8,26 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-28] Sexta vuelta: el filo seguía ahí — había que centrar el degradado, no solo agrandarlo
+
+El usuario reportó, con captura de su entorno real, que la vuelta anterior no cambió nada visible: seguía el filo recto, sobre todo arriba/derecha.
+
+**Causa real** (medida esta vez en las 4 esquinas, no solo en la más lejana): `farthest-corner` con el centro descentrado (`55% 42%`) solo garantiza transparencia total en LA esquina más lejana de ese centro (la inferior-izquierda, ~1%) — las otras 3 quedan con opacidad real: superior-izquierda ~17%, inferior-derecha ~12%, **superior-derecha ~30%** (la peor, justo donde se veía el filo). Es inevitable con cualquier centro descentrado: en un rectángulo, las 4 esquinas solo quedan a la misma distancia del centro cuando ese centro es el centro real de la caja.
+
+**`resources/css/public.css`** — solo `.cb-hero-slideshow`, el centro del degradado:
+
+| | Antes | Ahora |
+|---|---|---|
+| Centro | `55% 42%` | `50% 50%` |
+
+No afecta el encuadre del video (`object-position: 60% 45%` en `.cb-hero-video`, intacto) — solo cambia dónde está centrado el desvanecido de la máscara.
+
+**Verificado**: medición de canal alfa en las 4 esquinas — con `50% 50%` las 4 quedan igual de desvanecidas (~1% cada una). Capturas con la foto real, recortando la esquina superior-derecha, confirman que el filo vertical ya no aparece.
+
+**Pendiente confirmar por el usuario en su entorno real** — foco en la esquina superior-derecha.
+
+---
+
 ## [2026-08-28] Quinta vuelta: fix del filo recto en las esquinas del marco del video
 
 El usuario confirmó que le encantó la vuelta anterior, pero seguía viéndose el marco cuadrado del video en las esquinas, y sugirió el fix puntual: *"la máscara radial no llegaba a cero justo en los bordes/esquinas de la caja... puedes usar farthest-corner, que garantiza transparencia total exactamente en la esquina más lejana"*.
