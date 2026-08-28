@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Rediseño Contacto: ícono de pulso + pulso de opacidad sutil
+
+Se reemplazó el ícono duplicado del panel "Atención de emergencias" (era el mismo pin de ubicación que ya se usa arriba) por un ícono de pulso/ECG, que conecta con la línea de pulso del hero en dosis mínima. Se le agregó una animación de opacidad sutil (`cb-pulse-fade`, sin escala, respeta `prefers-reduced-motion`) siguiendo `docs/PLAN_SITIO_PUBLICO.md` sección 5.5 — contenido real (ambulancia/emergencias ya confirmado), no decoración porque sí. No depende del fix de `.cb-reveal`→`view()`, que sigue diferido para el final.
+
 ## [2026-08-28] Rediseño Servicios: fondo grounded en foto real (reemplaza el orb plano)
 
 Se quitó el `cb-orb-teal` (blob de color plano) de `servicios.blade.php` — es justo el cliché "gradiente healthcare tech abstracto" que `docs/PLAN_SITIO_PUBLICO.md` marca a evitar. En su lugar: `cb-hero-grid` reutilizado con máscara en la esquina opuesta a la de Especialidades, y un glow ambiental (`filter: blur`, clase nueva `.cb-services-glow` en `public.css`) hecho con la misma foto real que ya usa el tile de Quirófanos (`hero-quirofano.jpg`), mismo mecanismo que `.cb-hero-video-glow` del hero. El mosaico (bento grid) y el hover-scale de las fotos no se tocaron — el plan es explícito en que ya tienen suficiente movimiento propio. Pendiente confirmar visualmente en entorno real (mismo caveat que el resto de ajustes visuales, sin `vite build` completo en este sandbox).

@@ -12,6 +12,20 @@
     hero: grid + orb + un pin), no informativo, para no tener que fingir
     datos que todavía no existen.
 
+    Rediseño (28 ago 2026, mismo criterio de Especialidades/Servicios —
+    ver docs/PLAN_SITIO_PUBLICO.md sección 5.5, fila "Contacto" de la
+    tabla): el panel de "Atención de emergencias" tenía el mismo ícono de
+    pin de ubicación que ya se usa arriba (duplicado, no representaba la
+    idea de emergencia). Se cambió por un ícono de pulso/ECG — conecta
+    con la "línea de pulso" del hero, reutilizada acá en dosis mínima
+    (un ícono, no el trazo animado completo) — y se le agregó un pulso
+    muy sutil de opacidad (`cb-pulse-fade`, no escala, respeta
+    `prefers-reduced-motion`). El plan es explícito en que esto es
+    contenido real (ambulancia/emergencias ya confirmado, ver trust-strip
+    del hero), no decoración porque sí, y que no depende del fix de
+    scroll-reveal pendiente (`.cb-reveal` → `view()`, ese sigue diferido
+    para el final junto con el resto del sitio).
+
     TODOs de números reales: mismos placeholders que `nav.blade.php` y
     `hero.blade.php` (593000000000) — reemplazar los 3 juntos antes de
     publicar.
@@ -58,10 +72,11 @@
 
         <div class="cb-reveal lg:col-span-5" style="animation-delay:.15s">
             <div class="cb-contact-panel">
-                <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 21s-7-6.1-7-11.3A7 7 0 0 1 19 9.7C19 15 12 21 12 21Z"/>
-                    <circle cx="12" cy="9.5" r="2.4"/>
-                </svg>
+                <span class="cb-contact-panel-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 12h4l2-5.5L12 18l2.5-10L16 12h6"/>
+                    </svg>
+                </span>
                 <p class="cb-contact-panel-title">Atención de emergencias</p>
                 <p class="cb-contact-panel-text">
                     Equipo listo para casos urgentes, con ambulancia propia

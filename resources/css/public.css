@@ -1371,6 +1371,30 @@
         color: var(--color-cb-gold-300);
     }
 
+    /* Ícono de pulso/ECG (reemplaza al pin de ubicación duplicado que
+       tenía antes) — conecta con la línea de pulso del hero en dosis
+       mínima. Pulso de opacidad, no de escala (el plan es explícito en
+       "opacidad, no escala" para que se lea como "activo/disponible" y
+       no como una animación decorativa que compite con el contenido). */
+    .cb-contact-panel-icon {
+        display: inline-flex;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .cb-contact-panel-icon {
+            animation: cb-pulse-fade 2.6s ease-in-out infinite;
+        }
+    }
+
+    @keyframes cb-pulse-fade {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.55;
+        }
+    }
+
     .cb-contact-panel-title {
         margin-top: 1.25rem;
         font-family: var(--font-display);

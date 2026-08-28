@@ -249,12 +249,18 @@ que retome el trabajo no tenga que repreguntar nada.
    propia + glow ambiental hecho con la foto real de Quirófanos
    (`.cb-services-glow`). El mosaico y el hover-scale de las fotos no se
    tocaron (ver CHANGELOG.md, entrada del 28 ago 2026).
+6. **Sobre nosotros**: revisada y dejada como está, a propósito — ya estaba
+   documentada como la sección "pausa" del sitio (tipográfica, sin foto,
+   sin animación adicional, ver tabla de la sección 5.5). No necesitaba el
+   mismo tratamiento que Especialidades/Servicios.
+7. **Contacto**: implementado (28 ago 2026, cuarta entrada) — se corrigió
+   el ícono duplicado del panel de emergencias (pin de ubicación repetido)
+   por un ícono de pulso/ECG con un pulso sutil de opacidad
+   (`cb-pulse-fade`, no escala), siguiendo la fila "Contacto" de la tabla
+   de animaciones de esta sección.
 
 ### Siguiente paso pendiente
 
-Rediseño de **Sobre nosotros** y **Contacto**, mismo criterio ya validado en
-Especialidades y Servicios: un elemento propio grounded en contenido real
-(no decoración porque sí), presentado primero como preview antes de tocar el
-Blade/CSS real — mismo flujo que se siguió en las dos secciones anteriores.
-Por último, el fix de animación (punto 4) aplicado a todo el sitio de una
-vez.
+Solo queda el fix de animación (punto 4): `.cb-reveal` → scroll-driven
+`view()`, aplicado a todo el sitio de una vez. Con eso, el brief del plan
+queda completo.
