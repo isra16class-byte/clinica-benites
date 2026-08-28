@@ -251,11 +251,74 @@
        (1366×768, el escalón de compresión @media max-height:900px) deja
        108px libres entre el borde inferior del video y el primer botón;
        en pantallas altas (1920×1080, sin compresión) quedan 175px. */
+    /* 28 ago 2026 (tercera vuelta) — a pedido del usuario, que marcó con un
+       recuadro sobre una captura real de su entorno dónde quería el video:
+       "que cubra casi toda la parte derecha... tiene que ser más grande y
+       cubrir más... no quiero que el video baje de la línea de donde están
+       los iconos... los bordes del video se vean desvanecidos con el azul"
+       (esto último, el desvanecido, ya estaba resuelto desde la vuelta
+       anterior vía `mask-image` en `.cb-hero-slideshow` — el pedido nuevo es
+       tamaño/posición, no el efecto en sí). Se midió el recuadro de la
+       captura con Python/PIL (detección de píxeles rojos), calibrando contra
+       el viewport real del navegador en la imagen (descontando la barra de
+       Chrome y la taskbar de Windows, medidas por transición de color): el
+       recuadro ocupa ~45.5% del ancho del viewport, casi a sangre con el
+       borde derecho (margen ~12px).
+       Dos cambios de fondo respecto a la vuelta anterior:
+       (1) `right` deja de calcularse para alinearse con el borde derecho
+       *interno* del bloque de texto centrado (`max((100vw-80rem)/2+4rem,
+       4rem)`, que en 1920px daba 24rem/384px de margen) y pasa a un valor
+       fijo chico (`1.5rem`) que abraza el borde real del viewport — es
+       exactamente lo que pedía "cubra casi toda la parte derecha": ya no
+       tiene sentido alinearlo con el texto si el video ahora es una textura
+       de fondo, no una tarjeta que deba guardar la misma proporción que el
+       contenido.
+       (2) `width` sube de `min(39rem,46vw)` a `min(54rem,45vw)` — el tope en
+       `rem` (lo que en 1920px limitaba el ancho a 624px pese a que el 46vw
+       hubiera permitido 883px) se sube a 54rem para que, en el rango de
+       anchos de escritorio normales (hasta ~1920px), el tamaño real quede
+       gobernado por el `vw` (más grande, ~864-883px según el ancho) en vez
+       de por el tope fijo. El tope en `rem` no se saca del todo (evita que
+       crezca sin límite en monitores ultra-anchos 2560px+: sin el tope,
+       45vw en un 2560 daría 1152px, mucho más grande que lo verificado) —
+       se calibró para que iguale casi exactamente el valor que da el `vw`
+       en 1920px (864px = 54rem), así en monitores más anchos que eso el
+       video no sigue creciendo (se mantiene "clavado" en 864px), evitando
+       repetir el mismo tipo de bug que la vuelta anterior por acortar el
+       margen contra el trust-strip en pantallas grandes.
+       `top` baja de 9.5rem a 6rem — con el video más grande (más alto, por
+       el mismo `aspect-ratio: 4/3`), hubo que subirlo para no comerse el
+       margen contra la fila de iconos. El valor final (6rem) también resultó
+       ser, casi por coincidencia, el mismo piso que ya tenían los 2
+       escalones de compresión por la altura real del nav fijo — así que ese
+       piso pasó a ser también el valor base, y el primer escalón de
+       compresión (@media max-height:900px, más abajo) terminó con el mismo
+       `top` que el estado base, solo cambia el `width`.
+       **Verificado con Playwright** (bounding boxes reales, no a ojo) en una
+       matriz mucho más amplia que las vueltas anteriores — 7 anchos
+       (1280-2560px, sumando explícitamente monitores ultra-anchos que no se
+       habían probado antes) × 25 alturas (600-1080px, cada 20px): **0 casos
+       de solape** contra el trust-strip (peor caso: 27px libres, en
+       1920×920 — la misma zona de riesgo "justo arriba del breakpoint de
+       900px" ya identificada en vueltas anteriores) **ni contra el nav fijo**
+       (chequeo nuevo esta vuelta, no se había verificado antes explícitamente
+       — con el video ahora arrancando mucho más arriba, `top:6rem`, hay que
+       confirmar que no se mete detrás del nav; peor caso: 6.8-10.8px libres
+       según el escalón). Capturas visuales (con la foto real como sustituto
+       del `<video>`, misma limitación de siempre del Chromium de este
+       sandbox sin códec H.264) en 1920×1080, 1920×920 (el peor caso medido)
+       y 1366×900 confirman que el video cubre visualmente casi toda la mitad
+       derecha, con los bordes desvanecidos hacia el navy (mismo `mask-image`
+       de la vuelta anterior, sin cambios), sin tocar la fila de iconos en
+       ningún caso. **Pendiente confirmar por el usuario en su propio entorno
+       real** — en particular, que el punto de fusión con el título se siga
+       viendo bien ahora que el video es notablemente más grande y con menos
+       margen a la izquierda respecto al bloque de texto. */
     .cb-hero-side {
         position: absolute;
-        top: 9.5rem;
-        right: max(4rem, calc((100vw - 80rem) / 2 + 4rem));
-        width: min(39rem, 46vw);
+        top: 6rem;
+        right: 1.5rem;
+        width: min(54rem, 45vw);
         pointer-events: none;
     }
 
@@ -566,9 +629,18 @@
            el peor caso (1366×768, la laptop más angosta+baja del rango)
            deja 108px libres entre el borde inferior del video y el
            primer botón de la fila de CTAs — nunca solapa. */
+        /* Recalculado 28 ago 2026 (tercera vuelta) junto con el cambio de
+           tamaño base de `.cb-hero-side` — ver el comentario grande arriba.
+           `top` queda igual al valor base (6rem): ya era el piso real por
+           la altura del nav fijo, así que no hay margen para subirlo más en
+           este escalón. Solo se achica `width`, mismo criterio de siempre
+           (escalón más chico que el base, en proporción). Verificado con
+           Playwright en el rango de alturas 701-899px: sin solape contra el
+           trust-strip (peor caso 63px libres) ni contra el nav (peor caso
+           10.8px libres). */
         .cb-hero-side {
             top: 6rem;
-            width: min(30rem, 38vw);
+            width: min(38rem, 38vw);
         }
     }
 
@@ -600,15 +672,17 @@
         }
 
         /* Mismo criterio que el escalón de 900px de arriba, un paso más
-           chico — `top` no baja de 4rem por el mismo piso que ya tiene
-           `.cb-hero-content` (86px reales del nav fijo, con margen: a
-           esta altura el eyebrow ya arranca pegado al nav, así que el
-           video no puede subir más sin meterse debajo de él). Recalculado
-           el 27 ago 2026 (segunda entrada del día) junto con el escalón
-           de 900px, mismo criterio de tamaño proporcionalmente más chico. */
+           chico — `top` se mantiene en 6rem por el mismo piso real del nav
+           fijo (no hay margen para subirlo más en ningún escalón desde la
+           vuelta anterior, ver comentario grande sobre `.cb-hero-side`).
+           Recalculado 28 ago 2026 (tercera vuelta) junto con el cambio de
+           tamaño base — solo se achica `width` un paso más. Verificado con
+           Playwright en el rango de alturas 600-700px: sin solape contra el
+           trust-strip (peor caso 127px libres) ni contra el nav (peor caso
+           10.8px libres). */
         .cb-hero-side {
-            top: 4.5rem;
-            width: min(23.5rem, 31vw);
+            top: 6rem;
+            width: min(29rem, 29vw);
         }
     }
 

@@ -68,6 +68,18 @@
         (en particular, si el punto de fusión con el título se ve bien
         con el video corriendo — acá se verificó con Playwright, que en
         este sandbox no reproduce H.264 en vivo, ver nota en MEMORIA.md).
+
+        28 ago 2026 (tercera vuelta) — a pedido del usuario, que marcó con
+        un recuadro sobre una captura real dónde quería el video: mucho
+        más grande, cubriendo casi toda la mitad derecha, pegado al borde
+        real de la pantalla (no al borde del bloque de texto centrado como
+        antes), sin bajar de la fila de iconos del trust-strip. Solo
+        cambiaron los valores de `.cb-hero-side` en `public.css` (top,
+        right, width, y los 2 escalones de compresión) — ver el comentario
+        grande ahí para el detalle completo de la medición y verificación.
+        El resto (mask-image de bordes desvanecidos, aspect-ratio 4/3,
+        opacidad) no se tocó, sigue siendo lo que ya le había gustado al
+        usuario.
     --}}
     <div class="cb-hero-side hidden xl:block" aria-hidden="true">
         <div class="cb-hero-slideshow">

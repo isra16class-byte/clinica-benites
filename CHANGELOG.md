@@ -8,6 +8,30 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-28] Tercera vuelta: video de fondo del hero, mucho más grande y pegado al borde derecho (a partir de una captura marcada)
+
+El usuario compartió una captura real de su entorno (1920×1080) con un recuadro rojo marcando dónde quería el video: *"que el video cubra casi toda la parte derecha de la pantalla... tiene que ser más grande y cubrir más... no quiero que el video baje de la línea de donde están los iconos... los bordes del video se vean desvanecidos con el azul"* (el desvanecido ya estaba resuelto desde la vuelta anterior).
+
+**Medición del recuadro**: analizado con Python/PIL (detección de píxeles rojos + calibración del viewport real dentro de la captura, descontando barra de Chrome y taskbar de Windows) — el recuadro ocupaba 45.5% del ancho del viewport, con el borde derecho a solo ~12px del borde real de la pantalla.
+
+**`resources/css/public.css`** — `.cb-hero-side`, los 3 niveles (base + 2 escalones de compresión):
+
+| | Antes | Ahora |
+|---|---|---|
+| Base `top` | `9.5rem` | `6rem` |
+| Base `right` | `max(4rem, calc((100vw - 80rem)/2 + 4rem))` (24rem en 1920px) | `1.5rem` (fijo) |
+| Base `width` | `min(39rem, 46vw)` | `min(54rem, 45vw)` |
+| Escalón 900px `top`/`width` | `6rem` / `min(30rem,38vw)` | `6rem` / `min(38rem,38vw)` |
+| Escalón 700px `top`/`width` | `4.5rem` / `min(23.5rem,31vw)` | `6rem` / `min(29rem,29vw)` |
+
+**Por qué estos valores**: `right` deja de alinearse con el borde del bloque de texto centrado (pensado para una tarjeta) y pasa a abrazar el borde real del viewport (coherente con que ahora es una textura de fondo). El tope en `rem` de `width` se sube para que en pantallas de escritorio normales (hasta ~1920px) el tamaño real quede gobernado por el `vw` en vez de por un tope artificialmente bajo — pero se mantiene un tope (calibrado para igualar el valor que da el `vw` en 1920px) para que en monitores ultra-anchos (2560px+) el video no siga creciendo sin límite. `top` baja porque, con el video más ancho, también es más alto (mismo `aspect-ratio: 4/3`) — el nuevo valor (6rem) coincide con el piso real que ya imponía la altura del nav fijo, así que el escalón de 900px terminó con el mismo `top` que la base.
+
+**Verificado con Playwright**: 175 combinaciones (7 anchos, 1280-**2560px** — primera vez que se prueba explícitamente en monitores ultra-anchos — × 25 alturas, 600-1080px cada 20px). **0 casos de solape** contra el trust-strip (peor caso 27px libres, en 1920×920) **ni contra el nav fijo** (verificación nueva esta vuelta, dado que el video ahora arranca mucho más arriba — peor caso 6.8-10.8px libres). Capturas visuales (foto real como sustituto del `<video>`, limitación conocida del sandbox sin códec H.264) en 1920×1080, 1920×920 y 1366×900 confirman el resultado esperado.
+
+**Pendiente confirmar por el usuario en su entorno real.**
+
+---
+
 ## [2026-08-28] Segunda vuelta: video de fondo del hero, más grande y más abajo (todavía)
 
 El usuario, tras aplicar el patch anterior (ver la entrada de abajo, mismo día), pidió un empujón más: *"si mejoro pero aun le falta centrarse mas adonde yo quiero o hacerlo mas grande"*.
