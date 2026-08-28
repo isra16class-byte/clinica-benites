@@ -122,7 +122,7 @@ Ya resuelto: especialidades (27, ver `Servicios_CB_2026.pdf`), no se agenda cita
 - Paleta: navy `#0C447C` + verde azulado `#0F6E56` (mismos colores del panel) + acento dorado/champán, exclusivo del sitio público.
 - Tipografía: Space Grotesk (titulares) + Instrument Sans (cuerpo).
 - Elemento distintivo: línea de pulso SVG animada (plano técnico + pulso dorado en loop), respeta `prefers-reduced-motion`.
-- Video de fondo del hero (reemplazó a un slideshow de fotos): en pulido activo — última vuelta (28 ago) cambió de `mask-image` a un `::after` con `radial-gradient` overlay para desvanecer los 4 bordes, porque `mask-image` no es confiable sobre `<video>` con decodificación acelerada por hardware. **Pendiente confirmar por el usuario en su entorno real** (el sandbox de desarrollo no reproduce el `.mp4` en vivo).
+- Video de fondo del hero (reemplazó a un slideshow de fotos): solución final aplicada — `hero.blade.php` agrega una imagen de glow detrás del video; `public.css` la amplía y desenfoca, deja `::after` sin fondo y aplica una máscara alfa transparente directamente al video y al poster para que los bordes dejen ver el fondo real. El video quedó ligeramente más grande y más abajo, con los breakpoints responsive ajustados. **Confirmado visualmente por el usuario**.
 - **Pendiente**: secciones de Especialidades, Servicios, Sobre la clínica, Contacto/ubicación (anchors ya conectados en `nav.blade.php`, solo falta construir el contenido). Reemplazar 4 placeholders de teléfono/WhatsApp (`593000000000`) antes de publicar.
 
 ## 8. Funciones futuras propuestas (investigadas, no priorizadas ni construidas)
@@ -138,7 +138,7 @@ Detalle completo de cada propuesta en `docs/historico/MEMORIA_2026-08-23_2026-08
 - **Tablas de Filament no permiten juntar título+buscador en una sola fila de forma nativa** — se resolvió con CSS scoped en `theme.css` (`.fi-ta-header`/`.fi-ta-header-toolbar`), no forkeando el Blade del paquete.
 - **Botones de acción (Crear/Editar/Eliminar) no se ocultan solos según permisos** — hay que conectar `->visible()` a mano a `canCreate()`/`canEdit()`/`canDelete()` en cada Resource. Ya aplicado en los 18 puntos correspondientes.
 - **Un campo oculto con `->visible()` en un formulario Filament sigue guardando su valor** — si depende de otro campo (ej. `medico_id` según `rol`), hay que limpiarlo a mano en `afterStateUpdated()` + `mutateFormDataBeforeSave()`.
-- **`mask-image` no es confiable sobre `<video>`** en navegadores con decodificación acelerada por hardware — usar un overlay (`::after` con `radial-gradient`) en su lugar.
+- Para ocultar bordes de `<video>` sin depender de igualar el color del fondo, usar una máscara alfa transparente directamente sobre el video/poster; un `::after` coloreado puede crear un rectángulo visible si el fondo tiene gradientes o radial teal. El glow desenfocado detrás suaviza la transición.
 - Detalle y verificación de cada una de estas en el histórico si hace falta reconstruir el razonamiento completo.
 
 ## 10. Roles y permisos

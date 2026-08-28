@@ -169,9 +169,10 @@
        ============================================================ */
 
     .cb-hero {
-        background:
+        --cb-hero-surface:
             radial-gradient(ellipse 60% 50% at 80% 0%, rgb(15 110 86 / 22%), transparent 60%),
             linear-gradient(180deg, var(--color-cb-navy-950) 0%, var(--color-cb-navy-900) 55%, var(--color-cb-navy-950) 100%);
+        background: var(--cb-hero-surface);
     }
 
     .cb-hero-grid {
@@ -316,9 +317,9 @@
        margen a la izquierda respecto al bloque de texto. */
     .cb-hero-side {
         position: absolute;
-        top: 6rem;
+        top: 6.4rem;
         right: 1.5rem;
-        width: min(54rem, 45vw);
+        width: min(58rem, 49vw);
         pointer-events: none;
     }
 
@@ -346,7 +347,7 @@
         position: relative;
         width: 100%;
         aspect-ratio: 4 / 3;
-        overflow: hidden;
+        overflow: visible;
         opacity: 0;
         /* Historial resumido de los ajustes del desvanecido de bordes
            (28 ago 2026, vueltas 4 a 6, ver CHANGELOG.md para el detalle
@@ -403,7 +404,7 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: radial-gradient(ellipse farthest-corner at 50% 50%, transparent 22%, var(--color-cb-navy-950) 100%);
+        pointer-events: none;
     }
 
 
@@ -413,6 +414,20 @@
        exactamente el mismo espacio, superpuestas, con el mismo recorte
        (`object-fit: cover` + el mismo `object-position` que ya usaban
        las fotos del slideshow, para no perder el encuadre ya afinado). */
+    .cb-hero-video-glow {
+        position: absolute;
+        inset: -5rem;
+        display: block;
+        width: calc(100% + 10rem);
+        height: calc(100% + 10rem);
+        object-fit: cover;
+        object-position: 60% 45%;
+        filter: blur(64px);
+        opacity: 0.30;
+        z-index: -1;
+        pointer-events: none;
+    }
+
     .cb-hero-video,
     .cb-hero-video-poster {
         position: absolute;
@@ -422,6 +437,8 @@
         height: 100%;
         object-fit: cover;
         object-position: 60% 45%;
+        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 18%, transparent 78%);
+        mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 18%, transparent 78%);
     }
 
     .cb-hero-video-poster {
@@ -692,8 +709,8 @@
            trust-strip (peor caso 63px libres) ni contra el nav (peor caso
            10.8px libres). */
         .cb-hero-side {
-            top: 6rem;
-            width: min(38rem, 38vw);
+            top: 6.4rem;
+            width: min(44rem, 44vw);
         }
     }
 

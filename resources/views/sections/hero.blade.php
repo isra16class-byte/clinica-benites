@@ -83,6 +83,11 @@
     --}}
     <div class="cb-hero-side hidden xl:block" aria-hidden="true">
         <div class="cb-hero-slideshow">
+            <img
+                class="cb-hero-video-glow"
+                src="{{ asset('images/hero-quirofano.jpg') }}"
+                alt=""
+            >
             <video
                 class="cb-hero-video"
                 src="{{ asset('videos/hero-clinica.mp4') }}"
