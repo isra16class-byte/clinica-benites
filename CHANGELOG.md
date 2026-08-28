@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Fix: proporciones del mosaico no coincidían con la referencia del usuario
+
+- El usuario reportó, con captura de su entorno real, que el mosaico "no queda bien" — pidió que las fotos quedaran "tal cual" la referencia que había compartido, señalando que se veían con tamaños/recortes distintos a los de esa imagen.
+- **Causa raíz**: el cambio anterior (mosaico en molinete) había fijado las 5 posiciones/tamaños aproximando la disposición general de la referencia a ojo, sin medir sus proporciones reales — cada pieza terminó con una relación ancho/alto distinta a la de la referencia (ej. la pieza `b` quedó casi cuadrada en vez de rectangular/horizontal como en la imagen original).
+- **Medición**: se analizó la imagen de referencia con Python (`PIL` + `scipy.ndimage`, detección de componentes conectados sobre las 5 áreas oscuras) para obtener con precisión de píxeles la posición, ancho, alto y aspecto real de cada una de las 5 piezas, y se convirtieron a los porcentajes `top`/`left`/`width`/`height` de `.cb-hero-collage-item--a` a `--e` en `public.css`, con una corrección para compensar que nuestro contenedor es más alto que ancho (`aspect-ratio: 4/5`) mientras la referencia es cuadrada.
+- Mismo mecanismo de posicionamiento, `border-radius`, `box-shadow` y fade-in que ya existían — solo cambiaron los 5 valores de posición/tamaño.
+- **Verificado con Playwright**: misma matriz de anchos/alturas que las entradas anteriores — sin solapes con el trust-strip (peor caso: 143px libres, mejor que la versión anterior). Capturas en 1280×800 y 1920×1080 confirman que las proporciones ahora sí coinciden con la referencia.
+- **Pendiente confirmar por el usuario en su propio entorno real.**
+
+---
+
 ## [2026-08-27] Se cerró el pendiente de la 5ª foto del mosaico del hero
 
 - El usuario subió las 5 fotos que quería usar en el mosaico y pidió que quedaran "exactamente acomodados" al ejemplo de referencia ya usado para construir el molinete (cambio anterior).
