@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Especialidades: refuerzo tras feedback ("se ve muy simple")
+
+Sobre el ajuste anterior (cifra grande + scatter), el usuario lo vio simple en pantalla — el bloque central seguía siendo texto plano en 3 columnas y el scatter solo se veía desde `xl`. Cuatro retoques en `especialidades.blade.php` + `public.css`: scatter bajado a `lg` (más anchos de pantalla real lo muestran); divisores verticales entre las 3 columnas del directorio (antes solo espacio en blanco); marcador de letra pasa de texto suelto a chip con fondo (más textura); línea de acento teal→dorado debajo del "27" para anclarlo visualmente. Directorio de texto y demás secciones sin cambios.
+
 ## [2026-08-28] Especialidades: cifra grande + letras dispersas (referencia mobbin.com)
 
 El usuario pidió traer la "sensación general" (dispersión + escala del número grande) de una captura de mobbin.com, sin caer en íconos genéricos por especialidad — mismo criterio ya documentado en el archivo que descartó eso desde el rediseño original. Dos piezas nuevas en `especialidades.blade.php` + `public.css`: `cb-stat-callout` pone el "27" real en primer plano con la escala tipográfica de la referencia (antes solo vivía como watermark de fondo); `cb-directory-scatter` reemplaza el rail vertical fijo de letras por esas mismas letras reales dispersas en los márgenes de la sección (posiciones calculadas por índice, no al azar), visible solo desde `xl` por espacio de margen. El directorio de texto (nombre + flecha en hover) no se tocó.

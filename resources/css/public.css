@@ -1055,13 +1055,25 @@
         display: flex;
         align-items: baseline;
         gap: 1.1rem;
+        position: relative;
+        padding-bottom: 1.75rem;
+    }
+
+    .cb-stat-callout::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 3.5rem;
+        height: 2px;
+        background: linear-gradient(90deg, var(--color-cb-teal-400), var(--color-cb-gold-300));
     }
 
     .cb-stat-number {
         font-family: var(--font-display);
         font-weight: 700;
-        font-size: clamp(3.5rem, 5vw + 1.5rem, 5.5rem);
-        line-height: 0.9;
+        font-size: clamp(4rem, 6vw + 1.5rem, 6.5rem);
+        line-height: 0.85;
         background: linear-gradient(135deg, #fff, var(--color-cb-gold-300));
         -webkit-background-clip: text;
         background-clip: text;
@@ -1083,8 +1095,9 @@
        ahora repartidas en los márgenes de la sección con la sensación de
        dispersión de la referencia — posiciones calculadas por índice en el
        Blade, no al azar. Decorativo puro: aria-hidden, sin interacción,
-       clip por el overflow-hidden de la sección. Solo desde xl porque con
-       menos margen lateral se ve amontonado contra el contenido. */
+       clip por el overflow-hidden de la sección. Solo desde lg (antes xl —
+       se bajó tras feedback de que la sección se sentía plana en anchos
+       intermedios). */
     .cb-directory-scatter {
         position: absolute;
         inset: 0;
@@ -1100,11 +1113,12 @@
         width: 2.25rem;
         height: 2.25rem;
         border-radius: 999px;
-        border: 1px solid rgb(74 168 140 / 22%);
+        border: 1px solid rgb(74 168 140 / 28%);
+        background: rgb(74 168 140 / 6%);
         font-family: var(--font-display);
         font-weight: 600;
         font-size: 0.8125rem;
-        color: rgb(255 255 255 / 30%);
+        color: rgb(255 255 255 / 38%);
         user-select: none;
     }
 
@@ -1125,20 +1139,39 @@
         flex-direction: column;
     }
 
-    /* Marcador de letra: rompe el bloque largo de "C" (11 de 27
-       especialidades) sin fingir una taxonomía que no viene confirmada. */
+    /* Divisor vertical entre columnas (desde md): antes era solo el gap en
+       blanco — con esto el bloque se lee como directorio/tabla real, no
+       como texto plano corrido en 3 bloques sueltos. */
+    @media (min-width: 768px) {
+        .cb-directory-col:not(:first-child) {
+            border-left: 1px solid rgb(255 255 255 / 8%);
+            padding-left: 3rem;
+            margin-left: -3rem;
+        }
+    }
+
+    /* Marcador de letra: chip con borde, no texto suelto — rompe el bloque
+       largo de "C" (11 de las 27 especialidades) y da más textura visual
+       al directorio sin fingir una taxonomía que no viene confirmada. */
     .cb-directory-group-letter {
-        display: block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.5rem;
+        height: 1.5rem;
+        padding: 0 0.4rem;
+        border-radius: 0.35rem;
+        background: rgb(74 168 140 / 14%);
         font-family: var(--font-display);
         font-weight: 700;
-        font-size: 0.75rem;
-        letter-spacing: 0.1em;
+        font-size: 0.6875rem;
+        letter-spacing: 0.06em;
         color: var(--color-cb-teal-400);
-        padding: 1.1rem 0 0.35rem;
+        margin: 1.25rem 0 0.5rem;
     }
 
     .cb-directory-col > .cb-directory-group-letter:first-child {
-        padding-top: 0;
+        margin-top: 0;
     }
 
     .cb-directory-row {

@@ -57,8 +57,8 @@
       los márgenes de la sección — posiciones calculadas (no al azar) a
       partir del índice de cada letra, alternando lado/rotación, para que
       no se amontonen. Decorativo (aria-hidden, pointer-events:none),
-      visible solo en xl+ (con menos ancho de margen no se ve limpio) —
-      antes el rail aparecía desde md, pero ese layout ya no existe.
+      visible desde lg (antes xl — se bajó tras feedback de que la
+      sección se sentía plana en anchos intermedios).
 
     `$letras`: letras únicas del array de especialidades (para el
     scatter), en el mismo orden en que aparecen. El marcador de grupo por
@@ -120,7 +120,7 @@
         });
     @endphp
 
-    <div class="cb-directory-scatter hidden xl:block" aria-hidden="true">
+    <div class="cb-directory-scatter hidden lg:block" aria-hidden="true">
         @foreach ($scatter as $s)
             <span class="cb-directory-scatter-letter" style="top:{{ $s['top'] }}%; {{ $s['side'] }}:{{ $s['edge'] }}%; transform: rotate({{ $s['rotate'] }}deg);">{{ $s['letra'] }}</span>
         @endforeach
