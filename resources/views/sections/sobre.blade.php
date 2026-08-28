@@ -24,7 +24,7 @@
             <p class="cb-about-lede">
                 Clínica Benites es un centro privado de Guayaquil, pensado
                 para que la persona y el caso clínico reciban la misma
-                atención — no uno a costa del otro.
+                atención, sin que uno vaya a costa del otro.
             </p>
             <p class="cb-about-body">
                 Reunimos especialidades médicas y quirúrgicas, cuidados

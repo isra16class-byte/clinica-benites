@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Copy público: se sacan las rayas (—) del texto visible
+
+A pedido del usuario ("se ve como IA"). Se reescribieron sin em-dash las 3 frases del sitio público que lo usaban: el lede de "Sobre nosotros" (`sobre.blade.php`, "atención — no uno a costa del otro" → "atención, sin que uno vaya a costa del otro"), el lede de "Contacto" (`contacto.blade.php`, "por teléfono — sin pasos de más" → "por teléfono, sin pasos de más") y el `<meta name="description">` (`components/layouts/public.blade.php`, cambia a dos puntos). No se tocaron los comentarios de desarrollo (uso interno, no visibles en la web) ni el separador `—` del panel admin (`alertas-operativas-widget.blade.php`, es un patrón de lista distinto).
+
 ## [2026-08-28] Hero: eyebrow pasa de "Clínica privada" a "Clínica Benites"
 
 El usuario notó que "Clínica Benites" solo aparecía como `alt` del logo (chico, en el nav) — ningún texto legible de la página nombraba la clínica. Primer intento: agregarla como línea propia dentro del `<h1>` — descartado por el usuario al revisarlo. Solución final: el eyebrow arriba del titular (`cb-eyebrow` en `hero.blade.php`) cambia de "Clínica privada · Guayaquil" a "Clínica Benites · Guayaquil", sin agregar elementos nuevos ni tocar `public.css` (la clase `.cb-headline-brand` del intento descartado se quitó). El eslogan ("Precisión quirúrgica. Calidez humana.") queda intacto.

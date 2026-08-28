@@ -6,7 +6,7 @@
         <meta name="theme-color" content="#071b33">
 
         <title>{{ $title ?? config('app.name', 'Clínica Benites') }}</title>
-        <meta name="description" content="{{ $description ?? 'Clínica Benites — clínica privada en Guayaquil con más de 26 especialidades médicas y quirúrgicas, quirófanos, UCI y UCIN.' }}">
+        <meta name="description" content="{{ $description ?? 'Clínica Benites: clínica privada en Guayaquil con más de 26 especialidades médicas y quirúrgicas, quirófanos, UCI y UCIN.' }}">
 
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
 

@@ -40,7 +40,7 @@
             <h2 class="cb-headline cb-headline--section">Conversemos sobre tu cita.</h2>
             <p class="cb-section-lede">
                 Nuestro equipo de recepción confirma horarios por WhatsApp
-                o por teléfono — sin pasos de más.
+                o por teléfono, sin pasos de más.
             </p>
 
             <div class="cb-cta-row" style="margin-top:2.75rem;">
