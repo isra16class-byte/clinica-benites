@@ -8,6 +8,21 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-28] Ajuste fino del video de fondo del hero: más color, más abajo, más grande
+
+Pedido del usuario tras confirmar que el resultado del cambio anterior (video de fondo semitransparente) "le encantó": *"solo si me gustaría des un poco mas de color y de pocionamiento bájalo un poquito (se ve muy arriba y si lo puedes ampliar o hacer un poco mas grande fuera chevere)"*. Los 3 pedidos, uno a uno:
+
+**`resources/css/public.css`**:
+- **Más color**: opacidad final del keyframe `cb-hero-photo-fade-in` de `0.5` a `0.72`, y el punto donde el `mask-image` radial deja de ser sólido y empieza a desvanecerse, de `45%` a `60%` (más área visible antes del fundido hacia los bordes).
+- **Más abajo**: `top` de `.cb-hero-side` de `7rem` a `9rem` (base, pantallas altas). Escalones de compresión recalculados en la misma proporción: `@media max-height:900px` de `5rem` a `6rem`, `@media max-height:700px` de `4rem` a `4.5rem`.
+- **Más grande**: `width` de `.cb-hero-side` de `min(34rem, 42vw)` a `min(37rem, 44vw)` (base). Escalones: `900px` de `min(28rem,36vw)` a `min(30rem,38vw)`, `700px` de `min(22rem,30vw)` a `min(23.5rem,31vw)`.
+
+**Verificación con Playwright** (CSS real compilado con `@tailwindcss/cli`, HTML estático del nav+hero real, mismo método que sesiones anteriores de este bloque): primer intento (top 10rem + ancho 40rem/48vw) resultó demasiado agresivo — un barrido de resoluciones detectó que justo por encima del breakpoint de compresión (901-950px de alto) el video quedaba a solo 2-4px de tocar la fila de botones, un riesgo real de solape no cubierto por las 5 resoluciones puntuales que se venían usando como muestra en cambios anteriores. Se ajustó a los valores finales (arriba) y se corrió un barrido exhaustivo: **294 combinaciones** (anchos 1280-1920px × alturas 600-1080px, cada 10px) — **0 casos de solape**, peor caso (1366×901-950) deja 54px libres entre el video y el primer botón (antes del cambio, ese mismo peor caso dejaba ~122-124px — hay menos aire que antes, a propósito, porque el pedido era justamente agrandar y bajar, pero sigue habiendo margen real, nunca contacto). Capturas visuales (con la foto real `hero-quirofano.jpg` como sustituto del `<video>`, que en este sandbox no pinta su `background` CSS sin una fuente válida — limitación de la herramienta de verificación, no del código) en 1920×1080 y 1366×900 confirman el resultado: video visiblemente más grande, más abajo, con más color, sin invadir botones ni franja de confianza.
+
+**Pendiente confirmar por el usuario en su propio entorno real** (en particular, que el margen de 54px en el peor caso se sienta suficiente con el video corriendo de verdad, no solo con el frame estático verificado acá).
+
+---
+
 ## [2026-08-27] Video del hero: de "tarjeta al costado" a "video de fondo" (semitransparente, más grande, superpuesto al título)
 
 Retomado en una sesión nueva (la anterior se quedó sin créditos a mitad del cambio, sin llegar a generar el patch). El usuario reenvió el mismo video ya integrado (confirmado con frames idénticos, mismo archivo 1280×720/10s) — el video en sí siempre fue horizontal, lo "vertical" era el marco CSS heredado del slideshow de fotos anterior (`aspect-ratio: 4/5`).

@@ -253,9 +253,9 @@
        en pantallas altas (1920×1080, sin compresión) quedan 175px. */
     .cb-hero-side {
         position: absolute;
-        top: 7rem;
+        top: 9rem;
         right: max(4rem, calc((100vw - 80rem) / 2 + 4rem));
-        width: min(34rem, 42vw);
+        width: min(37rem, 44vw);
         pointer-events: none;
     }
 
@@ -285,8 +285,8 @@
         aspect-ratio: 4 / 3;
         overflow: hidden;
         opacity: 0;
-        mask-image: radial-gradient(ellipse 72% 72% at 55% 42%, #000 45%, transparent 100%);
-        -webkit-mask-image: radial-gradient(ellipse 72% 72% at 55% 42%, #000 45%, transparent 100%);
+        mask-image: radial-gradient(ellipse 72% 72% at 55% 42%, #000 60%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse 72% 72% at 55% 42%, #000 60%, transparent 100%);
         animation: cb-hero-photo-fade-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         animation-delay: 0.55s;
     }
@@ -567,8 +567,8 @@
            deja 108px libres entre el borde inferior del video y el
            primer botón de la fila de CTAs — nunca solapa. */
         .cb-hero-side {
-            top: 5rem;
-            width: min(28rem, 36vw);
+            top: 6rem;
+            width: min(30rem, 38vw);
         }
     }
 
@@ -607,8 +607,8 @@
            el 27 ago 2026 (segunda entrada del día) junto con el escalón
            de 900px, mismo criterio de tamaño proporcionalmente más chico. */
         .cb-hero-side {
-            top: 4rem;
-            width: min(22rem, 30vw);
+            top: 4.5rem;
+            width: min(23.5rem, 31vw);
         }
     }
 
@@ -711,7 +711,7 @@
        para que se siga leyendo "de fondo" también al terminar de aparecer. */
     @keyframes cb-hero-photo-fade-in {
         to {
-            opacity: 0.5;
+            opacity: 0.72;
         }
     }
 
