@@ -8,6 +8,18 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Mosaico de 5 fotos → slideshow con crossfade (el usuario lo pidió tras ver el hero de odoo.com/es)
+
+- El usuario reportó que el mosaico (posicionar 5 fotos por porcentaje, ajustando proporciones a mano) resultaba difícil de mantener, y pidió algo más parecido a un video/gif con transición de fotos — en la línea del bloque de video del hero de `odoo.com/es`.
+- **Reemplazo**: `.cb-hero-collage` (5 `<div>` con posición/tamaño individual por foto) → `.cb-hero-slideshow` (un solo marco) + `.cb-hero-slide` (las 5 fotos apiladas con `inset: 0`, sin posición individual). El marco ocupa exactamente el mismo lugar que el mosaico — mismo `aspect-ratio: 4/5` dentro del mismo `.cb-hero-side`, sin tocar ninguno de sus `top`/`width` (base ni los 2 escalones `@media max-height` ya medidos y verificados con Playwright).
+- Las 5 fotos (mismas de siempre: quirófano, UCI, cardiología, neonatología, centro de imagen) rotan en loop infinito vía CSS puro (`@keyframes cb-hero-slideshow-cycle`, `animation-delay` escalonado por orden en el DOM — 0/5/10/15/20s sobre una vuelta de 25s), con fundido cruzado + zoom lento tipo "Ken Burns" (`scale` 1.06 → 1 → 0.99).
+- **Ventaja de mantenimiento**: agregar o quitar una foto ahora es agregar o quitar un `<div class="cb-hero-slide">` en el Blade — no hace falta recalcular ninguna posición ni proporción, a diferencia del mosaico.
+- `prefers-reduced-motion`: el slideshow no rota, se congela en la primera foto (quirófano) fija.
+- **Verificado**: CSS validado con PostCSS (sintaxis OK) y compilado con Tailwind CLI sin errores. Verificado visualmente con Playwright, renderizando el Blade real (imágenes reales, mismo layout) como HTML estático — capturas en 1280×800, 1920×1080 y 1440×750 (el escenario de altura más ajustado, con la compresión `@media max-height: 900px` activa) confirman que el crossfade funciona (foto 1 → foto 2 sin glitches) y que el marco no se solapa con el trust-strip en ningún ancho/alto probado — igual que ya estaba verificado con el mosaico, porque el footprint del wrapper no cambió.
+- **Pendiente confirmar por el usuario en su propio entorno real.**
+
+---
+
 ## [2026-08-27] Fix: proporciones del mosaico no coincidían con la referencia del usuario
 
 - El usuario reportó, con captura de su entorno real, que el mosaico "no queda bien" — pidió que las fotos quedaran "tal cual" la referencia que había compartido, señalando que se veían con tamaños/recortes distintos a los de esa imagen.

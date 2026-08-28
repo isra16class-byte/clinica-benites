@@ -242,95 +242,78 @@
         pointer-events: none;
     }
 
-    /* Collage de 4 fotos en escalera diagonal → mosaico de 5 fotos tipo
-       "molinete", a pedido del usuario, que compartió una nueva referencia
-       (5 piezas asimétricas: una ancha arriba, una alta a la izquierda, una
-       media a la derecha superpuesta entre ambas, y dos abajo) distinta a
-       la escalera diagonal que había antes (una esquina tras otra, siempre
-       en la misma dirección). Se mantiene el mismo lenguaje visual ya
-       establecido (sin marco blanco, cinta ni texto caligráfico — ver
-       DISEÑO.md): solo cambia la geometría de la composición, no el
-       estilo de cada pieza (mismo `border-radius`, `box-shadow` y
-       fade-in escalonado que ya tenía cada foto).
-       Se suma una 5ª foto (Ambulancia) — la única área del trust-strip
-       ("Ambulancia propia") que todavía no tenía foto propia, mismo
-       criterio ya usado para elegir las otras 4 (reforzar visualmente lo
-       que el texto ya promete). Composición: `a` (quirófano) ancha arriba;
-       `b` (UCI) alta a la izquierda, arrancando debajo del borde superior
-       de `a` y superpuesta con ella; `c` (cardiología) a la derecha,
-       superpuesta con el borde inferior de `a` y el borde derecho de `b`;
-       `d` (neonatología) abajo a la izquierda, superpuesta con `b`; `e`
-       (ambulancia, la más chica) abajo a la derecha, superpuesta con `c`
-       y `d` — mismo criterio de superposición ~10-15% en cada unión que
-       ya usaba la versión anterior, solo que ahora en patrón de molinete
-       en vez de escalera. z-index alterna (2/3) para que la superposición
-       se lea como capas reales. Se deja ~12% de aire libre en la parte
-       inferior del contenedor (ninguna foto llega al 100% de `height`) a
-       propósito — colchón para no repetir el bug ya resuelto de la última
-       foto casi tocando el trust-strip (ver CHANGELOG). Mismo
-       `aspect-ratio` 4/5 del contenedor que ya estaba probado con
-       Playwright en el resto de escalones de compresión de altura. */
-    .cb-hero-collage {
+    /* Mosaico de 5 fotos ("molinete") → slideshow con crossfade, a pedido
+       del usuario: el mosaico obligaba a medir/ajustar posición, ancho y
+       alto de cada una de las 5 piezas a mano contra una referencia
+       visual — fue el origen de varias iteraciones (incluida una que
+       requirió medir la referencia con Python/PIL para no ajustar "a
+       ojo"). El usuario vio el bloque de video del hero de odoo.com/es y
+       pidió algo en esa línea: un solo marco, con las fotos disolviéndose
+       una en otra en loop, en vez de piezas fijas.
+       El marco (`.cb-hero-slideshow`) ocupa exactamente el mismo lugar
+       que ocupaba el mosaico — mismo `aspect-ratio` 4/5, dentro del mismo
+       `.cb-hero-side` sin tocar ninguno de sus `top`/`width` (base ni los
+       2 escalones @media max-height ya medidos y verificados con
+       Playwright para no solaparse con el trust-strip, ver más abajo) —
+       así que todo lo ya resuelto sobre el espacio disponible sigue
+       valiendo sin cambios.
+       Adentro, las 5 fotos (`.cb-hero-slide`) están todas apiladas exacto
+       una encima de otra (`inset: 0`, sin posición/tamaño individual —
+       a diferencia del mosaico, agregar o quitar una foto acá es agregar
+       o quitar un `<div>`, nada de recalcular porcentajes) y se turnan en
+       loop infinito vía CSS puro (`cb-hero-slideshow-cycle`, ver
+       keyframes más abajo): cada una hace fundido de entrada + zoom lento
+       de salida ("Ken Burns", 1.06 → 1 → 0.99 de `scale`), se mantiene
+       fija un rato y se funde a la siguiente. 5 fotos × 5s cada una = 25s
+       de vuelta completa; el reparto del tiempo (offsets de
+       `animation-delay`, 0/5/10/15/20s) viene del orden en el que
+       aparecen los `<div>` en el Blade — no hace falta ninguna clase por
+       foto. */
+    .cb-hero-slideshow {
         position: relative;
         width: 100%;
         aspect-ratio: 4 / 5;
-    }
-
-    .cb-hero-collage-item {
-        position: absolute;
         overflow: hidden;
-        border-radius: 1rem;
+        border-radius: 1.25rem;
+        box-shadow: 0 24px 48px -20px rgb(0 15 40 / 65%);
+        outline: 1px solid rgb(255 255 255 / 10%);
+        outline-offset: -1px;
         opacity: 0;
-        box-shadow: 0 18px 34px -16px rgb(0 15 40 / 60%);
         animation: cb-hero-photo-fade-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    .cb-hero-collage-item--a {
-        top: 0;
-        left: 0;
-        width: 61%;
-        height: 20%;
-        z-index: 2;
         animation-delay: 0.55s;
     }
 
-    .cb-hero-collage-item--b {
-        top: 19%;
-        left: 0;
-        width: 48%;
-        height: 30%;
-        z-index: 3;
-        animation-delay: 0.7s;
+    .cb-hero-slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        animation: cb-hero-slideshow-cycle 25s ease-in-out infinite backwards;
     }
 
-    .cb-hero-collage-item--c {
-        top: 21%;
-        left: 48%;
-        width: 52%;
-        height: 30%;
-        z-index: 2;
-        animation-delay: 0.7s;
+    /* El orden de los `<div class="cb-hero-slide">` en el Blade define el
+       reparto: 5 fotos, cada una "dueña" de una franja de 5s dentro de la
+       vuelta de 25s. */
+    .cb-hero-slide:nth-child(1) {
+        animation-delay: 0s;
     }
 
-    .cb-hero-collage-item--d {
-        top: 56%;
-        left: 10%;
-        width: 42%;
-        height: 30%;
-        z-index: 3;
-        animation-delay: 0.85s;
+    .cb-hero-slide:nth-child(2) {
+        animation-delay: 5s;
     }
 
-    .cb-hero-collage-item--e {
-        top: 64%;
-        left: 54%;
-        width: 30%;
-        height: 20%;
-        z-index: 2;
-        animation-delay: 1s;
+    .cb-hero-slide:nth-child(3) {
+        animation-delay: 10s;
     }
 
-    .cb-hero-collage-item img {
+    .cb-hero-slide:nth-child(4) {
+        animation-delay: 15s;
+    }
+
+    .cb-hero-slide:nth-child(5) {
+        animation-delay: 20s;
+    }
+
+    .cb-hero-slide img {
         display: block;
         width: 100%;
         height: 100%;
@@ -575,25 +558,29 @@
             padding-top: 1.5rem;
         }
 
-        /* El collage (.cb-hero-side) no formaba parte de esta compresión:
-           su `top` y su tamaño (que fija su alto vía aspect-ratio) son fijos
+        /* .cb-hero-side (el wrapper, hoy con el slideshow adentro en vez
+           del mosaico anterior) no formaba parte de esta compresión: su
+           `top` y su tamaño (que fija su alto vía aspect-ratio) son fijos
            en píxeles, mientras que el bloque de texto de al lado sí se
            achica y además se recentra verticalmente (flex-col justify-center
            dentro de un contenedor más bajo) — así que a medida que la
            pantalla perdía altura, el trust-strip subía pero el fondo del
-           collage se quedaba clavado en el mismo lugar. Medido con
-           Playwright antes de este cambio: con la pantalla real del usuario
+           slideshow se quedaba clavado en el mismo lugar. Medido con
+           Playwright antes de este cambio (con el mosaico, mismo footprint
+           que el slideshow actual): con la pantalla real del usuario
            (~800-840px de alto útil) quedaban ~25-30px libres entre la última
            foto y "Atención de emergencias" (se leía como si casi se tocaran);
            por debajo de ~750px de alto ya era solape real, no solo apretado.
-           Se agrega este mismo escalón para el collage: sube (`top` más
-           chico) y se achica (mismo `aspect-ratio`, menos `width`), así el
-           fondo del collage se mueve para arriba en la misma proporción que
-           el trust-strip. Verificado con Playwright en 6 anchos (1280 a
-           1920) x 10 alturas (600 a 1080px): el peor caso da 93.6px libres
-           entre la última foto y el trust-strip (antes, en ese mismo rango,
-           llegaba a solaparse -46px) — nunca menos de 24px de aire en
-           ninguna combinación probada. */
+           Se agrega este mismo escalón: sube (`top` más chico) y se achica
+           (mismo `aspect-ratio`, menos `width`), así el marco se mueve para
+           arriba en la misma proporción que el trust-strip. Verificado con
+           Playwright en 6 anchos (1280 a 1920) x 10 alturas (600 a 1080px)
+           con el mosaico anterior — sigue valiendo igual con el slideshow
+           porque el footprint (`aspect-ratio`/`top`/`width` de este wrapper)
+           no cambió: el peor caso daba 93.6px libres entre la última foto y
+           el trust-strip (antes, en ese mismo rango, llegaba a solaparse
+           -46px) — nunca menos de 24px de aire en ninguna combinación
+           probada. */
         .cb-hero-side {
             top: 9.5rem;
             width: min(18rem, 23vw);
@@ -735,6 +722,38 @@
         }
     }
 
+    /* Ciclo de una foto del slideshow del hero dentro de su franja de 5s
+       (20% de la vuelta completa de 25s, ver `.cb-hero-slide`): entra con
+       fundido + zoom-out lento, se mantiene fija, y se funde de salida
+       antes de que empiece la siguiente. El resto de la vuelta (20%-100%)
+       queda en opacity:0 — ahí es cuando les toca a las otras 4 fotos. */
+    @keyframes cb-hero-slideshow-cycle {
+        0% {
+            opacity: 0;
+            transform: scale(1.06);
+        }
+
+        3% {
+            opacity: 1;
+            transform: scale(1.03);
+        }
+
+        17% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        20% {
+            opacity: 0;
+            transform: scale(0.99);
+        }
+
+        100% {
+            opacity: 0;
+            transform: scale(0.99);
+        }
+    }
+
     @keyframes cb-bounce {
         0%,
         100% {
@@ -773,8 +792,21 @@
             display: none;
         }
 
-        .cb-hero-collage-item {
+        /* Con movimiento reducido, el slideshow no rota ni hace zoom:
+           se congela mostrando la primera foto (quirófano) fija, en vez
+           de intentar "pausarlo" a mitad de una transición. */
+        .cb-hero-slideshow {
             animation: none;
+            opacity: 1;
+        }
+
+        .cb-hero-slide {
+            animation: none;
+            opacity: 0;
+            transform: none;
+        }
+
+        .cb-hero-slide:first-child {
             opacity: 1;
         }
     }
