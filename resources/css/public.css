@@ -1128,6 +1128,27 @@
         border-bottom: 1px solid rgb(255 255 255 / 10%);
     }
 
+    /* Grupo izquierdo (ícono + nombre) de cada fila del directorio. */
+    .cb-directory-left {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        min-width: 0;
+    }
+
+    .cb-directory-icon {
+        flex-shrink: 0;
+        color: var(--color-cb-teal-600);
+        transition:
+            color 0.25s ease,
+            transform 0.25s ease;
+    }
+
+    .cb-directory-row:hover .cb-directory-icon {
+        color: var(--color-cb-gold-500);
+        transform: scale(1.08);
+    }
+
     .cb-directory-col > .cb-directory-row:first-child {
         border-top: 1px solid rgb(255 255 255 / 10%);
     }
@@ -1181,6 +1202,65 @@
     .cb-directory-row:hover .cb-directory-arrow {
         opacity: 1;
         transform: translateX(0);
+    }
+
+    /* ---------- Especialidades sobre fondo claro (28 ago 2026) ----------
+       Antes esta sección era `cb-section--dark` — a pedido del usuario
+       pasó a `cb-section--light`. Las clases de arriba (watermark, cifra
+       grande, divisores, nombre, flecha) están pensadas por defecto para
+       fondo navy; acá se sobreescriben sus colores solo dentro de
+       `.cb-section--light`, sin tocar su comportamiento en ninguna otra
+       sección oscura que las reutilice. Mismo criterio de paleta que
+       `.cb-about-lede`/`.cb-about-body` en "Sobre nosotros" (navy-950
+       sobre ivory), la otra sección clara del sitio. */
+    .cb-section--light .cb-hero-grid {
+        background-image:
+            repeating-linear-gradient(0deg, rgb(0 31 95 / 5%) 0 1px, transparent 1px 72px),
+            repeating-linear-gradient(90deg, rgb(0 31 95 / 5%) 0 1px, transparent 1px 72px);
+    }
+
+    .cb-section--light .cb-directory-watermark {
+        -webkit-text-stroke-color: rgb(15 110 86 / 16%);
+    }
+
+    .cb-section--light .cb-headline {
+        color: var(--color-cb-navy-950);
+    }
+
+    .cb-section--light .cb-section-lede {
+        color: rgb(0 31 95 / 66%);
+    }
+
+    .cb-section--light .cb-stat-number {
+        background: linear-gradient(135deg, var(--color-cb-navy-950), var(--color-cb-teal-600));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .cb-section--light .cb-stat-label {
+        color: rgb(0 31 95 / 55%);
+    }
+
+    .cb-section--light .cb-directory-col:not(:first-child) {
+        border-left-color: rgb(0 31 95 / 10%);
+    }
+
+    .cb-section--light .cb-directory-row,
+    .cb-section--light .cb-directory-col > .cb-directory-row:first-child {
+        border-color: rgb(0 31 95 / 12%);
+    }
+
+    .cb-section--light .cb-directory-name {
+        color: rgb(0 31 95 / 80%);
+    }
+
+    .cb-section--light .cb-directory-row:hover .cb-directory-name {
+        color: var(--color-cb-navy-950);
+    }
+
+    .cb-section--light .cb-directory-arrow {
+        color: var(--color-cb-gold-500);
     }
 
     /* ============================================================

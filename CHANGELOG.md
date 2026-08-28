@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Especialidades: ícono por fila + fondo blanco
+
+A pedido del usuario: la sección pasa de `cb-section--dark` a `cb-section--light` (mismo tratamiento que "Sobre nosotros"), con overrides de color en `public.css` para watermark/cifra/divisores/nombre/flecha sobre fondo claro. Cada fila del directorio suma un ícono de trazo fino (`especialidades.blade.php`, array `$iconos`) agrupado por sistema/órgano clínico real (ej. Cardiología y Cateterismo Cardiaco comparten el corazón) en vez de un ícono distinto sin criterio por cada una de las 27. Verificado con una vista previa HTML renderizada con Playwright (CSS real compilado vía `vite build`, sin la fuente Bunny por falta de red en el sandbox) antes de dar el cambio por cerrado — el ícono de Neurología pasó de un cerebro de dos lóbulos (no se leía a 20px) a un rayo de impulso nervioso, más claro a ese tamaño.
+
 ## [2026-08-28] Especialidades: se saca por completo el tratamiento de letras
 
 Feedback directo del usuario: "no me gusta, quítale el alfabeto". Se eliminó de `especialidades.blade.php` + `public.css` todo lo relacionado a letras — el marcador de grupo inline dentro de cada columna (`cb-directory-group-letter`) y el scatter de letras dispersas en los márgenes (`cb-directory-scatter`, agregado en el commit anterior tras la referencia de mobbin.com). Queda: watermark "27" de fondo, cifra grande en primer plano (`cb-stat-callout`), divisores verticales entre las 3 columnas y línea dorada en hover. El array de especialidades sigue alfabetizado (es el orden de los datos), simplemente ya no se anota visualmente. `$letras`/`$scatter` se sacaron del Blade por no usarse más.
