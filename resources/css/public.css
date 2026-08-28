@@ -253,9 +253,9 @@
        en pantallas altas (1920×1080, sin compresión) quedan 175px. */
     .cb-hero-side {
         position: absolute;
-        top: 9rem;
+        top: 9.5rem;
         right: max(4rem, calc((100vw - 80rem) / 2 + 4rem));
-        width: min(37rem, 44vw);
+        width: min(39rem, 46vw);
         pointer-events: none;
     }
 

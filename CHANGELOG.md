@@ -8,6 +8,29 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-28] Segunda vuelta: video de fondo del hero, más grande y más abajo (todavía)
+
+El usuario, tras aplicar el patch anterior (ver la entrada de abajo, mismo día), pidió un empujón más: *"si mejoro pero aun le falta centrarse mas adonde yo quiero o hacerlo mas grande"*.
+
+**`resources/css/public.css`** — solo se tocó `.cb-hero-side` (base, sin compresión):
+- `top`: `9rem` → `9.5rem`.
+- `width`: `min(37rem, 44vw)` → `min(39rem, 46vw)`.
+
+**Por qué no se agrandó más**: agrandar y bajar compiten por el mismo presupuesto de espacio (el borde inferior del video no puede pasar de la fila de botones). Se probaron 4 combinaciones con Playwright (barrido de 294 combinaciones de ancho×alto) antes de elegir esta:
+
+| Candidato | Peor margen | Resultado |
+|---|---|---|
+| `top:10rem` / `width:min(42rem,50vw)` | **-22px** | Solape real (68 combinaciones) — descartado |
+| `top:9rem` / `width:min(41rem,48vw)` | 6px | Sin solape, pero demasiado ajustado — descartado |
+| `top:9.25rem` / `width:min(40rem,47vw)` | 14px | Sin solape, todavía ajustado — descartado |
+| `top:9.5rem` / `width:min(39rem,46vw)` | **22px** | Sin solape, margen prudente — **elegido** |
+
+**Verificado**: 0 casos de solape en las 294 combinaciones (anchos 1280-1920 × alturas 600-1080, cada 10px). Peor caso 22px libres (antes de esta vuelta, 54px — hay menos aire a propósito, el pedido era justamente seguir agrandando/bajando). No se tocaron los escalones `@media max-height` (900px/700px), ya ajustados en la vuelta anterior y sin necesidad de más cambios según esta misma verificación.
+
+**Pendiente confirmar por el usuario en su entorno real.**
+
+---
+
 ## [2026-08-28] Ajuste fino del video de fondo del hero: más color, más abajo, más grande
 
 Pedido del usuario tras confirmar que el resultado del cambio anterior (video de fondo semitransparente) "le encantó": *"solo si me gustaría des un poco mas de color y de pocionamiento bájalo un poquito (se ve muy arriba y si lo puedes ampliar o hacer un poco mas grande fuera chevere)"*. Los 3 pedidos, uno a uno:
