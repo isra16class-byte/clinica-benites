@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Fix de scroll-reveal: `.cb-reveal` ahora se dispara con el scroll, no al cargar
+
+`animation-timeline: view()` (scroll-driven, CSS puro, con `@supports` para degradar seguro) reemplaza el disparo por `animation-delay` en ms — antes el fade-up terminaba antes de que el usuario llegara scrolleando a secciones como Contacto, y nunca se veía. **Scoped a `.cb-section .cb-reveal`** (no al Hero, que usa `.cb-hero`): el Hero mantiene su fade-up escalonado al cargar la página intacto — es el "momento audaz" ya confirmado del sitio, y aplicar el fix ahí lo habría roto (el Hero ya está visible en scroll=0, así que su rango "entry" ya habría pasado al cargar). Con esto, el brief cerrado de `docs/PLAN_SITIO_PUBLICO.md` queda completo.
+
 ## [2026-08-28] Rediseño Contacto: ícono de pulso + pulso de opacidad sutil
 
 Se reemplazó el ícono duplicado del panel "Atención de emergencias" (era el mismo pin de ubicación que ya se usa arriba) por un ícono de pulso/ECG, que conecta con la línea de pulso del hero en dosis mínima. Se le agregó una animación de opacidad sutil (`cb-pulse-fade`, sin escala, respeta `prefers-reduced-motion`) siguiendo `docs/PLAN_SITIO_PUBLICO.md` sección 5.5 — contenido real (ambulancia/emergencias ya confirmado), no decoración porque sí. No depende del fix de `.cb-reveal`→`view()`, que sigue diferido para el final.

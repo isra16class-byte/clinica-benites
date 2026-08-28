@@ -241,9 +241,12 @@ que retome el trabajo no tenga que repreguntar nada.
    marcador de grupo por letra + línea dorada trazada en hover) y ya
    implementado en `especialidades.blade.php` + `public.css` (ver
    CHANGELOG.md, entrada del 28 ago 2026).
-4. **Fix de animación (`.cb-reveal` → scroll-driven `view()`)**: confirmado,
-   pero **pendiente** — se aplica al final, junto con el resto de las
-   secciones, no ahora. No implementar todavía.
+4. **Fix de animación (`.cb-reveal` → scroll-driven `view()`)**: implementado
+   (28 ago 2026, quinta entrada) — `animation-timeline: view()` con
+   `@supports`, scoped a `.cb-section .cb-reveal` (no al Hero, que mantiene
+   su fade-up escalonado al cargar sin tocar). Ver comentario en
+   `public.css` para el razonamiento completo de por qué no se aplicó al
+   Hero.
 5. **Servicios**: implementado (28 ago 2026, tercera entrada) — se quitó el
    `cb-orb-teal` (color plano) y se reemplazó por `cb-hero-grid` con máscara
    propia + glow ambiental hecho con la foto real de Quirófanos
@@ -261,6 +264,8 @@ que retome el trabajo no tenga que repreguntar nada.
 
 ### Siguiente paso pendiente
 
-Solo queda el fix de animación (punto 4): `.cb-reveal` → scroll-driven
-`view()`, aplicado a todo el sitio de una vez. Con eso, el brief del plan
-queda completo.
+Ninguno del rediseño — el brief de este documento queda completo (las 5
+secciones + el fix de scroll-reveal). Lo que sigue son los pendientes
+operativos de `MEMORIA.md` sección 11: confirmar visualmente en entorno
+real, reemplazar los placeholders de teléfono/WhatsApp, asignar `medico_id`
+a usuarios médico, y la entrevista formal con el dueño.

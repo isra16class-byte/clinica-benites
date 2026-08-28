@@ -805,6 +805,40 @@
         animation: cb-fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
+    /* Fix de scroll-reveal (28 ago 2026) — ver docs/PLAN_SITIO_PUBLICO.md
+       sección 5.5 para la investigación completa. Antes, TODO `.cb-reveal`
+       se disparaba al cargar la página vía `animation-delay` en ms: al
+       llegar scrolleando a una sección de más abajo (Contacto, por
+       ejemplo), esa animación ya había terminado hace rato y nunca se
+       veía — una de las razones por las que esas secciones se sentían
+       más planas que el Hero.
+
+       La solución es CSS scroll-driven puro (`animation-timeline:
+       view()`, sin JS, con `@supports` para degradar seguro en
+       navegadores sin soporte — el contenido simplemente queda visible
+       de una, sin animación rota).
+
+       Importante: esto se aplica solo dentro de `.cb-section` (el
+       wrapper genérico de Especialidades/Servicios/Sobre
+       nosotros/Contacto), NO al Hero (`.cb-hero`, otra clase). El Hero
+       usa `.cb-reveal` para su propio fade-up escalonado al cargar la
+       página — es el "momento audaz" ya confirmado del sitio (ver tabla
+       de la sección 5.5, fila Hero: "No tocar"). Si este fix se aplicara
+       también ahí, se rompería: el Hero ya está visible en scroll=0
+       desde el primer frame, así que su rango "entry" ya habría pasado
+       al cargar y el contenido aparecería de golpe sin animar, en vez
+       del escalonado actual por `animation-delay`. Por eso el scoping a
+       `.cb-section .cb-reveal`, que cubre exactamente las 4 secciones
+       que sí tenían el problema reportado. */
+    @media (prefers-reduced-motion: no-preference) {
+        @supports (animation-timeline: view()) {
+            .cb-section .cb-reveal {
+                animation-timeline: view();
+                animation-range: entry 0% cover 30%;
+            }
+        }
+    }
+
     @keyframes cb-fade-up {
         from {
             opacity: 0;
