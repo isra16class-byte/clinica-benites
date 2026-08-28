@@ -8,6 +8,17 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Fix: la última foto del collage casi tocaba el trust-strip en pantallas de poca altura
+
+- El usuario confirmó que el collage en cascada (entrada de abajo) "sí estuvo bien" en su entorno real, pero pidió correrlo "un poco más arriba para que no toque lo de abajo" — compartió una captura de `localhost/#inicio` donde la última foto (`--d`) quedaba muy cerca de "Atención de emergencias" (último ítem del trust-strip).
+- **Medido con Playwright antes de tocar CSS** (mismo criterio que el bug de compresión vertical de una sesión anterior): `.cb-hero-side` tiene `top`/`width` fijos, así que su alto real en píxeles no responde a la altura del viewport. El bloque de texto de al lado sí: además de los dos escalones de compresión ya existentes (`@media max-height: 900px/700px`), está centrado verticalmente dentro de un `min-h-screen`, así que en pantallas más bajas todo el bloque (trust-strip incluido) sube — mientras el fondo del collage se queda fijo, cerrando el aire entre ambos.
+- En la franja de 700-900px de alto de viewport (donde cae la pantalla real del usuario, ~800-840px efectivos) quedaban solo ~25-30px libres antes del cambio; por debajo de ~750px ya era **solape real** medido (hasta -46px) — un bug genuino, no solo apretado.
+- **Fix aplicado**: se sumó `.cb-hero-side` a los mismos dos escalones de compresión que ya existían (`top`/`width` más chicos en cada uno; el alto se reduce en la misma proporción vía el `aspect-ratio` ya existente) — mismo mecanismo que el resto del bloque, no un valor nuevo inventado.
+- **Verificado con Playwright**: matriz de 6 anchos (1280-1920px) × 10-11 alturas (600-1080px). Peor caso: 93.6px libres entre la última foto y el trust-strip (antes, -46px de solape real en ese mismo rango). Ningún caso quedó por debajo de 24px de aire. Capturas confirmaron visualmente el resultado a ~820px de alto (aproximando el entorno real del usuario). El escalón base (>900px de alto) no se tocó, se ve igual que antes.
+- **Pendiente confirmar por el usuario en su propio entorno real.**
+
+---
+
 ## [2026-08-27] Grid 2x2 de fotos → collage asimétrico en cascada
 
 - El usuario compartió una referencia visual de un collage tipo scrapbook (polaroids con marco blanco y ligera rotación, washi tape, texto caligráfico "Enero") y preguntó si se podía hacer algo similar con las fotos del hero.

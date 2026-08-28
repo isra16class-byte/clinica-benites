@@ -551,6 +551,30 @@
             margin-top: 2.25rem;
             padding-top: 1.5rem;
         }
+
+        /* El collage (.cb-hero-side) no formaba parte de esta compresión:
+           su `top` y su tamaño (que fija su alto vía aspect-ratio) son fijos
+           en píxeles, mientras que el bloque de texto de al lado sí se
+           achica y además se recentra verticalmente (flex-col justify-center
+           dentro de un contenedor más bajo) — así que a medida que la
+           pantalla perdía altura, el trust-strip subía pero el fondo del
+           collage se quedaba clavado en el mismo lugar. Medido con
+           Playwright antes de este cambio: con la pantalla real del usuario
+           (~800-840px de alto útil) quedaban ~25-30px libres entre la última
+           foto y "Atención de emergencias" (se leía como si casi se tocaran);
+           por debajo de ~750px de alto ya era solape real, no solo apretado.
+           Se agrega este mismo escalón para el collage: sube (`top` más
+           chico) y se achica (mismo `aspect-ratio`, menos `width`), así el
+           fondo del collage se mueve para arriba en la misma proporción que
+           el trust-strip. Verificado con Playwright en 6 anchos (1280 a
+           1920) x 10 alturas (600 a 1080px): el peor caso da 93.6px libres
+           entre la última foto y el trust-strip (antes, en ese mismo rango,
+           llegaba a solaparse -46px) — nunca menos de 24px de aire en
+           ninguna combinación probada. */
+        .cb-hero-side {
+            top: 9.5rem;
+            width: min(18rem, 23vw);
+        }
     }
 
     @media (max-height: 700px) {
@@ -578,6 +602,14 @@
         .cb-trust-strip {
             margin-top: 1rem;
             padding-top: 0.75rem;
+        }
+
+        /* Mismo criterio que el escalón de 900px de arriba, un paso más
+           chico — `top` no baja de 7.5rem por el mismo piso que ya tiene
+           `.cb-hero-content` (86px reales del nav fijo, con margen). */
+        .cb-hero-side {
+            top: 7.5rem;
+            width: min(15rem, 20vw);
         }
     }
 
