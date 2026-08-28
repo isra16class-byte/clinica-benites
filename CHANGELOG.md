@@ -8,6 +8,28 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Video del hero: de "tarjeta al costado" a "video de fondo" (semitransparente, más grande, superpuesto al título)
+
+Retomado en una sesión nueva (la anterior se quedó sin créditos a mitad del cambio, sin llegar a generar el patch). El usuario reenvió el mismo video ya integrado (confirmado con frames idénticos, mismo archivo 1280×720/10s) — el video en sí siempre fue horizontal, lo "vertical" era el marco CSS heredado del slideshow de fotos anterior (`aspect-ratio: 4/5`).
+
+Pedido: *"lo podemos hacer medio transparente y más grande, no importa que toque las letras de Precisión quirúrgica. Calidez humana., ya que el video va a estar como de fondo"*. Alcance confirmado: más grande y superpuesto al título, pero sin cubrir la fila de botones ni la franja de confianza (siguen sobre fondo sólido).
+
+**`resources/css/public.css`**:
+- `.cb-hero-side`: `min(21rem,27vw)` → `min(34rem,42vw)`, `top:12.5rem` → `top:7rem`. Recalculados los 2 escalones `@media max-height` (900px y 700px) en la misma proporción.
+- `.cb-hero-slideshow`: se sacan `border-radius`/`box-shadow`/`outline` (ya no es una tarjeta), se agrega `opacity: 0.5` + `mask-image: radial-gradient(72% 72% at 55% 42%, #000 45%, transparent 100%)` (con prefijo `-webkit-`) para desvanecer los 4 bordes en vez de cortar en seco. `aspect-ratio` de 4/5 (vertical) a 4/3 (horizontal, coherente con el video real 16:9).
+- Keyframe `cb-hero-photo-fade-in`: opacidad final de `1` a `0.5`, consistente con el nuevo estado translúcido.
+- Bloque `prefers-reduced-motion`: `.cb-hero-slideshow` congelado ahora en `opacity: 0.5` (no 1), mismo criterio.
+
+**`resources/views/sections/hero.blade.php`**: comentario reescrito documentando el pedido textual, el alcance confirmado y el detalle de cada cambio.
+
+**Verificado con Playwright** (bounding boxes reales, `getBoundingClientRect()`) en 7 combinaciones ancho/alto (1280-1920 × 700-1080): sin solape con `.cb-cta-row` en ningún caso — peor caso (1366×768) 108px libres, mejor caso (1920×1080) 175px libres. Se armó un entorno de prueba local (Blade→HTML estático + Tailwind CLI + `http.server`) para medir sin depender de PHP/Sail. Capturas ampliadas confirman el degradado radial funcionando (bordes difuminados hacia el navy de fondo, texto del título legible por encima).
+
+**Nota de entorno**: el Chromium de este sandbox no reproduce H.264 en vivo (misma limitación ya documentada) — la verificación fue contra el `poster`/primer frame estático, no el video en loop real.
+
+**Pendiente confirmar por el usuario en su propio entorno real** — en particular, cómo se ve la fusión con el título con el video realmente en movimiento.
+
+---
+
 ## [2026-08-27] Slideshow de 5 fotos → video único en loop (plan ya definido, el usuario subió el video)
 
 - Plan ya acordado desde la entrada anterior (slideshow con crossfade): reemplazar las 5 fotos por un video único en loop, un solo plano continuo. El usuario generó el video en otra plataforma y lo subió (`1280×720`, 10s, h264/aac, 2.6MB) — dentro del rango objetivo de 8-15s.

@@ -234,11 +234,28 @@
        internamente para centrar ese contenedor, así que en cualquier
        ancho de pantalla (1280px hasta un monitor 4K) el grid termina
        exactamente donde termina el resto del contenido, nunca más allá. */
+    /* 27 ago 2026 (segunda entrada del día) — video "de fondo": a pedido
+       del usuario ("hazlo medio transparente y más grande, no importa
+       que toque las letras de Precisión quirúrgica. Calidez humana, ya
+       que el video va a estar como de fondo"), la caja crece bastante
+       (de min(21rem,27vw) a min(34rem,42vw) en pantallas altas) y sube
+       (`top` de 12.5rem a 7rem) para quedar detrás del título en vez de
+       al costado — el texto sigue arriba en el z-index (`.cb-hero-content`
+       tiene z-10, `.cb-hero-side` no define z-index, así que el título
+       siempre gana) y el video puede meterse debajo sin taparlo.
+       Único límite duro que se mantuvo: no invadir la fila de botones
+       (`.cb-cta-row`) ni la franja de confianza (`.cb-trust-strip`), que
+       siguen sobre fondo sólido, sin ningún elemento semitransparente
+       encima — verificado con Playwright (bounding boxes reales, no a
+       ojo) en la misma matriz de anchos/alturas de siempre: el peor caso
+       (1366×768, el escalón de compresión @media max-height:900px) deja
+       108px libres entre el borde inferior del video y el primer botón;
+       en pantallas altas (1920×1080, sin compresión) quedan 175px. */
     .cb-hero-side {
         position: absolute;
-        top: 12.5rem;
+        top: 7rem;
         right: max(4rem, calc((100vw - 80rem) / 2 + 4rem));
-        width: min(21rem, 27vw);
+        width: min(34rem, 42vw);
         pointer-events: none;
     }
 
@@ -246,24 +263,30 @@
        ya estaba definido desde que se hizo el slideshow (ver MEMORIA.md):
        el usuario generó el video en otra plataforma (un solo plano
        continuo, no varios clips) y lo subió.
-       El marco (`.cb-hero-slideshow`) no cambió — mismo `aspect-ratio`
-       4/5, mismo `border-radius`/`box-shadow`/`outline`, mismo fade-in de
-       entrada, dentro del mismo `.cb-hero-side` sin tocar ninguno de sus
-       `top`/`width` (base ni los 2 escalones @media max-height ya
-       medidos y verificados con Playwright para no solaparse con el
-       trust-strip, ver más abajo) — solo cambió qué hay adentro: antes 5
-       `<div class="cb-hero-slide">` apilados con crossfade por CSS, ahora
-       un único `<video>`. */
+       27 ago 2026 (segunda entrada del día) — de "tarjeta de foto" a
+       "video de fondo": ya no es un recorte tipo tarjeta (foto con
+       esquinas redondeadas, sombra y borde) apoyada al costado del
+       texto — ahora es una mancha translúcida sin borde duro que se
+       superpone al título. Se sacaron `border-radius`/`box-shadow`/
+       `outline` (ya no hay tarjeta que enmarcar) y se agregó `opacity`
+       + `mask-image` con un degradado radial: el rectángulo real del
+       `<video>` se desvanece hacia los 4 bordes en vez de cortarse en
+       seco, así nunca se lee como "una foto pegada encima del texto"
+       sino como una textura de fondo. `aspect-ratio` cambia de 4/5
+       (vertical, heredado sin querer del slideshow de fotos anterior —
+       nunca se había reconsiderado al pasar a video) a 4/3 (más
+       horizontal, coherente con el video real de 16:9 y con el uso "de
+       fondo" que se le está dando ahora). Mismo mecanismo de fade-in de
+       entrada (`cb-hero-photo-fade-in`), pero el estado final ya no es
+       opacidad 1 (opaco) sino 0.5 — ver el keyframe más abajo. */
     .cb-hero-slideshow {
         position: relative;
         width: 100%;
-        aspect-ratio: 4 / 5;
+        aspect-ratio: 4 / 3;
         overflow: hidden;
-        border-radius: 1.25rem;
-        box-shadow: 0 24px 48px -20px rgb(0 15 40 / 65%);
-        outline: 1px solid rgb(255 255 255 / 10%);
-        outline-offset: -1px;
         opacity: 0;
+        mask-image: radial-gradient(ellipse 72% 72% at 55% 42%, #000 45%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse 72% 72% at 55% 42%, #000 45%, transparent 100%);
         animation: cb-hero-photo-fade-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         animation-delay: 0.55s;
     }
@@ -526,32 +549,26 @@
             padding-top: 1.5rem;
         }
 
-        /* .cb-hero-side (el wrapper, hoy con el slideshow adentro en vez
-           del mosaico anterior) no formaba parte de esta compresión: su
-           `top` y su tamaño (que fija su alto vía aspect-ratio) son fijos
-           en píxeles, mientras que el bloque de texto de al lado sí se
-           achica y además se recentra verticalmente (flex-col justify-center
-           dentro de un contenedor más bajo) — así que a medida que la
-           pantalla perdía altura, el trust-strip subía pero el fondo del
-           slideshow se quedaba clavado en el mismo lugar. Medido con
-           Playwright antes de este cambio (con el mosaico, mismo footprint
-           que el slideshow actual): con la pantalla real del usuario
-           (~800-840px de alto útil) quedaban ~25-30px libres entre la última
-           foto y "Atención de emergencias" (se leía como si casi se tocaran);
-           por debajo de ~750px de alto ya era solape real, no solo apretado.
-           Se agrega este mismo escalón: sube (`top` más chico) y se achica
-           (mismo `aspect-ratio`, menos `width`), así el marco se mueve para
-           arriba en la misma proporción que el trust-strip. Verificado con
-           Playwright en 6 anchos (1280 a 1920) x 10 alturas (600 a 1080px)
-           con el mosaico anterior — sigue valiendo igual con el slideshow
-           porque el footprint (`aspect-ratio`/`top`/`width` de este wrapper)
-           no cambió: el peor caso daba 93.6px libres entre la última foto y
-           el trust-strip (antes, en ese mismo rango, llegaba a solaparse
-           -46px) — nunca menos de 24px de aire en ninguna combinación
-           probada. */
+        /* .cb-hero-side (el wrapper, con el video de fondo adentro) no
+           formaba parte de esta compresión: su `top` y su tamaño (que
+           fija su alto vía aspect-ratio) son fijos en píxeles, mientras
+           que el bloque de texto de al lado sí se achica y además se
+           recentra verticalmente (flex-col justify-center dentro de un
+           contenedor más bajo) — así que a medida que la pantalla pierde
+           altura, la fila de botones sube pero el video se quedaría
+           clavado en el mismo lugar si no se ajusta también. Mismo
+           escalón que ya existía (sube y se achica en la misma
+           proporción), recalculado el 27 ago 2026 (segunda entrada del
+           día) para el tamaño nuevo, más grande, del video "de fondo":
+           de min(21rem,27vw)/top:12.5rem (tarjeta chica al costado) a
+           min(28rem,36vw)/top:5rem. Reverificado con Playwright (bounding
+           boxes reales) en la misma matriz de anchos (1280-1920) —
+           el peor caso (1366×768, la laptop más angosta+baja del rango)
+           deja 108px libres entre el borde inferior del video y el
+           primer botón de la fila de CTAs — nunca solapa. */
         .cb-hero-side {
-            top: 9.5rem;
-            width: min(18rem, 23vw);
+            top: 5rem;
+            width: min(28rem, 36vw);
         }
     }
 
@@ -583,11 +600,15 @@
         }
 
         /* Mismo criterio que el escalón de 900px de arriba, un paso más
-           chico — `top` no baja de 7.5rem por el mismo piso que ya tiene
-           `.cb-hero-content` (86px reales del nav fijo, con margen). */
+           chico — `top` no baja de 4rem por el mismo piso que ya tiene
+           `.cb-hero-content` (86px reales del nav fijo, con margen: a
+           esta altura el eyebrow ya arranca pegado al nav, así que el
+           video no puede subir más sin meterse debajo de él). Recalculado
+           el 27 ago 2026 (segunda entrada del día) junto con el escalón
+           de 900px, mismo criterio de tamaño proporcionalmente más chico. */
         .cb-hero-side {
-            top: 7.5rem;
-            width: min(15rem, 20vw);
+            top: 4rem;
+            width: min(22rem, 30vw);
         }
     }
 
@@ -684,9 +705,13 @@
         }
     }
 
+    /* Opacidad final 0.5 (no 1): desde el cambio a "video de fondo" (27
+       ago 2026), el marco ya no es una tarjeta opaca — el fade-in de
+       entrada ahora lleva a un estado semitransparente, no a full opacidad,
+       para que se siga leyendo "de fondo" también al terminar de aparecer. */
     @keyframes cb-hero-photo-fade-in {
         to {
-            opacity: 1;
+            opacity: 0.5;
         }
     }
 
@@ -732,10 +757,13 @@
            se pausa: un <video autoplay> no se puede pausar por CSS) y se
            reemplaza por la foto fija de respaldo — mismo criterio que ya
            usaba el slideshow (congelarse en la primera foto) en vez de
-           dejar movimiento corriendo. */
+           dejar movimiento corriendo. Opacidad final 0.5, no 1 (27 ago
+           2026): con movimiento reducido el marco no debe volverse
+           opaco de golpe — sigue siendo "de fondo", solo que congelado
+           en vez de en loop, mismo criterio que el estado normal. */
         .cb-hero-slideshow {
             animation: none;
-            opacity: 1;
+            opacity: 0.5;
         }
 
         .cb-hero-video {

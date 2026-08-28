@@ -22,15 +22,34 @@
     <div class="cb-orb cb-orb-gold" aria-hidden="true"></div>
 
     {{--
-        Columna derecha del hero: video único en loop (un solo plano
-        continuo), reemplaza al slideshow con crossfade de 5 fotos
-        anterior — plan definido desde que se hizo el slideshow (ver
-        MEMORIA.md): el usuario generó el video en otra plataforma y lo
-        subió. Mismo marco que ya tenía el slideshow (`.cb-hero-slideshow`
-        sin cambios: mismo `aspect-ratio` 4/5, mismo `top`/`width`/
-        breakpoints de `.cb-hero-side`, mismo `border-radius`/
-        `box-shadow` — no se tocó nada de eso, solo cambió qué hay
-        adentro del marco).
+        Columna derecha del hero: video único en loop, "de fondo" —
+        27 ago 2026 (segunda entrada del día), a pedido del usuario tras
+        ver el primer resultado (marco tipo tarjeta, vertical, al costado
+        del texto): "por qué lo hiciste vertical? lo podemos hacer medio
+        transparente y más grande, no importa que toque las letras de
+        Precisión quirúrgica. Calidez humana., ya que el video va a estar
+        como de fondo". Confirmado el alcance antes de tocar CSS: "más
+        grande que ahora y superpuesto al título, pero sin cubrir todo el
+        hero (botones/trust-strip siguen sobre fondo sólido)".
+        Cambios sobre la versión anterior (ver `public.css` para el
+        detalle completo de cada regla):
+        - `.cb-hero-side` crece bastante (de min(21rem,27vw) a
+          min(34rem,42vw)) y sube (`top` de 12.5rem a 7rem) para quedar
+          detrás del título en vez de al costado.
+        - `.cb-hero-slideshow` ya no es una tarjeta (se sacaron
+          `border-radius`/`box-shadow`/`outline`): ahora es semitransparente
+          (`opacity: 0.5`) con un `mask-image` radial que desvanece los 4
+          bordes, para que nunca se lea como una foto pegada encima del
+          texto sino como una textura de fondo.
+        - `aspect-ratio` pasa de 4/5 (vertical, heredado sin querer del
+          slideshow de fotos anterior) a 4/3 (más horizontal, coherente
+          con el video real de 16:9 y con el uso "de fondo").
+        El texto sigue arriba en el z-index (`.cb-hero-content` tiene
+        z-10, `.cb-hero-side` no define z-index) — el video puede
+        meterse debajo del título sin taparlo. Único límite que se
+        mantuvo: no invadir la fila de botones ni la franja de confianza
+        — verificado con Playwright (bounding boxes reales) en la misma
+        matriz de anchos/alturas de siempre, ver `public.css`.
         Requisitos técnicos del `<video>`: `muted` (obligatorio para que
         `autoplay` funcione en todos los navegadores), `autoplay`,
         `loop`, `playsinline` (evita que iOS lo abra en pantalla
@@ -45,6 +64,10 @@
         criterio que ya usaba el slideshow (congelarse en la primera
         foto) — sin necesitar JS para pausar el video (el sitio público
         no tiene JS propio, es deliberadamente CSS puro, ver DISEÑO.md).
+        **Pendiente confirmar por el usuario en su propio entorno real**
+        (en particular, si el punto de fusión con el título se ve bien
+        con el video corriendo — acá se verificó con Playwright, que en
+        este sandbox no reproduce H.264 en vivo, ver nota en MEMORIA.md).
     --}}
     <div class="cb-hero-side hidden xl:block" aria-hidden="true">
         <div class="cb-hero-slideshow">
