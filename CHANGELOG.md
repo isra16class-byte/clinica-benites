@@ -8,6 +8,25 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-28] Cuarta vuelta: más desvanecido en el marco del video
+
+El usuario confirmó que el tamaño/posición de la vuelta anterior le gustó y pidió un ajuste puntual: *"si me gusto, pero puedes desvanecer mas el marco del video?"*.
+
+**`resources/css/public.css`** — solo `.cb-hero-slideshow`, el `mask-image`:
+
+| | Antes | Ahora |
+|---|---|---|
+| Elipse | `72% 72%` | `85% 85%` |
+| Stop sólido (`#000`) | `60%` | `22%` |
+
+La elipse crece y el desvanecido arranca mucho antes desde el centro — antes quedaba apretado en una franja angosta cerca del borde, más notorio en el borde derecho e inferior (los más cercanos al borde real del viewport desde la vuelta anterior). Ahora los 4 bordes se funden gradualmente con el navy.
+
+**Verificado**: capturas visuales en 1920×1080 (foto real como sustituto del `<video>`) con recortes ampliados de los bordes, confirman transición suave en los 4 lados. No se tocó geometría ni opacidad.
+
+**Pendiente confirmar por el usuario en su entorno real.**
+
+---
+
 ## [2026-08-28] Tercera vuelta: video de fondo del hero, mucho más grande y pegado al borde derecho (a partir de una captura marcada)
 
 El usuario compartió una captura real de su entorno (1920×1080) con un recuadro rojo marcando dónde quería el video: *"que el video cubra casi toda la parte derecha de la pantalla... tiene que ser más grande y cubrir más... no quiero que el video baje de la línea de donde están los iconos... los bordes del video se vean desvanecidos con el azul"* (el desvanecido ya estaba resuelto desde la vuelta anterior).

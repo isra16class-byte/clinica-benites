@@ -348,8 +348,19 @@
         aspect-ratio: 4 / 3;
         overflow: hidden;
         opacity: 0;
-        mask-image: radial-gradient(ellipse 72% 72% at 55% 42%, #000 60%, transparent 100%);
-        -webkit-mask-image: radial-gradient(ellipse 72% 72% at 55% 42%, #000 60%, transparent 100%);
+        /* 28 ago 2026 (cuarta vuelta) — a pedido del usuario tras confirmar
+           que le gustó el tamaño/posición nuevos ("si me gusto, pero puedes
+           desvanecer mas el marco del video?"): la elipse crece de 72%/72%
+           a 85%/85% y el punto donde empieza a desvanecerse (el stop de
+           `#000`) baja de 60% a 22% — antes el centro se mantenía sólido
+           hasta bastante cerca del borde y el desvanecido real quedaba
+           apretado en una franja angosta (se notaba, sobre todo en el
+           borde derecho e inferior, más cerca del borde del contenedor por
+           el `right:1.5rem` de la vuelta anterior). Con la elipse más
+           grande y el desvanecido arrancando mucho antes, la transición es
+           gradual en los 4 bordes, no solo arriba/izquierda. */
+        mask-image: radial-gradient(ellipse 85% 85% at 55% 42%, #000 22%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse 85% 85% at 55% 42%, #000 22%, transparent 100%);
         animation: cb-hero-photo-fade-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         animation-delay: 0.55s;
     }
