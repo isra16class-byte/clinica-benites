@@ -8,6 +8,18 @@ Ver `MEMORIA.md` para el estado actual y contexto técnico completo — este arc
 
 ---
 
+## [2026-08-27] Se cerró el pendiente de la 5ª foto del mosaico del hero
+
+- El usuario subió las 5 fotos que quería usar en el mosaico y pidió que quedaran "exactamente acomodados" al ejemplo de referencia ya usado para construir el molinete (cambio anterior).
+- Se compararon las 5 contra lo que ya había en el repo antes de tocar nada: las 4 primeras (quirófano, UCI, cardiología, neonatología) resultaron ser, píxel a píxel, las mismas fotos ya usadas (diferencia media <1 punto/canal al recomprimir — ruido de JPEG, no un cambio real) — no se sobreescribieron, para no ensuciar el historial con un archivo "distinto" que en la práctica es idéntico.
+- **La 5ª foto sí es nueva y resuelve el pendiente abierto**: muestra una sala de diagnóstico por imágenes (tomógrafo + monitores), no una ambulancia. Se usó como **"Centro de Imagen"** en vez de "Ambulancia" — ambas son áreas confirmadas en el PDF de marketing (sección 6.1 de `MEMORIA.md`), pero el contenido real de la foto encaja con Centro de Imagen. Decisión tomada según la foto entregada, pendiente de confirmar con el usuario si prefiere otra etiqueta.
+- Archivo nuevo: `public/images/hero-centro-imagen.jpg` (960×536, mismo pipeline con ImageMagick `-quality 82 -strip`, 68KB) — reemplaza el placeholder que repetía `hero-quirofano.jpg` en la pieza `e`.
+- Comentario Blade en `hero.blade.php` reescrito para documentar la decisión Centro de Imagen vs. Ambulancia. El trust-strip del hero (texto "Ambulancia propia") no se tocó — es un dato de texto ya confirmado, independiente del mosaico visual.
+- **Verificado con Playwright**: misma matriz de anchos/alturas que la entrada anterior — sin solapes con el trust-strip (peor caso ~136px libres, el layout no cambió). Capturas en 1280×800 y 1920×1080 confirman las 5 fotos completas y distintas entre sí.
+- **Pendiente**: confirmar por el usuario en su entorno real; confirmar si "Centro de Imagen" es el área/etiqueta correcta para la 5ª foto.
+
+---
+
 ## [2026-08-27] Collage en cascada (4 fotos) → mosaico en "molinete" de 5 fotos
 
 - El usuario compartió una nueva referencia visual: un mosaico de 5 piezas asimétricas (una ancha arriba, una alta a la izquierda, una media a la derecha superpuesta entre ambas, y dos abajo), distinto al patrón de escalera diagonal de 4 fotos que había hasta ahora.

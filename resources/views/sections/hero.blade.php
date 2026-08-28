@@ -37,20 +37,25 @@
         suficiente ancho como para que esta columna se le monte encima.
 
         Mosaico asimétrico de 5 fotos (quirófano, UCI, cardiología,
-        neonatología, ambulancia) en patrón de "molinete" — reemplaza a
-        la escalera diagonal de 4 fotos anterior, a pedido del usuario
+        neonatología, centro de imagen) en patrón de "molinete" — reemplaza
+        a la escalera diagonal de 4 fotos anterior, a pedido del usuario
         que compartió una nueva referencia visual (5 piezas, no 4, en
         otra disposición). Mismo lenguaje visual ya establecido (sin
         marco blanco, cinta ni texto a mano — ver DISEÑO.md) — ver
         `.cb-hero-collage` en public.css para el detalle de la
         composición.
 
-        TODO: hero-ambulancia.jpg es un placeholder temporal (reutiliza
-        hero-quirofano.jpg) hasta que el usuario genere la foto real de
-        Ambulancia con el mismo prompt/estilo que las otras 4 (navy,
-        cinematográfico, sin rostros identificables, degradado oscuro en
-        el borde izquierdo) y la suba — reemplazar el archivo cuando
-        esté lista, mismo flujo ya usado para UCI/cardiología/neonatología.
+        La 5ª pieza (--e) usaba un placeholder (repetía hero-quirofano.jpg)
+        a la espera de definir qué área usar. El usuario generó y subió
+        las 5 fotos finales (mismo estilo navy/cinematográfico, sin
+        rostros identificables) — la que corresponde a la 5ª pieza
+        muestra una sala de diagnóstico por imágenes (tomógrafo/monitores),
+        así que se usó como "Centro de Imagen" en vez de "Ambulancia":
+        ambas son áreas confirmadas en el PDF de marketing (sección 6.1
+        de MEMORIA.md, listado de servicios/infraestructura), pero el
+        contenido real de la foto encaja con Centro de Imagen, no con
+        Ambulancia — decisión tomada según la foto entregada, pendiente
+        de confirmar con el usuario si prefiere que diga otra cosa.
     --}}
     <div class="cb-hero-side hidden xl:block" aria-hidden="true">
         <div class="cb-hero-collage">
@@ -67,7 +72,7 @@
                 <img src="{{ asset('images/hero-neonatologia.jpg') }}" alt="" loading="lazy">
             </div>
             <div class="cb-hero-collage-item cb-hero-collage-item--e">
-                <img src="{{ asset('images/hero-quirofano.jpg') }}" alt="" loading="lazy">
+                <img src="{{ asset('images/hero-centro-imagen.jpg') }}" alt="" loading="lazy">
             </div>
         </div>
     </div>
