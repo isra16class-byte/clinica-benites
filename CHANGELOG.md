@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Especialidades: se saca por completo el tratamiento de letras
+
+Feedback directo del usuario: "no me gusta, quítale el alfabeto". Se eliminó de `especialidades.blade.php` + `public.css` todo lo relacionado a letras — el marcador de grupo inline dentro de cada columna (`cb-directory-group-letter`) y el scatter de letras dispersas en los márgenes (`cb-directory-scatter`, agregado en el commit anterior tras la referencia de mobbin.com). Queda: watermark "27" de fondo, cifra grande en primer plano (`cb-stat-callout`), divisores verticales entre las 3 columnas y línea dorada en hover. El array de especialidades sigue alfabetizado (es el orden de los datos), simplemente ya no se anota visualmente. `$letras`/`$scatter` se sacaron del Blade por no usarse más.
+
 ## [2026-08-28] Especialidades: refuerzo tras feedback ("se ve muy simple")
 
 Sobre el ajuste anterior (cifra grande + scatter), el usuario lo vio simple en pantalla — el bloque central seguía siendo texto plano en 3 columnas y el scatter solo se veía desde `xl`. Cuatro retoques en `especialidades.blade.php` + `public.css`: scatter bajado a `lg` (más anchos de pantalla real lo muestran); divisores verticales entre las 3 columnas del directorio (antes solo espacio en blanco); marcador de letra pasa de texto suelto a chip con fondo (más textura); línea de acento teal→dorado debajo del "27" para anclarlo visualmente. Directorio de texto y demás secciones sin cambios.

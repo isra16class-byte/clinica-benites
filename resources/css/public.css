@@ -1010,15 +1010,15 @@
     /* ============================================================
        Especialidades — directorio editorial
        ============================================================
-       Rediseño 28 ago 2026 (ver especialidades.blade.php para el porqué
-       de cada pieza y docs/PLAN_SITIO_PUBLICO.md para la investigación):
-       watermark "27" + marcador de grupo + línea de hover trazada con
-       gradiente (en vez de solo cambiar el color del borde). Segundo
-       ajuste el mismo día (referencia: mobbin.com): cifra "27" grande en
-       primer plano (`cb-stat-callout`) + letras dispersas en los márgenes
-       (`cb-directory-scatter`), en reemplazo del rail vertical fijo. Todo
-       con transform/opacity donde hay animación, para que corra en el
-       compositor.
+       Ver especialidades.blade.php para el historial completo de
+       iteraciones (28 ago 2026, 3 rondas de feedback). Estado actual:
+       watermark "27" de fondo + cifra "27" grande en primer plano
+       (`cb-stat-callout`, con línea de acento) + divisores verticales
+       entre columnas + línea dorada trazada en hover (en vez de solo
+       cambiar el color del borde). Sin ningún tratamiento de letras —
+       se sacó por completo tras feedback ("no me gusta, quítale el
+       alfabeto"). Todo con transform/opacity donde hay animación, para
+       que corra en el compositor.
        ============================================================ */
 
     /* Watermark: número real (27 especialidades), en trazo — no relleno,
@@ -1090,38 +1090,6 @@
         text-transform: uppercase;
     }
 
-    /* ---------- Letras dispersas (reemplaza al rail vertical) ----------
-       Mismas letras reales del rail anterior (índice real del directorio),
-       ahora repartidas en los márgenes de la sección con la sensación de
-       dispersión de la referencia — posiciones calculadas por índice en el
-       Blade, no al azar. Decorativo puro: aria-hidden, sin interacción,
-       clip por el overflow-hidden de la sección. Solo desde lg (antes xl —
-       se bajó tras feedback de que la sección se sentía plana en anchos
-       intermedios). */
-    .cb-directory-scatter {
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-    }
-
-    .cb-directory-scatter-letter {
-        position: absolute;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 2.25rem;
-        height: 2.25rem;
-        border-radius: 999px;
-        border: 1px solid rgb(74 168 140 / 28%);
-        background: rgb(74 168 140 / 6%);
-        font-family: var(--font-display);
-        font-weight: 600;
-        font-size: 0.8125rem;
-        color: rgb(255 255 255 / 38%);
-        user-select: none;
-    }
-
     .cb-directory {
         display: grid;
         grid-template-columns: 1fr;
@@ -1150,30 +1118,6 @@
         }
     }
 
-    /* Marcador de letra: chip con borde, no texto suelto — rompe el bloque
-       largo de "C" (11 de las 27 especialidades) y da más textura visual
-       al directorio sin fingir una taxonomía que no viene confirmada. */
-    .cb-directory-group-letter {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 1.5rem;
-        height: 1.5rem;
-        padding: 0 0.4rem;
-        border-radius: 0.35rem;
-        background: rgb(74 168 140 / 14%);
-        font-family: var(--font-display);
-        font-weight: 700;
-        font-size: 0.6875rem;
-        letter-spacing: 0.06em;
-        color: var(--color-cb-teal-400);
-        margin: 1.25rem 0 0.5rem;
-    }
-
-    .cb-directory-col > .cb-directory-group-letter:first-child {
-        margin-top: 0;
-    }
-
     .cb-directory-row {
         position: relative;
         display: flex;
@@ -1184,7 +1128,7 @@
         border-bottom: 1px solid rgb(255 255 255 / 10%);
     }
 
-    .cb-directory-col:first-child > .cb-directory-group-letter:first-child + .cb-directory-row {
+    .cb-directory-col > .cb-directory-row:first-child {
         border-top: 1px solid rgb(255 255 255 / 10%);
     }
 
