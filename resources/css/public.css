@@ -437,21 +437,17 @@
         height: 100%;
         object-fit: cover;
         object-position: 60% 45%;
-        /* 28 ago 2026 (corrección tras reporte del usuario: "se ven los
-           bordes del video, antes no se veían"): el intento anterior movió
-           el punto `transparent` de 78% a 92% para que se viera más video
-           — pero 78% no era arbitrario (ver comentario grande más arriba,
-           validado con medición del canal alfa en varias vueltas): es el
-           punto mínimo necesario para que el desvanecido termine ANTES de
-           llegar a los bordes medios del rectángulo (que en un radial-
-           gradient "farthest-corner" sobre una caja no cuadrada quedan
-           geométricamente más cerca del centro que las esquinas, así que
-           con 92% todavía no habían terminado de desvanecerse ahí — eso
-           es la línea dura que se vio). Fix correcto: agrandar el NÚCLEO
-           sólido (`black`, de 18% a 40%) para mostrar más video nítido en
-           el centro, pero dejar `transparent` en el 78% ya validado. */
-        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 40%, transparent 78%);
-        mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 40%, transparent 78%);
+        /* 28 ago 2026 (segunda vuelta, a pedido del usuario: "aún más
+           visible pero sin que se vean los bordes"): mismo criterio que
+           el ajuste anterior — el único parámetro seguro para subir es el
+           núcleo sólido (`black`), nunca `transparent` (78% es el mínimo
+           validado para que el desvanecido termine antes de los bordes
+           medios del rectángulo, ver comentario/historial arriba). `black`
+           sube de 40% a 58% — el margen de desvanecido (58%→78%) se
+           angosta pero sigue existiendo, solo que se ve más video nítido
+           antes de que arranque. */
+        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 58%, transparent 78%);
+        mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 58%, transparent 78%);
     }
 
     .cb-hero-video-poster {
