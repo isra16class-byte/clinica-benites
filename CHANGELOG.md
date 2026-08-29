@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Hero: fix real del desvanecido — elipse con tamaño explícito, no `farthest-corner`
+
+El usuario mandó captura: con `ellipse farthest-corner`, el desvanecido solo cubría bien las esquinas — los bordes rectos del medio (arriba/derecha en la caja de 4:3) se veían como línea dura sin importar qué tan alto se pusiera `black`, porque geométricamente quedan más cerca del centro que las esquinas. No era un problema de calibrar el número, era el método. Fix: `radial-gradient(ellipse 50% 50% at 50% 50%, ...)` con tamaño explícito en vez de la palabra clave — así el degradado termina exactamente en el borde real en los 4 lados por igual, y las esquinas (más lejos que ese 100%) quedan transparentes automáticamente. `black 62%, transparent 100%`.
+
 ## [2026-08-28] Hero: video aún más visible (tercera vuelta)
 
 Mismo pedido del usuario repetido. `black` sube de 58% a 66%, `transparent` sigue fijo en 78% (margen de desvanecido angostado a 12 puntos — el mínimo razonable antes de arriesgar que reaparezcan bordes duros).

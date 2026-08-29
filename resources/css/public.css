@@ -437,17 +437,27 @@
         height: 100%;
         object-fit: cover;
         object-position: 60% 45%;
-        /* 28 ago 2026 (tercera vuelta, mismo pedido: "aún más visible sin
-           bordes"). Mismo criterio de siempre: `transparent` fijo en 78%,
-           solo sube el núcleo sólido, ahora de 58% a 66% — margen de
-           desvanecido angostado a 12 puntos (66%→78%), el mínimo razonable
-           antes de arriesgar que reaparezca el problema de la vuelta
-           anterior (bordes duros). Si se pide subir más después de esto,
-           el próximo movimiento seguro ya no es este parámetro solo —
-           conviene revisar junto con el usuario en su entorno real antes
-           de seguir angostando el margen. */
-        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 66%, transparent 78%);
-        mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 66%, transparent 78%);
+        /* 28 ago 2026 (fix real, no otro empujón del mismo número): el
+           usuario mandó captura mostrando el problema real — con
+           `ellipse farthest-corner`, el degradado se ajusta para tocar
+           las ESQUINAS del rectángulo, pero en una caja no cuadrada (4:3)
+           los bordes rectos del medio (arriba/abajo, izquierda/derecha)
+           quedan geométricamente más cerca del centro que las esquinas.
+           Resultado: el desvanecido nunca los cubre parejo sin importar
+           qué tan alto se ponga `black` — se ve un óvalo metido dentro
+           de un rectángulo, con línea dura en los bordes rectos (visible
+           en la captura, arriba y a la derecha del video).
+           Fix real: elipse con tamaño EXPLÍCITO (`ellipse 50% 50%`, no
+           la palabra clave) — así el 100% del degradado cae exactamente
+           en el borde real de la caja en los 4 lados a la vez (rx = 50%
+           del ancho, ry = 50% del alto), no en la esquina. Con
+           `transparent` en 100%, el desvanecido termina justo en el
+           borde real en los 4 lados por igual, y las esquinas (que
+           quedan geométricamente MÁS lejos que el 100% de esta elipse)
+           se pintan automáticamente con el último color del degradado
+           (transparente) — sin necesitar un segundo número para eso. */
+        -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, black 62%, transparent 100%);
+        mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, black 62%, transparent 100%);
     }
 
     .cb-hero-video-poster {
