@@ -1565,6 +1565,48 @@
         max-width: 22rem;
     }
 
+    /* Mapa embebido — 28 ago 2026. Mismo lenguaje visual que
+       `.cb-contact-panel` (borde sutil blanco sobre el fondo navy,
+       radio de esquina 1.5rem) para que no se sienta un widget pegado
+       de otro sitio. Alto fijo (no aspect-ratio) porque un iframe de
+       Google Maps no respeta bien `aspect-ratio` del contenedor en
+       algunos navegadores — más simple y confiable fijar el alto. */
+    .cb-contact-map {
+        margin-top: 3.5rem;
+        height: 22rem;
+        border-radius: 1.5rem;
+        overflow: hidden;
+        border: 1px solid rgb(255 255 255 / 12%);
+        /* Placeholder de fondo mientras carga el iframe (loading="lazy"),
+           mismo navy del resto de la sección — evita un parpadeo blanco. */
+        background: var(--color-cb-navy-950);
+    }
+
+    .cb-contact-map iframe {
+        display: block;
+        /* El mapa de Google trae su propio tono claro — un filtro sutil
+           lo acerca a la paleta navy/fría del resto del sitio en vez de
+           un rectángulo blanco/beige que corta el fondo oscuro. No se
+           toca el contraste de las etiquetas del mapa (grayscale bajo,
+           no invert), para que siga siendo legible. */
+        filter: grayscale(0.25) brightness(0.92) contrast(1.05);
+    }
+
+    .cb-contact-map-link {
+        margin-top: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--color-cb-gold-300);
+        text-decoration: none;
+    }
+
+    .cb-contact-map-link:hover {
+        text-decoration: underline;
+    }
+
     /* ============================================================
        Footer
        ============================================================ */

@@ -6,11 +6,16 @@
     siempre WhatsApp/teléfono, coherente con cómo recepción registra
     citas hoy (manual, ver MEMORIA.md). Sin dirección exacta ni horario:
     no están confirmados por el cliente, no se inventan (mismo criterio
-    del resto del sitio). Sin mapa embebido por la misma razón — un
-    iframe de Google Maps con coordenadas inventadas sería peor que no
-    tener mapa. El panel derecho es decorativo (mismo lenguaje visual del
-    hero: grid + orb + un pin), no informativo, para no tener que fingir
-    datos que todavía no existen.
+    del resto del sitio). El panel derecho es decorativo (mismo lenguaje
+    visual del hero: grid + orb + un pin), no informativo, para no tener
+    que fingir datos que todavía no existen.
+
+    Mapa embebido (28 ago 2026, a pedido del usuario): sí hay coordenadas
+    reales (el usuario las confirmó contra el listado de Google Maps de
+    "Clínica Benites"), así que el mapa en sí ya no es "dato inventado".
+    Pero ese listado de Google está sin reclamar por el negocio — no se
+    usan el horario ni el teléfono que muestra ahí, siguen sin confirmar
+    con el dueño real. Ver bloque `.cb-contact-map` más abajo.
 
     Rediseño (28 ago 2026, mismo criterio de Especialidades/Servicios —
     ver docs/PLAN_SITIO_PUBLICO.md sección 5.5, fila "Contacto" de la
@@ -84,5 +89,39 @@
                 </p>
             </div>
         </div>
+    </div>
+
+    {{--
+        Mapa embebido — 28 ago 2026, a pedido del usuario. Coordenadas
+        confirmadas por el usuario contra el listado real de Google Maps
+        de "Clínica Benites" en Guayaquil (-2.142825, -79.9050583). Solo
+        la ubicación: el listado de Google es un negocio sin reclamar
+        ("Reclamar este negocio" visible en el panel), así que horario y
+        teléfono que muestra Google NO se usan acá — siguen sin confirmar
+        con el dueño, mismo criterio que el resto del sitio (nada se
+        publica sin confirmar). Iframe sin API key (`output=embed`), el
+        mismo mecanismo que usa cualquier "compartir mapa" de Google.
+    --}}
+    <div class="cb-reveal relative z-10 mx-auto mt-16 max-w-7xl px-6 sm:px-10 lg:px-16" style="animation-delay:.25s">
+        <div class="cb-contact-map">
+            <iframe
+                src="https://www.google.com/maps?q=-2.142825,-79.9050583&z=16&output=embed"
+                width="100%"
+                height="100%"
+                style="border:0;"
+                allowfullscreen
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Ubicación de Clínica Benites en el mapa"
+            ></iframe>
+        </div>
+        <a
+            href="https://www.google.com/maps/place/Cl%C3%ADnica+Benites/@-2.142825,-79.9050583,17z"
+            target="_blank"
+            rel="noopener"
+            class="cb-contact-map-link"
+        >
+            Ver en Google Maps
+        </a>
     </div>
 </section>

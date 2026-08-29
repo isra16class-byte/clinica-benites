@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Contacto: mapa embebido con ubicación real
+
+El usuario encontró el listado real de "Clínica Benites" en Google Maps y confirmó las coordenadas (-2.142825, -79.9050583). Se agrega un `<iframe>` de Google Maps (sin API key, `output=embed`) debajo del grid de 2 columnas en `contacto.blade.php`, con estilos nuevos en `public.css` (`.cb-contact-map`, filtro sutil para acercarlo a la paleta navy del sitio). **Ojo**: el listado de Google está sin reclamar por el negocio ("Reclamar este negocio" visible en el panel) — solo se usan las coordenadas, no el horario ni el teléfono que muestra ahí, que siguen sin confirmar con el dueño real (mismo criterio de siempre: nada se publica sin confirmar).
+
 ## [2026-08-28] Hero: fix real del desvanecido — elipse con tamaño explícito, no `farthest-corner`
 
 El usuario mandó captura: con `ellipse farthest-corner`, el desvanecido solo cubría bien las esquinas — los bordes rectos del medio (arriba/derecha en la caja de 4:3) se veían como línea dura sin importar qué tan alto se pusiera `black`, porque geométricamente quedan más cerca del centro que las esquinas. No era un problema de calibrar el número, era el método. Fix: `radial-gradient(ellipse 50% 50% at 50% 50%, ...)` con tamaño explícito en vez de la palabra clave — así el degradado termina exactamente en el borde real en los 4 lados por igual, y las esquinas (más lejos que ese 100%) quedan transparentes automáticamente. `black 62%, transparent 100%`.
