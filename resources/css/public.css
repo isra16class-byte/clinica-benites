@@ -437,17 +437,17 @@
         height: 100%;
         object-fit: cover;
         object-position: 60% 45%;
-        /* 28 ago 2026 (segunda vuelta, a pedido del usuario: "aún más
-           visible pero sin que se vean los bordes"): mismo criterio que
-           el ajuste anterior — el único parámetro seguro para subir es el
-           núcleo sólido (`black`), nunca `transparent` (78% es el mínimo
-           validado para que el desvanecido termine antes de los bordes
-           medios del rectángulo, ver comentario/historial arriba). `black`
-           sube de 40% a 58% — el margen de desvanecido (58%→78%) se
-           angosta pero sigue existiendo, solo que se ve más video nítido
-           antes de que arranque. */
-        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 58%, transparent 78%);
-        mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 58%, transparent 78%);
+        /* 28 ago 2026 (tercera vuelta, mismo pedido: "aún más visible sin
+           bordes"). Mismo criterio de siempre: `transparent` fijo en 78%,
+           solo sube el núcleo sólido, ahora de 58% a 66% — margen de
+           desvanecido angostado a 12 puntos (66%→78%), el mínimo razonable
+           antes de arriesgar que reaparezca el problema de la vuelta
+           anterior (bordes duros). Si se pide subir más después de esto,
+           el próximo movimiento seguro ya no es este parámetro solo —
+           conviene revisar junto con el usuario en su entorno real antes
+           de seguir angostando el margen. */
+        -webkit-mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 66%, transparent 78%);
+        mask-image: radial-gradient(ellipse farthest-corner at 50% 50%, black 66%, transparent 78%);
     }
 
     .cb-hero-video-poster {

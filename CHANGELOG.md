@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-28] Hero: video aún más visible (tercera vuelta)
+
+Mismo pedido del usuario repetido. `black` sube de 58% a 66%, `transparent` sigue fijo en 78% (margen de desvanecido angostado a 12 puntos — el mínimo razonable antes de arriesgar que reaparezcan bordes duros).
+
 ## [2026-08-28] Hero: video aún más visible (segunda vuelta, mismo criterio)
 
 A pedido del usuario, tras confirmar que el fix anterior funcionó. Mismo principio: `transparent` se deja fijo en 78% (el punto que mantiene los bordes ocultos) y se sigue agrandando el núcleo sólido, ahora de `black 40%` a `black 58%`.
