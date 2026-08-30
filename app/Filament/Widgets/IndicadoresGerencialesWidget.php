@@ -441,7 +441,8 @@ class IndicadoresGerencialesWidget extends BaseWidget
             ->count();
 
         if ($total === 0) {
-            return Stat::make('Ocupación de camas', 'Sin camas registradas')
+            return Stat::make('Ocupación de camas', '—')
+                ->description('Sin camas registradas')
                 ->color('gray')
                 ->extraAttributes(['class' => 'cb-stat-accent-gray']);
         }
