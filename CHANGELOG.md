@@ -4,6 +4,18 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-31] Fix: anclas del nav/footer compartido no funcionaban fuera de la home
+
+`partials/nav.blade.php` y `partials/footer.blade.php` se incluyen en todas las páginas (no solo en `/`), pero sus links usaban anclas relativas (`#inicio`, `#especialidades`, etc.) que solo funcionan estando ya en la home — desde `/especialidades/{slug}` no navegaban a ningún lado, solo intentaban hacer scroll a un id inexistente en la página actual. Se antepuso `{{ url('/') }}` a los 11 links del nav (logo + 5 desktop + 5 mobile) y a los 6 del footer (logo + 5), para que siempre naveguen a la home primero y después hagan scroll a la sección. Sin cambios de estilo ni de estructura.
+
+## [2026-08-31] Fix: nav con scroll — menú móvil se ocultaba abierto + parpadeo por umbral asimétrico
+
+Dos bugs en el script de `partials/nav.blade.php` que oculta/muestra el nav según dirección de scroll (agregado el mismo día, ver entrada de "Nav público" más abajo): (1) el menú móvil vive dentro del `<header>` que se oculta, así que si el usuario scrolleaba con el menú abierto, el menú entero desaparecía a mitad de uso — se agregó una condición `menuOpen` (lee `#cb-nav-toggle:checked`) que mantiene el nav visible mientras el menú está abierto. (2) el umbral de 6px para detectar "bajando" no tenía equivalente para "subiendo" (cualquier decremento de scroll de 1px mostraba el nav), lo que podía causar parpadeo con scroll de trackpad o rebote elástico de iOS — se agregó `scrollingUp` simétrico con el mismo umbral, sin rama `else` catch-all.
+
+## [2026-08-31] Especialidad individual: fix de espaciado bajo el nav fijo + orden de cascada CSS
+
+Dos ajustes de seguimiento sobre el fix visual anterior: el link "← Volver a especialidades" quedaba tapado por `.cb-nav` (que es `position: fixed`, no empuja contenido) — se agregó `pt-16 sm:pt-20 lg:pt-24` al contenedor de contenido en `especialidad.blade.php`. Aparte, `.cb-specialty-return-link` y `.cb-footer-link` tenían la misma especificidad CSS y `.cb-footer-link` (pensada para el footer oscuro) estaba definida después en `public.css`, así que ganaba y el link volvía a verse casi invisible — se reordenó `.cb-specialty-return-link` para que quede después de `.cb-footer-link` en el archivo. También se eliminó un `<style>` inline duplicado que había quedado en `especialidad.blade.php` con valores de padding distintos a los de `public.css` (fuente de verdad ahora única, solo en `public.css`).
+
 ## [2026-08-31] Nav público: reveal por scroll hacia arriba + barra sutil
 
 Se ajusta la navegación del sitio público para ocultarse al bajar y reaparecer al subir, con una barra de acento muy discreta en la parte inferior del header. La lógica se mantiene en `resources/views/partials/nav.blade.php` y los estilos en `resources/css/public.css`, sin tocar contenido ni datos. La barra queda como detalle de marca y no tapa el contenido del primer bloque debajo del nav.
