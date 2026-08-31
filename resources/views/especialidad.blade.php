@@ -5,6 +5,9 @@
     @include('partials.nav')
 
     <section class="cb-section cb-section--light relative">
+        <div class="overflow-hidden">
+            <div class="cb-hero-grid" aria-hidden="true"></div>
+        </div>
         <div class="mx-auto max-w-4xl px-6 py-24 sm:px-10 lg:px-16">
             <a href="{{ url('/') }}#especialidades" class="cb-footer-link">← Volver a especialidades</a>
 
