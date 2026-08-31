@@ -81,32 +81,39 @@ class FetchEspecialidadesFotos extends Command
                 'Authorization' => 'Client-ID ' . config('services.unsplash.access_key'),
             ])->get('https://api.unsplash.com/search/photos', [
                 'query' => $termino,
-                'per_page' => 1,
+                'per_page' => 3,
                 'orientation' => 'landscape',
             ]);
 
-            $fotoUrl = null;
-            $autorNombre = null;
-            $autorUrl = null;
+            $resultados[$slug] = [
+                'fotos' => [],
+            ];
 
             $results = $response->json('results', []);
-            $foto = $results[0] ?? null;
 
-            if ($foto) {
+            foreach ($results as $foto) {
                 $fotoUrl = $foto['urls']['regular'] ?? null;
                 $autorNombre = $foto['user']['name'] ?? null;
-                $autorUrl = ($foto['user']['links']['html'] ?? null) ? ($foto['user']['links']['html'] . '?utm_source=clinica_benites&utm_medium=referral') : null;
-            } else {
+                $autorUrl = null;
+
+                $htmlAutor = $foto['user']['links']['html'] ?? null;
+                if ($htmlAutor !== null) {
+                    $autorUrl = $htmlAutor;
+                    $autorUrl .= str_contains($autorUrl, '?') ? '&utm_source=clinica_benites&utm_medium=referral' : '?utm_source=clinica_benites&utm_medium=referral';
+                }
+
+                $resultados[$slug]['fotos'][] = [
+                    'foto_url' => $fotoUrl,
+                    'foto_autor' => $autorNombre,
+                    'foto_autor_url' => $autorUrl,
+                ];
+            }
+
+            if (empty($resultados[$slug]['fotos'])) {
                 $this->warn("No se encontraron resultados para {$slug}");
             }
 
-            $resultados[$slug] = [
-                'foto_url' => $fotoUrl,
-                'foto_autor' => $autorNombre,
-                'foto_autor_url' => $autorUrl,
-            ];
-
-            $this->line(sprintf('%s %s', $slug, $foto ? '✓' : '✗'));
+            $this->line(sprintf('%s %s', $slug, empty($resultados[$slug]['fotos']) ? '✗' : '✓'));
 
             sleep(1);
         }

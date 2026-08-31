@@ -91,10 +91,13 @@ class Especialidades
         foreach ($lista as $index => $item) {
             $slug = $item['slug'];
             $datosFoto = $fotos[$slug] ?? [];
+            $fotosEspecialidad = is_array($datosFoto['fotos'] ?? null) ? $datosFoto['fotos'] : [];
+            $primeraFoto = $fotosEspecialidad[0] ?? null;
 
-            $lista[$index]['foto_url'] = $datosFoto['foto_url'] ?? null;
-            $lista[$index]['foto_autor'] = $datosFoto['foto_autor'] ?? null;
-            $lista[$index]['foto_autor_url'] = $datosFoto['foto_autor_url'] ?? null;
+            $lista[$index]['fotos'] = $fotosEspecialidad;
+            $lista[$index]['foto_url'] = $primeraFoto['foto_url'] ?? null;
+            $lista[$index]['foto_autor'] = $primeraFoto['foto_autor'] ?? null;
+            $lista[$index]['foto_autor_url'] = $primeraFoto['foto_autor_url'] ?? null;
         }
 
         return $lista;
