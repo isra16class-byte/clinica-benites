@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-31] Especialidades: descripciones reales + fotos de Unsplash en la página individual
+
+Se agrega el comando `especialidades:fetch-fotos` que genera `resources/data/especialidades-fotos.json` (foto + autor + link de Unsplash) para las 27 especialidades. `app/Support/Especialidades.php` gana el campo `descripcion` por especialidad y mezcla el JSON de fotos por slug en `all()`/`find()`. `especialidad.blade.php` reemplaza el placeholder "Estamos preparando el detalle..." por la descripción real y muestra la foto con crédito a Unsplash. Contenido genérico para demo/propuesta, no específico de la clínica (pendiente entrevista con el dueño).
+
 ## [2026-08-31] Fix: slug de especialidades generado fuera de la propiedad estática
 
 Se corrige la causa raíz del error 500 en `app/Support/Especialidades.php`: `Str::slug()` no puede ejecutarse dentro de una propiedad estática inicializada con un array en PHP. La lista original de 27 especialidades se mantiene igual y el cálculo del `slug` se mueve a un método privado, sin cambiar los nombres ni los iconos.
