@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-31] Fix: `.cb-hero-content` sin tope en viewports de altura extrema
+
+`min-h-screen` (Tailwind, `min-height: 100vh`) en `hero.blade.php` no tenía techo, así que a zoom bajo (viewport con altura lógica muy grande) el contenido fijo del Hero quedaba con espacio en blanco arriba y abajo. Se sacó `min-h-screen` del div y se agregó `min-height: min(100vh, 60rem)` a `.cb-hero-content` en `public.css`, sin tocar padding ni las compresiones `@media (max-height: 900px/700px)` ya existentes. Verificado con medición real en consola (`getBoundingClientRect().height`): 100% zoom sin cambios (sigue en 100vh, por debajo del tope), 50% y 25% con el tope aplicado (960px) donde antes no había ninguno. Primer intento (descartado): tope solo dentro de un `@media (min-height: 1600px)` con `!important` — dejaba sin cubrir el rango intermedio (~1080-1600px de alto lógico, reproducible a ~50% de zoom) y generaba un salto brusco en el umbral.
+
 ## [2026-08-31] Fix: anclas del nav/footer compartido no funcionaban fuera de la home
 
 `partials/nav.blade.php` y `partials/footer.blade.php` se incluyen en todas las páginas (no solo en `/`), pero sus links usaban anclas relativas (`#inicio`, `#especialidades`, etc.) que solo funcionan estando ya en la home — desde `/especialidades/{slug}` no navegaban a ningún lado, solo intentaban hacer scroll a un id inexistente en la página actual. Se antepuso `{{ url('/') }}` a los 11 links del nav (logo + 5 desktop + 5 mobile) y a los 6 del footer (logo + 5), para que siempre naveguen a la home primero y después hagan scroll a la sección. Sin cambios de estilo ni de estructura.
