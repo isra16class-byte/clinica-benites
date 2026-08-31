@@ -35,9 +35,11 @@
     (sección 5.5) es explícito en que ya tienen suficiente movimiento
     propio y no hace falta sumarles más.
 --}}
-<section id="servicios" class="cb-section cb-section--dark relative overflow-hidden">
-    <div class="cb-hero-grid" aria-hidden="true" style="mask-image: radial-gradient(ellipse 55% 50% at 10% 0%, black, transparent 70%); -webkit-mask-image: radial-gradient(ellipse 55% 50% at 10% 0%, black, transparent 70%);"></div>
-    <img src="{{ asset('images/hero-quirofano.jpg') }}" alt="" aria-hidden="true" class="cb-services-glow">
+<section id="servicios" class="cb-section cb-section--dark relative">
+    <div class="overflow-hidden" aria-hidden="true">
+        <div class="cb-hero-grid" aria-hidden="true" style="mask-image: radial-gradient(ellipse 55% 50% at 10% 0%, black, transparent 70%); -webkit-mask-image: radial-gradient(ellipse 55% 50% at 10% 0%, black, transparent 70%);"></div>
+        <img src="{{ asset('images/hero-quirofano.jpg') }}" alt="" aria-hidden="true" class="cb-services-glow">
+    </div>
 
     <div class="relative z-10 mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
         <div class="cb-section-head cb-reveal">

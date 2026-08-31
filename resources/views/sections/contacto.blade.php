@@ -35,9 +35,11 @@
     `hero.blade.php` (593000000000) — reemplazar los 3 juntos antes de
     publicar.
 --}}
-<section id="contacto" class="cb-section cb-section--dark relative overflow-hidden">
-    <div class="cb-hero-grid" aria-hidden="true"></div>
-    <div class="cb-orb cb-orb-gold" style="bottom:-8rem; left:auto; right:-8rem;" aria-hidden="true"></div>
+<section id="contacto" class="cb-section cb-section--dark relative">
+    <div class="overflow-hidden" aria-hidden="true">
+        <div class="cb-hero-grid" aria-hidden="true"></div>
+        <div class="cb-orb cb-orb-gold" style="bottom:-8rem; left:auto; right:-8rem;" aria-hidden="true"></div>
+    </div>
 
     <div class="relative z-10 mx-auto grid max-w-7xl gap-14 px-6 sm:px-10 lg:grid-cols-12 lg:items-center lg:px-16">
         <div class="cb-reveal lg:col-span-7">

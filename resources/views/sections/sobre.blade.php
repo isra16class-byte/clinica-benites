@@ -17,7 +17,7 @@
     dato nuevo (nada de año de fundación, cantidad de médicos, etc., que
     no está confirmado).
 --}}
-<section id="nosotros" class="cb-section cb-section--light relative overflow-hidden">
+<section id="nosotros" class="cb-section cb-section--light relative">
     <div class="mx-auto grid max-w-7xl gap-16 px-6 sm:px-10 lg:grid-cols-12 lg:gap-8 lg:px-16">
         <div class="cb-reveal lg:col-span-7">
             <p class="cb-eyebrow cb-eyebrow--light">Sobre nosotros</p>

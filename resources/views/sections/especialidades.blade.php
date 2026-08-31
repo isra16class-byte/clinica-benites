@@ -41,9 +41,11 @@
        línea dorada en hover.
     4. Feedback (esta ronda): ícono por especialidad + fondo blanco.
 --}}
-<section id="especialidades" class="cb-section cb-section--light relative overflow-hidden">
-    <div class="cb-hero-grid" aria-hidden="true" style="mask-image: radial-gradient(ellipse 60% 55% at 85% 100%, black, transparent 70%); -webkit-mask-image: radial-gradient(ellipse 60% 55% at 85% 100%, black, transparent 70%);"></div>
-    <p class="cb-directory-watermark" aria-hidden="true">27</p>
+<section id="especialidades" class="cb-section cb-section--light relative">
+    <div class="overflow-hidden" aria-hidden="true">
+        <div class="cb-hero-grid" aria-hidden="true" style="mask-image: radial-gradient(ellipse 60% 55% at 85% 100%, black, transparent 70%); -webkit-mask-image: radial-gradient(ellipse 60% 55% at 85% 100%, black, transparent 70%);"></div>
+        <p class="cb-directory-watermark" aria-hidden="true">27</p>
+    </div>
 
     @php
         // Trazos de ícono por grupo clínico (viewBox 0 0 24 24, mismo
