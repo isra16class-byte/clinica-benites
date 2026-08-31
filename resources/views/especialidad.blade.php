@@ -4,32 +4,11 @@
 >
     @include('partials.nav')
 
-    <style>
-        .cb-specialty-page {
-            padding-top: 2.25rem;
-            padding-bottom: 4rem;
-        }
-
-        .cb-specialty-content {
-            padding-top: 1rem;
-            padding-bottom: 0;
-        }
-
-        .cb-specialty-return-link {
-            color: var(--color-cb-navy-950, #0C447C);
-            font-weight: 600;
-        }
-
-        .cb-specialty-return-link:hover {
-            color: var(--color-cb-teal-600, #0F6E56);
-        }
-    </style>
-
     <section class="cb-section cb-section--light cb-specialty-page relative">
         <div class="cb-specialty-hero overflow-hidden">
             <div class="cb-hero-grid" aria-hidden="true"></div>
         </div>
-        <div class="cb-specialty-content mx-auto max-w-6xl px-6 sm:px-10 lg:px-16">
+        <div class="cb-specialty-content mx-auto max-w-6xl px-6 pt-16 sm:px-10 sm:pt-20 lg:px-16 lg:pt-24">
             <a href="{{ url('/') }}#especialidades" class="cb-footer-link cb-specialty-return-link">← Volver a especialidades</a>
 
             <div class="grid grid-cols-1 gap-12 md:grid-cols-2 md:items-start mt-8">
