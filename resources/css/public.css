@@ -1056,15 +1056,6 @@
         padding-bottom: 0;
     }
 
-    .cb-specialty-return-link {
-        color: var(--color-cb-navy-950);
-        font-weight: 600;
-    }
-
-    .cb-specialty-return-link:hover {
-        color: var(--color-cb-teal-600);
-    }
-
     .cb-section-head {
         max-width: 42rem;
     }
@@ -1683,6 +1674,15 @@
 
     .cb-footer-link:hover {
         color: var(--color-cb-gold-300);
+    }
+
+    .cb-specialty-return-link {
+        color: var(--color-cb-navy-950);
+        font-weight: 600;
+    }
+
+    .cb-specialty-return-link:hover {
+        color: var(--color-cb-teal-600);
     }
 
     .cb-footer-bottom {
