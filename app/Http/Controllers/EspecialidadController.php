@@ -8,20 +8,13 @@ class EspecialidadController extends Controller
 {
     public function show(string $slug)
     {
-        $especialidades = Especialidades::all();
-        $especialidad = null;
-
-        foreach ($especialidades as $item) {
-            if (($item['slug'] ?? null) === $slug) {
-                $especialidad = $item;
-                break;
-            }
-        }
+        $especialidad = Especialidades::find($slug);
 
         if ($especialidad === null) {
             abort(404);
         }
 
+        $especialidades = Especialidades::all();
         $indiceActual = null;
         foreach ($especialidades as $indice => $item) {
             if (($item['slug'] ?? null) === $slug) {
