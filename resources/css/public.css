@@ -55,10 +55,12 @@
 @layer base {
     html {
         scroll-behavior: smooth;
+        overflow-x: hidden;
     }
 
     body {
         background-color: var(--color-cb-navy-950);
+        overflow-x: hidden;
     }
 }
 
@@ -247,6 +249,22 @@
         background: var(--color-cb-gold-500);
         opacity: 0.18;
         animation: cb-orb-float 22s ease-in-out infinite reverse;
+    }
+
+    @media (min-width: 2561px) {
+        .cb-orb-teal {
+            top: -5rem;
+            right: 0;
+            width: min(18rem, 12vw);
+            height: min(18rem, 12vw);
+        }
+
+        .cb-orb-gold {
+            bottom: -6rem;
+            left: 0;
+            width: min(18rem, 12vw);
+            height: min(18rem, 12vw);
+        }
     }
 
     /* Columna derecha del hero (grid 2x2 de fotos) — rellena el espacio
@@ -1359,6 +1377,14 @@
         filter: blur(70px);
         opacity: 0.22;
         pointer-events: none;
+    }
+
+    @media (min-width: 2561px) {
+        .cb-services-glow {
+            left: 0;
+            width: min(26rem, 18vw);
+            height: min(26rem, 18vw);
+        }
     }
 
     .cb-services-grid {
