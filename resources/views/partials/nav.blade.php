@@ -59,21 +59,24 @@
             const nav = document.getElementById('cb-nav');
             if (!nav) return;
 
+            const SCROLL_THRESHOLD = 6;
             let lastScrollY = window.scrollY;
             let ticking = false;
 
             const applyNavState = () => {
                 const currentY = window.scrollY;
-                const scrollingDown = currentY > lastScrollY + 6;
+                const menuOpen = document.getElementById('cb-nav-toggle')?.checked;
+                const scrollingDown = currentY > lastScrollY + SCROLL_THRESHOLD;
+                const scrollingUp = currentY < lastScrollY - SCROLL_THRESHOLD;
                 const atTop = currentY <= 12;
 
-                if (atTop) {
+                if (atTop || menuOpen) {
                     nav.classList.add('cb-nav--visible');
                     nav.classList.remove('cb-nav--accent');
                 } else if (scrollingDown) {
                     nav.classList.remove('cb-nav--visible');
                     nav.classList.remove('cb-nav--accent');
-                } else {
+                } else if (scrollingUp) {
                     nav.classList.add('cb-nav--visible');
                     nav.classList.add('cb-nav--accent');
                 }
