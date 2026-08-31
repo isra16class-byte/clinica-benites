@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-31] Especialidades: layout de 2 columnas con "Qué tratamos" y "Cuándo consultar"
+
+`app/Support/Especialidades.php` reemplaza la descripción larga por 3 campos: `descripcion` (1 oración), `que_tratamos` (array de bullets) y `cuando_consultar` (string), genéricos como siempre. `especialidad.blade.php` pasa de 1 a 2 columnas (`max-w-6xl`): ícono+foto a la izquierda, texto+bullets+callout a la derecha. El callout de "Cuándo consultar" recibió su título después de un ajuste de feedback (mismo estilo que "Qué tratamos"). Sin cambios en `fotos()`/`all()`/`find()`.
+
 ## [2026-08-31] Especialidades: descripciones expandidas + fondo decorativo en la página individual
 
 Las 27 descripciones de `app/Support/Especialidades.php` pasan de una frase a 2-3 oraciones (qué trata, condiciones comunes, cuándo consultar), mismo criterio genérico de siempre. Se agrega el fondo decorativo `cb-hero-grid` (ya usado en Hero/Servicios/Contacto) a `especialidad.blade.php`, envuelto en `overflow-hidden` para no interferir con el scroll-reveal del sitio. Sin cambios en `fotos()`/`all()`/`find()`.
