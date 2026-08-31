@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Especialidades;
+
 class EspecialidadController extends Controller
 {
     public function show(string $slug)
     {
-        $especialidad = \App\Support\Especialidades::find($slug);
+        $especialidad = Especialidades::find($slug);
 
         if ($especialidad === null) {
             abort(404);
