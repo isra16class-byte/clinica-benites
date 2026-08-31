@@ -1,0 +1,137 @@
+{
+    "anestesiologia-y-terapia-del-dolor": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1638598124048-10c5b3f2f964?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8YW5lc3RoZXNpb2xvZ3klMjBvcGVyYXRpbmclMjByb29tfGVufDB8MHx8fDE3ODgxOTc4NzF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "engin akyurt",
+        "foto_autor_url": "https:\/\/unsplash.com\/@enginakyurt?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "auditoria-medica": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1562654501-a0ccc0fc3fb1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8bWVkaWNhbCUyMGF1ZGl0JTIwaGVhbHRoY2FyZSUyMGRvY3VtZW50c3xlbnwwfDB8fHwxNzg4MTk3ODczfDA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Arisa Chattasa",
+        "foto_autor_url": "https:\/\/unsplash.com\/@golfarisa?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "cardiologia": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1625134673337-519d4d10b313?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8Y2FyZGlvbG9neSUyMGhlYXJ0JTIwZG9jdG9yfGVufDB8MHx8fDE3ODgxOTc4NzV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Sasun Bughdaryan",
+        "foto_autor_url": "https:\/\/unsplash.com\/@sasun1990?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "cateterismo-cardiaco": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1563233987-35f9d4b9a861?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8Y2FyZGlhYyUyMGNhdGhldGVyaXphdGlvbiUyMHByb2NlZHVyZXxlbnwwfDB8fHwxNzg4MTk3ODc3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Olga Kononenko",
+        "foto_autor_url": "https:\/\/unsplash.com\/@olga_kononenko?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "cirugia-general-y-digestiva": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1760600865625-dbf6a3acfb67?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8Z2VuZXJhbCUyMHN1cmdlcnklMjBvcGVyYXRpbmclMjByb29tfGVufDB8MHx8fDE3ODgxOTc4Nzl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Sakarie Mustafe Hidig",
+        "foto_autor_url": "https:\/\/unsplash.com\/@sakariemhidig?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "cirugia-holep-de-prostata": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1784256066763-465082ea6dc8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8dXJvbG9neSUyMHN1cmdlcnklMjBob3NwaXRhbHxlbnwwfDB8fHwxNzg4MTk3ODgxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "PUSEN Medical",
+        "foto_autor_url": "https:\/\/unsplash.com\/@pusenmedical?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "cirugia-oncologica": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1514416309827-bfb0cf433a2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8b25jb2xvZ3klMjBzdXJnZW9uJTIwb3BlcmF0aW5nfGVufDB8MHx8fDE3ODgxOTg3OTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Piron Guillaume",
+        "foto_autor_url": "https:\/\/unsplash.com\/@gpiron?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "cirugia-pediatrica": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1715634430473-c5891ff16103?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8cGVkaWF0cmljJTIwc3VyZ2VyeSUyMGNoaWxkcmVuJTIwaG9zcGl0YWx8ZW58MHwwfHx8MTc4ODE5Nzg4NXww&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Husien Bisky",
+        "foto_autor_url": "https:\/\/unsplash.com\/@husien_bisky1?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "cirugia-plastica": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1690306815613-f839b74af330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8cGxhc3RpYyUyMHN1cmdlcnklMjBjbGluaWN8ZW58MHwwfHx8MTc4ODE5Nzg4N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Mateo Hernandez Reyes",
+        "foto_autor_url": "https:\/\/unsplash.com\/@mattreyes7?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "cirugia-toracica": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1743767587847-08c42b31cdec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8Y2hlc3QlMjBsdW5nJTIwc3VyZ2VyeSUyMGRvY3RvcnxlbnwwfDB8fHwxNzg4MTk4NTI2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Aakash Dhage",
+        "foto_autor_url": "https:\/\/unsplash.com\/@aakashdhage?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "cirugia-vascular": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1512678080530-7760d81faba6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8dmFzY3VsYXIlMjBzdXJnZXJ5JTIwaG9zcGl0YWx8ZW58MHwwfHx8MTc4ODE5Nzg5MHww&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Martha Dominguez de Gouveia",
+        "foto_autor_url": "https:\/\/unsplash.com\/@m_dominguez_marketing?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "coloproctologia": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1758691461990-03b49d969495?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8Y29sb3JlY3RhbCUyMHN1cmdlb24lMjBjb25zdWx0YXRpb258ZW58MHwwfHx8MTc4ODE5ODc5NXww&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Vitaly Gariev",
+        "foto_autor_url": "https:\/\/unsplash.com\/@silverkblack?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "cuidados-criticos": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1633488781325-d36e6818d0c8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8aW50ZW5zaXZlJTIwY2FyZSUyMHVuaXQlMjBob3NwaXRhbHxlbnwwfDB8fHwxNzg4MTk3ODk0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Bagoes Ilhamy",
+        "foto_autor_url": "https:\/\/unsplash.com\/@goestock?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "endocrinologia": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1624454002429-40ed87a5ec04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8dGh5cm9pZCUyMGRpYWJldGVzJTIwZG9jdG9yfGVufDB8MHx8fDE3ODgxOTg1MzB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Towfiqu barbhuiya",
+        "foto_autor_url": "https:\/\/unsplash.com\/@towfiqu999999?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "gastroenterologia": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1532938911079-1b06ac7ceec7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8Z2FzdHJvZW50ZXJvbG9neSUyMGRvY3RvciUyMGhvc3BpdGFsfGVufDB8MHx8fDE3ODgxOTc4OTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Online Marketing",
+        "foto_autor_url": "https:\/\/unsplash.com\/@impulsq?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "ginecologia": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1711313532327-2f47602eb6ba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8cHJlZ25hbmN5JTIwY2hlY2t1cCUyMGRvY3RvcnxlbnwwfDB8fHwxNzg4MTk5MDQ2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Max B\u00f6hme",
+        "foto_autor_url": "https:\/\/unsplash.com\/@max_boehme?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "laparoscopia": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1579684453423-f84349ef60b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8bGFwYXJvc2NvcGljJTIwc3VyZ2VyeSUyMG9wZXJhdGluZyUyMHJvb218ZW58MHwwfHx8MTc4ODE5NzkwMnww&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "National Cancer Institute",
+        "foto_autor_url": "https:\/\/unsplash.com\/@nci?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "medico-ocupacional": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1780220176316-99cfba738b07?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8d29ya3BsYWNlJTIwc2FmZXR5JTIwbWVkaWNhbCUyMGV4YW18ZW58MHwwfHx8MTc4ODE5ODc5N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Heng Chiu",
+        "foto_autor_url": "https:\/\/unsplash.com\/@chiuchuuu?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "neurologia": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1711409645921-ef3db0501f96?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8bmV1cm9sb2d5JTIwZG9jdG9yJTIwYnJhaW4lMjBzY2FufGVufDB8MHx8fDE3ODgxOTc5MDZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Shawn Day",
+        "foto_autor_url": "https:\/\/unsplash.com\/@whisperingshiba?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "nutricion-clinica": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1675270690434-aa99f4871e8a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8Y2xpbmljYWwlMjBudXRyaXRpb24lMjBkb2N0b3J8ZW58MHwwfHx8MTc4ODE5NzkwOHww&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "B Y G",
+        "foto_autor_url": "https:\/\/unsplash.com\/@beyzahzah?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "nutricionista": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1543352634-a1c51d9f1fa7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8bnV0cml0aW9uaXN0JTIwaGVhbHRoeSUyMGZvb2QlMjBjb25zdWx0YXRpb258ZW58MHwwfHx8MTc4ODE5NzkxMHww&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Ella Olsson",
+        "foto_autor_url": "https:\/\/unsplash.com\/@ellaolsson?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "oncocirugia-traumatologica": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1758206523766-7c5380ce2f47?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8b3J0aG9wZWRpYyUyMHN1cmdlcnklMjBob3NwaXRhbHxlbnwwfDB8fHwxNzg4MTk3OTEyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Navy Medicine",
+        "foto_autor_url": "https:\/\/unsplash.com\/@navymedicine?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "otorrinolaringologia": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1581056771107-24ca5f033842?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8RU5UJTIwZG9jdG9yJTIwZXhhbWluYXRpb258ZW58MHwwfHx8MTc4ODE5NzkxNHww&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "National Cancer Institute",
+        "foto_autor_url": "https:\/\/unsplash.com\/@nci?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "pediatria-y-neonatologia": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1632053002928-1919605ee6f7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8cGVkaWF0cmljaWFuJTIwYmFieSUyMGRvY3RvcnxlbnwwfDB8fHwxNzg4MTk3OTE2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "CDC",
+        "foto_autor_url": "https:\/\/unsplash.com\/@cdc?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "terapia-intensiva": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1633488781325-d36e6818d0c8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8aW50ZW5zaXZlJTIwY2FyZSUyMHVuaXQlMjBob3NwaXRhbHxlbnwwfDB8fHwxNzg4MTk3ODk0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Bagoes Ilhamy",
+        "foto_autor_url": "https:\/\/unsplash.com\/@goestock?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "traumatologia-y-ortopedia": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1666214277657-e60f05c40b04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8b3J0aG9wZWRpY3MlMjBkb2N0b3IlMjB4cmF5fGVufDB8MHx8fDE3ODgxOTc5MTl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Accuray",
+        "foto_autor_url": "https:\/\/unsplash.com\/@accuray?utm_source=clinica_benites&utm_medium=referral"
+    },
+    "urologia": {
+        "foto_url": "https:\/\/images.unsplash.com\/photo-1559757175-053139280de2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDUwMzg1fDB8MXxzZWFyY2h8MXx8a2lkbmV5JTIwdXJvbG9naXN0JTIwZXhhbXxlbnwwfDB8fHwxNzg4MTk4NTMzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+        "foto_autor": "Robina Weermeijer",
+        "foto_autor_url": "https:\/\/unsplash.com\/@averey?utm_source=clinica_benites&utm_medium=referral"
+    }
+}
