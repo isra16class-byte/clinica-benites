@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-31] Vista única de especialidad
+
+Se agrega la página individual de detalle por slug para cada especialidad usando `Especialidades::find($slug)`, con 404 si no existe. La ruta nueva es `/especialidades/{slug}` y la vista reutiliza el layout público y el patrón visual del sitio (`partials.nav`, `partials.footer`, `cb-footer-link`, `cb-btn-primary`, `cb-about-body`). Archivos tocados: `app/Support/Especialidades.php`, `app/Http/Controllers/EspecialidadController.php`, `routes/web.php`, `resources/views/especialidad.blade.php`.
+
 ## [2026-08-31] Fix scroll-reveal: `overflow-hidden` en decorativos, no en `<section>`
 
 El scroll-reveal de las 4 secciones (Especialidades, Servicios, Sobre nosotros, Contacto) no funcionaba: los elementos `.cb-reveal` estaban visibles en `opacity: 1` fuera del viewport en lugar de mantener `opacity: 0` y transicionar al entrar. **Causa raíz**: `overflow-hidden` en el `<section>` padre altera el contenedor de referencia de `animation-timeline: view()`, haciendo que calcule la entrada/salida contra el contenedor en lugar del viewport. **Fix**: se quitó `overflow-hidden` de los `<section>` y se envolvió únicamente el decorativo (`cb-hero-grid` + `cb-directory-watermark` en Especialidades; `cb-hero-grid` + `cb-services-glow` en Servicios; `cb-hero-grid` + `cb-orb` en Contacto; nada en Sobre nosotros por no tener decorativos) en un `<div class="overflow-hidden">` nuevo. El recorte visual se mantiene igual, pero ahora `animation-timeline: view()` funciona correctamente — el fade-up empieza en `opacity: 0` fuera de vista y transiciona suavemente al entrar. Archivos tocados: `resources/views/sections/especialidades.blade.php`, `servicios.blade.php`, `sobre.blade.php`, `contacto.blade.php`.
