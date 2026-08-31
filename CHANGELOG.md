@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-31] Especialidades: galería de hasta 3 fotos, "Proceso de atención" y "Especialidades relacionadas"
+
+`especialidades:fetch-fotos` pasa a pedir `per_page=3` a Unsplash y guarda un array `fotos` (hasta 3 elementos, no todas las especialidades llegan a 3 según lo que devuelve Unsplash) en `especialidades-fotos.json`. `Especialidades.php` expone `fotos` completo y sigue llenando `foto_url`/`foto_autor`/`foto_autor_url` con el primer elemento (compatibilidad). `especialidad.blade.php` suma una grilla secundaria con las fotos extra (si hay más de 1), una sección fija "Proceso de atención" (4 pasos genéricos, mismo texto en las 27 páginas, vive directo en el blade) y "Especialidades relacionadas" (3 tarjetas a las siguientes especialidades del array por posición, dando la vuelta al principio si hace falta, sin relación clínica real). `EspecialidadController.php` calcula las relacionadas con `Especialidades::all()` pero sigue usando `Especialidades::find($slug)` para la especialidad principal (necesario para preservar `icono_paths`, que solo `find()` agrega). Sin cambios en `Especialidades.php` fuera de exponer `fotos`.
+
 ## [2026-08-31] Especialidades: layout de 2 columnas con "Qué tratamos" y "Cuándo consultar"
 
 `app/Support/Especialidades.php` reemplaza la descripción larga por 3 campos: `descripcion` (1 oración), `que_tratamos` (array de bullets) y `cuando_consultar` (string), genéricos como siempre. `especialidad.blade.php` pasa de 1 a 2 columnas (`max-w-6xl`): ícono+foto a la izquierda, texto+bullets+callout a la derecha. El callout de "Cuándo consultar" recibió su título después de un ajuste de feedback (mismo estilo que "Qué tratamos"). Sin cambios en `fotos()`/`all()`/`find()`.
