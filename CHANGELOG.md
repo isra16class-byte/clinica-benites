@@ -4,6 +4,14 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-31] Nav público: reveal por scroll hacia arriba + barra sutil
+
+Se ajusta la navegación del sitio público para ocultarse al bajar y reaparecer al subir, con una barra de acento muy discreta en la parte inferior del header. La lógica se mantiene en `resources/views/partials/nav.blade.php` y los estilos en `resources/css/public.css`, sin tocar contenido ni datos. La barra queda como detalle de marca y no tapa el contenido del primer bloque debajo del nav.
+
+## [2026-08-31] Especialidad individual: espacio superior y contraste del botón de volver
+
+Se corrigen dos issues visuales en `resources/views/especialidad.blade.php` y `resources/css/public.css`: se reduce el espacio excesivo arriba de la primera sección y el link "← Volver a especialidades" pasa a tener contraste suficiente sobre fondo claro sin tocar la base `.cb-footer-link` del footer real. La clase de la página se deja scoped para no afectar al resto del sitio público.
+
 ## [2026-08-31] Especialidades: galería de hasta 3 fotos, "Proceso de atención" y "Especialidades relacionadas"
 
 `especialidades:fetch-fotos` pasa a pedir `per_page=3` a Unsplash y guarda un array `fotos` (hasta 3 elementos, no todas las especialidades llegan a 3 según lo que devuelve Unsplash) en `especialidades-fotos.json`. `Especialidades.php` expone `fotos` completo y sigue llenando `foto_url`/`foto_autor`/`foto_autor_url` con el primer elemento (compatibilidad). `especialidad.blade.php` suma una grilla secundaria con las fotos extra (si hay más de 1), una sección fija "Proceso de atención" (4 pasos genéricos, mismo texto en las 27 páginas, vive directo en el blade) y "Especialidades relacionadas" (3 tarjetas a las siguientes especialidades del array por posición, dando la vuelta al principio si hace falta, sin relación clínica real). `EspecialidadController.php` calcula las relacionadas con `Especialidades::all()` pero sigue usando `Especialidades::find($slug)` para la especialidad principal (necesario para preservar `icono_paths`, que solo `find()` agrega). Sin cambios en `Especialidades.php` fuera de exponer `fotos`.

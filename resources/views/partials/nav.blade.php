@@ -5,7 +5,7 @@
     solo para esto. Los links a #especialidades / #servicios / #nosotros /
     #contacto apuntan a las secciones correspondientes en `home.blade.php`.
 --}}
-<header class="cb-nav">
+<header class="cb-nav cb-nav--visible" id="cb-nav">
     <input type="checkbox" id="cb-nav-toggle" class="cb-nav-checkbox">
 
     <div class="cb-nav-inner mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4 sm:px-10 lg:px-16">
@@ -53,4 +53,44 @@
             Agendar por WhatsApp
         </a>
     </nav>
+
+    <script>
+        (() => {
+            const nav = document.getElementById('cb-nav');
+            if (!nav) return;
+
+            let lastScrollY = window.scrollY;
+            let ticking = false;
+
+            const applyNavState = () => {
+                const currentY = window.scrollY;
+                const scrollingDown = currentY > lastScrollY + 6;
+                const atTop = currentY <= 12;
+
+                if (atTop) {
+                    nav.classList.add('cb-nav--visible');
+                    nav.classList.remove('cb-nav--accent');
+                } else if (scrollingDown) {
+                    nav.classList.remove('cb-nav--visible');
+                    nav.classList.remove('cb-nav--accent');
+                } else {
+                    nav.classList.add('cb-nav--visible');
+                    nav.classList.add('cb-nav--accent');
+                }
+
+                lastScrollY = currentY;
+                ticking = false;
+            };
+
+            const onScroll = () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(applyNavState);
+                    ticking = true;
+                }
+            };
+
+            window.addEventListener('scroll', onScroll, { passive: true });
+            applyNavState();
+        })();
+    </script>
 </header>
