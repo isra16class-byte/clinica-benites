@@ -6,16 +6,16 @@
 --}}
 <footer class="cb-footer">
     <div class="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-14 sm:px-10 lg:flex-row lg:items-center lg:justify-between lg:px-16">
-        <a href="#inicio">
+        <a href="{{ url('/') }}#inicio">
             <img src="{{ asset('images/logo-horizontal-white.png') }}" alt="Clínica Benites" class="h-7 w-auto">
         </a>
 
         <nav class="flex flex-wrap gap-x-8 gap-y-3" aria-label="Navegación del pie de página">
-            <a href="#inicio" class="cb-footer-link">Inicio</a>
-            <a href="#especialidades" class="cb-footer-link">Especialidades</a>
-            <a href="#servicios" class="cb-footer-link">Servicios</a>
-            <a href="#nosotros" class="cb-footer-link">Nosotros</a>
-            <a href="#contacto" class="cb-footer-link">Contacto</a>
+            <a href="{{ url('/') }}#inicio" class="cb-footer-link">Inicio</a>
+            <a href="{{ url('/') }}#especialidades" class="cb-footer-link">Especialidades</a>
+            <a href="{{ url('/') }}#servicios" class="cb-footer-link">Servicios</a>
+            <a href="{{ url('/') }}#nosotros" class="cb-footer-link">Nosotros</a>
+            <a href="{{ url('/') }}#contacto" class="cb-footer-link">Contacto</a>
         </nav>
 
         {{-- TODO: reemplazar por el número real de WhatsApp de la clínica antes de publicar. --}}
