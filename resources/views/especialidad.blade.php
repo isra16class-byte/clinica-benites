@@ -56,7 +56,8 @@
 
                     <!-- Cuándo consultar -->
                     <div class="rounded-xl border border-gray-200 bg-white/60 p-4 mt-6">
-                        <p class="text-sm text-gray-700">{{ $especialidad['cuando_consultar'] }}</p>
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Cuándo consultar</h2>
+                        <p class="text-sm text-gray-700 mt-2">{{ $especialidad['cuando_consultar'] }}</p>
                     </div>
 
                     <a href="https://wa.me/593000000000?text=Hola%2C%20deseo%20agendar%20una%20cita%20en%20Cl%C3%ADnica%20Benites." class="cb-btn-primary mt-8 inline-flex" target="_blank" rel="noopener">
