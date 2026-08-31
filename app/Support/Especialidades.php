@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class Especialidades
@@ -33,33 +34,33 @@ class Especialidades
     private static function especialidades(): array
     {
         $lista = [
-            ['nombre' => 'Anestesiología y Terapia del Dolor', 'icono' => 'moon'],
-            ['nombre' => 'Auditoría Médica', 'icono' => 'clipboard'],
-            ['nombre' => 'Cardiología', 'icono' => 'heart'],
-            ['nombre' => 'Cateterismo Cardiaco', 'icono' => 'heart'],
-            ['nombre' => 'Cirugía General y Digestiva', 'icono' => 'scalpel'],
-            ['nombre' => 'Cirugía Holep de Próstata', 'icono' => 'drop'],
-            ['nombre' => 'Cirugía Oncológica', 'icono' => 'ribbon'],
-            ['nombre' => 'Cirugía Pediátrica', 'icono' => 'baby'],
-            ['nombre' => 'Cirugía Plástica', 'icono' => 'sparkle'],
-            ['nombre' => 'Cirugía Torácica', 'icono' => 'lungs'],
-            ['nombre' => 'Cirugía Vascular', 'icono' => 'vein'],
-            ['nombre' => 'Coloproctología', 'icono' => 'spiral'],
-            ['nombre' => 'Cuidados Críticos', 'icono' => 'monitor'],
-            ['nombre' => 'Endocrinología', 'icono' => 'molecule'],
-            ['nombre' => 'Gastroenterología', 'icono' => 'stomach'],
-            ['nombre' => 'Ginecología', 'icono' => 'venus'],
-            ['nombre' => 'Laparoscopía', 'icono' => 'camera'],
-            ['nombre' => 'Médico Ocupacional', 'icono' => 'briefcase'],
-            ['nombre' => 'Neurología', 'icono' => 'nervio'],
-            ['nombre' => 'Nutrición Clínica', 'icono' => 'leaf'],
-            ['nombre' => 'Nutricionista', 'icono' => 'leaf'],
-            ['nombre' => 'Oncocirugía Traumatológica', 'icono' => 'bone'],
-            ['nombre' => 'Otorrinolaringología', 'icono' => 'ear'],
-            ['nombre' => 'Pediatría y Neonatología', 'icono' => 'baby'],
-            ['nombre' => 'Terapia Intensiva', 'icono' => 'monitor'],
-            ['nombre' => 'Traumatología y Ortopedia', 'icono' => 'bone'],
-            ['nombre' => 'Urología', 'icono' => 'drop'],
+            ['nombre' => 'Anestesiología y Terapia del Dolor', 'icono' => 'moon', 'descripcion' => 'Especialidad encargada de garantizar la seguridad y el confort del paciente durante procedimientos quirúrgicos, además del manejo integral del dolor agudo y crónico mediante técnicas farmacológicas e intervencionistas.'],
+            ['nombre' => 'Auditoría Médica', 'icono' => 'clipboard', 'descripcion' => 'Área dedicada a la revisión y control de calidad de los procesos asistenciales, verificando que la atención brindada cumpla con protocolos clínicos, normativas vigentes y estándares de seguridad del paciente.'],
+            ['nombre' => 'Cardiología', 'icono' => 'heart', 'descripcion' => 'Diagnóstico, tratamiento y seguimiento de enfermedades del corazón y del sistema circulatorio, incluyendo hipertensión, arritmias, insuficiencia cardíaca y prevención de enfermedad coronaria.'],
+            ['nombre' => 'Cateterismo Cardiaco', 'icono' => 'heart', 'descripcion' => 'Procedimiento diagnóstico e intervencionista mínimamente invasivo que permite evaluar las arterias coronarias y tratar obstrucciones mediante angioplastia o colocación de stents.'],
+            ['nombre' => 'Cirugía General y Digestiva', 'icono' => 'scalpel', 'descripcion' => 'Tratamiento quirúrgico de patologías del aparato digestivo, pared abdominal y órganos relacionados, abarcando desde procedimientos electivos hasta emergencias abdominales.'],
+            ['nombre' => 'Cirugía Holep de Próstata', 'icono' => 'drop', 'descripcion' => 'Técnica quirúrgica mínimamente invasiva con láser para el tratamiento de la hiperplasia prostática benigna, con menor sangrado y recuperación más rápida que la cirugía convencional.'],
+            ['nombre' => 'Cirugía Oncológica', 'icono' => 'ribbon', 'descripcion' => 'Tratamiento quirúrgico de tumores malignos en distintos órganos, con enfoque en la resección completa de la lesión y la preservación de la función y calidad de vida del paciente.'],
+            ['nombre' => 'Cirugía Pediátrica', 'icono' => 'baby', 'descripcion' => 'Atención quirúrgica especializada para recién nacidos, niños y adolescentes, adaptando técnicas y cuidados a las particularidades anatómicas y fisiológicas de cada etapa de crecimiento.'],
+            ['nombre' => 'Cirugía Plástica', 'icono' => 'sparkle', 'descripcion' => 'Procedimientos reconstructivos y estéticos orientados a restaurar la forma y función de tejidos afectados por trauma, enfermedad o malformaciones congénitas, así como intervenciones electivas.'],
+            ['nombre' => 'Cirugía Torácica', 'icono' => 'lungs', 'descripcion' => 'Tratamiento quirúrgico de patologías de pulmones, esófago, mediastino y pared torácica, incluyendo procedimientos oncológicos y no oncológicos del tórax.'],
+            ['nombre' => 'Cirugía Vascular', 'icono' => 'vein', 'descripcion' => 'Diagnóstico y tratamiento quirúrgico de enfermedades de arterias y venas, como várices, aneurismas y obstrucciones circulatorias periféricas.'],
+            ['nombre' => 'Coloproctología', 'icono' => 'spiral', 'descripcion' => 'Especialidad enfocada en el diagnóstico y tratamiento de enfermedades del colon, recto y ano, tanto por vía médica como quirúrgica.'],
+            ['nombre' => 'Cuidados Críticos', 'icono' => 'monitor', 'descripcion' => 'Atención especializada a pacientes en estado grave que requieren monitoreo constante y soporte vital avanzado, generalmente en unidades de cuidados intensivos.'],
+            ['nombre' => 'Endocrinología', 'icono' => 'molecule', 'descripcion' => 'Diagnóstico y manejo de trastornos hormonales y metabólicos, incluyendo diabetes, enfermedades de tiroides y alteraciones del crecimiento.'],
+            ['nombre' => 'Gastroenterología', 'icono' => 'stomach', 'descripcion' => 'Diagnóstico y tratamiento de enfermedades del sistema digestivo, como reflujo, úlceras, enfermedad inflamatoria intestinal y afecciones hepáticas.'],
+            ['nombre' => 'Ginecología', 'icono' => 'venus', 'descripcion' => 'Atención integral de la salud del sistema reproductivo femenino, incluyendo control ginecológico preventivo, tratamiento de patologías y seguimiento hormonal.'],
+            ['nombre' => 'Laparoscopía', 'icono' => 'camera', 'descripcion' => 'Técnica quirúrgica mínimamente invasiva que utiliza pequeñas incisiones y cámara para realizar procedimientos abdominales con menor dolor y recuperación más rápida.'],
+            ['nombre' => 'Médico Ocupacional', 'icono' => 'briefcase', 'descripcion' => 'Evaluación y seguimiento de la salud de trabajadores en relación con su entorno laboral, incluyendo exámenes preventivos y manejo de enfermedades relacionadas con el trabajo.'],
+            ['nombre' => 'Neurología', 'icono' => 'nervio', 'descripcion' => 'Diagnóstico y tratamiento de enfermedades del sistema nervioso central y periférico, como migrañas, epilepsia, accidentes cerebrovasculares y trastornos neurodegenerativos.'],
+            ['nombre' => 'Nutrición Clínica', 'icono' => 'leaf', 'descripcion' => 'Evaluación y manejo nutricional de pacientes con enfermedades que requieren un abordaje dietético específico, como diabetes, insuficiencia renal u obesidad.'],
+            ['nombre' => 'Nutricionista', 'icono' => 'leaf', 'descripcion' => 'Orientación en hábitos alimenticios saludables, diseño de planes nutricionales personalizados y acompañamiento en objetivos de salud y bienestar.'],
+            ['nombre' => 'Oncocirugía Traumatológica', 'icono' => 'bone', 'descripcion' => 'Tratamiento quirúrgico especializado de tumores óseos y de tejidos blandos del sistema musculoesquelético, con enfoque en preservar la función del miembro afectado.'],
+            ['nombre' => 'Otorrinolaringología', 'icono' => 'ear', 'descripcion' => 'Diagnóstico y tratamiento de enfermedades de oído, nariz y garganta, incluyendo trastornos auditivos, sinusitis y afecciones de la vía respiratoria superior.'],
+            ['nombre' => 'Pediatría y Neonatología', 'icono' => 'baby', 'descripcion' => 'Atención integral de la salud de recién nacidos, niños y adolescentes, incluyendo control de crecimiento, vacunación y manejo de enfermedades propias de la infancia.'],
+            ['nombre' => 'Terapia Intensiva', 'icono' => 'monitor', 'descripcion' => 'Monitoreo y soporte vital especializado para pacientes con enfermedades graves o inestables, con equipos y personal dedicados a la atención crítica continua.'],
+            ['nombre' => 'Traumatología y Ortopedia', 'icono' => 'bone', 'descripcion' => 'Diagnóstico y tratamiento de lesiones y enfermedades del sistema musculoesquelético, incluyendo fracturas, lesiones deportivas y patologías articulares.'],
+            ['nombre' => 'Urología', 'icono' => 'drop', 'descripcion' => 'Diagnóstico y tratamiento de enfermedades del aparato urinario y del sistema reproductor masculino, incluyendo cálculos renales, infecciones urinarias y afecciones prostáticas.'],
         ];
 
         foreach ($lista as $index => $item) {
@@ -69,14 +70,39 @@ class Especialidades
         return $lista;
     }
 
+    private static function fotos(): array
+    {
+        $ruta = base_path('resources/data/especialidades-fotos.json');
+
+        if (! File::exists($ruta)) {
+            return [];
+        }
+
+        $contenido = File::get($ruta);
+
+        return json_decode($contenido, true) ?: [];
+    }
+
     public static function all(): array
     {
-        return self::especialidades();
+        $lista = self::especialidades();
+        $fotos = self::fotos();
+
+        foreach ($lista as $index => $item) {
+            $slug = $item['slug'];
+            $datosFoto = $fotos[$slug] ?? [];
+
+            $lista[$index]['foto_url'] = $datosFoto['foto_url'] ?? null;
+            $lista[$index]['foto_autor'] = $datosFoto['foto_autor'] ?? null;
+            $lista[$index]['foto_autor_url'] = $datosFoto['foto_autor_url'] ?? null;
+        }
+
+        return $lista;
     }
 
     public static function find(string $slug): ?array
     {
-        foreach (self::especialidades() as $especialidad) {
+        foreach (self::all() as $especialidad) {
             if (($especialidad['slug'] ?? null) === $slug) {
                 $resultado = $especialidad;
                 $resultado['icono_paths'] = self::$iconos[$especialidad['icono']] ?? [];
