@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-31] Especialidades: descripciones expandidas + fondo decorativo en la página individual
+
+Las 27 descripciones de `app/Support/Especialidades.php` pasan de una frase a 2-3 oraciones (qué trata, condiciones comunes, cuándo consultar), mismo criterio genérico de siempre. Se agrega el fondo decorativo `cb-hero-grid` (ya usado en Hero/Servicios/Contacto) a `especialidad.blade.php`, envuelto en `overflow-hidden` para no interferir con el scroll-reveal del sitio. Sin cambios en `fotos()`/`all()`/`find()`.
+
 ## [2026-08-31] Especialidades: descripciones reales + fotos de Unsplash en la página individual
 
 Se agrega el comando `especialidades:fetch-fotos` que genera `resources/data/especialidades-fotos.json` (foto + autor + link de Unsplash) para las 27 especialidades. `app/Support/Especialidades.php` gana el campo `descripcion` por especialidad y mezcla el JSON de fotos por slug en `all()`/`find()`. `especialidad.blade.php` reemplaza el placeholder "Estamos preparando el detalle..." por la descripción real y muestra la foto con crédito a Unsplash. Contenido genérico para demo/propuesta, no específico de la clínica (pendiente entrevista con el dueño).
