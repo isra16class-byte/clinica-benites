@@ -114,7 +114,7 @@
         `@media (max-height: ...)` (ver public.css) para esos casos, sin
         afectar pantallas altas donde ya entraba bien.
     --}}
-    <div class="cb-hero-content relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 sm:px-10 lg:px-16">
+    <div class="cb-hero-content relative z-10 mx-auto flex max-w-7xl flex-col justify-center px-6 sm:px-10 lg:px-16">
         <p class="cb-eyebrow cb-reveal" style="animation-delay:.05s">
             Clínica Benites &middot; Guayaquil
         </p>
