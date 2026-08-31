@@ -16,11 +16,18 @@
                 </svg>
             </div>
 
+            @if($especialidad['foto_url'] ?? null)
+                <img src="{{ $especialidad['foto_url'] }}" alt="{{ $especialidad['nombre'] }}" class="mt-6 h-64 w-full rounded-2xl object-cover sm:h-72">
+                <p class="mt-2 text-xs text-gray-400">
+                    Foto: <a href="{{ $especialidad['foto_autor_url'] }}" target="_blank" rel="noopener" class="text-gray-500 underline underline-offset-2">{{ $especialidad['foto_autor'] }}</a> / Unsplash
+                </p>
+            @endif
+
             <p class="cb-eyebrow cb-eyebrow--light mt-6">Especialidad</p>
             <h1 class="cb-headline cb-headline--section">{{ $especialidad['nombre'] }}</h1>
 
             <p class="cb-about-body mt-6">
-                Estamos preparando el detalle de esta especialidad: médicos a cargo, horarios de atención y servicios específicos. Mientras tanto, podés consultarnos directamente por WhatsApp o teléfono.
+                {{ $especialidad['descripcion'] }}
             </p>
 
             <a href="https://wa.me/593000000000?text=Hola%2C%20deseo%20agendar%20una%20cita%20en%20Cl%C3%ADnica%20Benites." class="cb-btn-primary mt-8 inline-flex" target="_blank" rel="noopener">
