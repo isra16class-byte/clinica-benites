@@ -9,7 +9,7 @@
     <input type="checkbox" id="cb-nav-toggle" class="cb-nav-checkbox">
 
     <div class="cb-nav-inner mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4 sm:px-10 lg:px-16">
-        <a href="#inicio" class="shrink-0">
+        <a href="{{ url('/') }}#inicio" class="shrink-0">
             <img
                 src="{{ asset('images/logo-horizontal-white.png') }}"
                 alt="Clínica Benites"
@@ -18,11 +18,11 @@
         </a>
 
         <nav class="hidden items-center gap-9 lg:flex" aria-label="Navegación principal">
-            <a href="#inicio" class="cb-nav-link">Inicio</a>
-            <a href="#especialidades" class="cb-nav-link">Especialidades</a>
-            <a href="#servicios" class="cb-nav-link">Servicios</a>
-            <a href="#nosotros" class="cb-nav-link">Nosotros</a>
-            <a href="#contacto" class="cb-nav-link">Contacto</a>
+            <a href="{{ url('/') }}#inicio" class="cb-nav-link">Inicio</a>
+            <a href="{{ url('/') }}#especialidades" class="cb-nav-link">Especialidades</a>
+            <a href="{{ url('/') }}#servicios" class="cb-nav-link">Servicios</a>
+            <a href="{{ url('/') }}#nosotros" class="cb-nav-link">Nosotros</a>
+            <a href="{{ url('/') }}#contacto" class="cb-nav-link">Contacto</a>
         </nav>
 
         <div class="hidden lg:block">
@@ -44,11 +44,11 @@
     </div>
 
     <nav class="cb-nav-mobile" aria-label="Navegación móvil">
-        <a href="#inicio" class="cb-nav-link">Inicio</a>
-        <a href="#especialidades" class="cb-nav-link">Especialidades</a>
-        <a href="#servicios" class="cb-nav-link">Servicios</a>
-        <a href="#nosotros" class="cb-nav-link">Nosotros</a>
-        <a href="#contacto" class="cb-nav-link">Contacto</a>
+        <a href="{{ url('/') }}#inicio" class="cb-nav-link">Inicio</a>
+        <a href="{{ url('/') }}#especialidades" class="cb-nav-link">Especialidades</a>
+        <a href="{{ url('/') }}#servicios" class="cb-nav-link">Servicios</a>
+        <a href="{{ url('/') }}#nosotros" class="cb-nav-link">Nosotros</a>
+        <a href="{{ url('/') }}#contacto" class="cb-nav-link">Contacto</a>
         <a href="https://wa.me/593000000000?text=Hola%2C%20deseo%20agendar%20una%20cita%20en%20Cl%C3%ADnica%20Benites." class="cb-btn-primary mt-3 justify-center" target="_blank" rel="noopener">
             Agendar por WhatsApp
         </a>
