@@ -527,6 +527,13 @@
         padding-bottom: 5.5rem;
     }
 
+    @media (min-height: 1600px) {
+        section#inicio .cb-hero-content {
+            min-height: min(100vh, 60rem) !important;
+            height: min(100vh, 60rem) !important;
+        }
+    }
+
     .cb-eyebrow {
         display: inline-flex;
         align-items: center;
