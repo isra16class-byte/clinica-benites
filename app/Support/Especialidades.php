@@ -30,44 +30,53 @@ class Especialidades
         'bone' => ['M5.5 8.5a2 2 0 1 1 3-3l10 10a2 2 0 1 1-3 3l-10-10Z', 'M8.5 5.5a2 2 0 1 1-3 3', 'M15.5 18.5a2 2 0 1 0 3-3'],
     ];
 
-    private static array $especialidades = [
-        ['nombre' => 'Anestesiología y Terapia del Dolor', 'icono' => 'moon', 'slug' => Str::slug('Anestesiología y Terapia del Dolor')],
-        ['nombre' => 'Auditoría Médica', 'icono' => 'clipboard', 'slug' => Str::slug('Auditoría Médica')],
-        ['nombre' => 'Cardiología', 'icono' => 'heart', 'slug' => Str::slug('Cardiología')],
-        ['nombre' => 'Cateterismo Cardiaco', 'icono' => 'heart', 'slug' => Str::slug('Cateterismo Cardiaco')],
-        ['nombre' => 'Cirugía General y Digestiva', 'icono' => 'scalpel', 'slug' => Str::slug('Cirugía General y Digestiva')],
-        ['nombre' => 'Cirugía Holep de Próstata', 'icono' => 'drop', 'slug' => Str::slug('Cirugía Holep de Próstata')],
-        ['nombre' => 'Cirugía Oncológica', 'icono' => 'ribbon', 'slug' => Str::slug('Cirugía Oncológica')],
-        ['nombre' => 'Cirugía Pediátrica', 'icono' => 'baby', 'slug' => Str::slug('Cirugía Pediátrica')],
-        ['nombre' => 'Cirugía Plástica', 'icono' => 'sparkle', 'slug' => Str::slug('Cirugía Plástica')],
-        ['nombre' => 'Cirugía Torácica', 'icono' => 'lungs', 'slug' => Str::slug('Cirugía Torácica')],
-        ['nombre' => 'Cirugía Vascular', 'icono' => 'vein', 'slug' => Str::slug('Cirugía Vascular')],
-        ['nombre' => 'Coloproctología', 'icono' => 'spiral', 'slug' => Str::slug('Coloproctología')],
-        ['nombre' => 'Cuidados Críticos', 'icono' => 'monitor', 'slug' => Str::slug('Cuidados Críticos')],
-        ['nombre' => 'Endocrinología', 'icono' => 'molecule', 'slug' => Str::slug('Endocrinología')],
-        ['nombre' => 'Gastroenterología', 'icono' => 'stomach', 'slug' => Str::slug('Gastroenterología')],
-        ['nombre' => 'Ginecología', 'icono' => 'venus', 'slug' => Str::slug('Ginecología')],
-        ['nombre' => 'Laparoscopía', 'icono' => 'camera', 'slug' => Str::slug('Laparoscopía')],
-        ['nombre' => 'Médico Ocupacional', 'icono' => 'briefcase', 'slug' => Str::slug('Médico Ocupacional')],
-        ['nombre' => 'Neurología', 'icono' => 'nervio', 'slug' => Str::slug('Neurología')],
-        ['nombre' => 'Nutrición Clínica', 'icono' => 'leaf', 'slug' => Str::slug('Nutrición Clínica')],
-        ['nombre' => 'Nutricionista', 'icono' => 'leaf', 'slug' => Str::slug('Nutricionista')],
-        ['nombre' => 'Oncocirugía Traumatológica', 'icono' => 'bone', 'slug' => Str::slug('Oncocirugía Traumatológica')],
-        ['nombre' => 'Otorrinolaringología', 'icono' => 'ear', 'slug' => Str::slug('Otorrinolaringología')],
-        ['nombre' => 'Pediatría y Neonatología', 'icono' => 'baby', 'slug' => Str::slug('Pediatría y Neonatología')],
-        ['nombre' => 'Terapia Intensiva', 'icono' => 'monitor', 'slug' => Str::slug('Terapia Intensiva')],
-        ['nombre' => 'Traumatología y Ortopedia', 'icono' => 'bone', 'slug' => Str::slug('Traumatología y Ortopedia')],
-        ['nombre' => 'Urología', 'icono' => 'drop', 'slug' => Str::slug('Urología')],
-    ];
+    private static function especialidades(): array
+    {
+        $lista = [
+            ['nombre' => 'Anestesiología y Terapia del Dolor', 'icono' => 'moon'],
+            ['nombre' => 'Auditoría Médica', 'icono' => 'clipboard'],
+            ['nombre' => 'Cardiología', 'icono' => 'heart'],
+            ['nombre' => 'Cateterismo Cardiaco', 'icono' => 'heart'],
+            ['nombre' => 'Cirugía General y Digestiva', 'icono' => 'scalpel'],
+            ['nombre' => 'Cirugía Holep de Próstata', 'icono' => 'drop'],
+            ['nombre' => 'Cirugía Oncológica', 'icono' => 'ribbon'],
+            ['nombre' => 'Cirugía Pediátrica', 'icono' => 'baby'],
+            ['nombre' => 'Cirugía Plástica', 'icono' => 'sparkle'],
+            ['nombre' => 'Cirugía Torácica', 'icono' => 'lungs'],
+            ['nombre' => 'Cirugía Vascular', 'icono' => 'vein'],
+            ['nombre' => 'Coloproctología', 'icono' => 'spiral'],
+            ['nombre' => 'Cuidados Críticos', 'icono' => 'monitor'],
+            ['nombre' => 'Endocrinología', 'icono' => 'molecule'],
+            ['nombre' => 'Gastroenterología', 'icono' => 'stomach'],
+            ['nombre' => 'Ginecología', 'icono' => 'venus'],
+            ['nombre' => 'Laparoscopía', 'icono' => 'camera'],
+            ['nombre' => 'Médico Ocupacional', 'icono' => 'briefcase'],
+            ['nombre' => 'Neurología', 'icono' => 'nervio'],
+            ['nombre' => 'Nutrición Clínica', 'icono' => 'leaf'],
+            ['nombre' => 'Nutricionista', 'icono' => 'leaf'],
+            ['nombre' => 'Oncocirugía Traumatológica', 'icono' => 'bone'],
+            ['nombre' => 'Otorrinolaringología', 'icono' => 'ear'],
+            ['nombre' => 'Pediatría y Neonatología', 'icono' => 'baby'],
+            ['nombre' => 'Terapia Intensiva', 'icono' => 'monitor'],
+            ['nombre' => 'Traumatología y Ortopedia', 'icono' => 'bone'],
+            ['nombre' => 'Urología', 'icono' => 'drop'],
+        ];
+
+        foreach ($lista as $index => $item) {
+            $lista[$index]['slug'] = Str::slug($item['nombre']);
+        }
+
+        return $lista;
+    }
 
     public static function all(): array
     {
-        return self::$especialidades;
+        return self::especialidades();
     }
 
     public static function find(string $slug): ?array
     {
-        foreach (self::$especialidades as $especialidad) {
+        foreach (self::especialidades() as $especialidad) {
             if (($especialidad['slug'] ?? null) === $slug) {
                 $resultado = $especialidad;
                 $resultado['icono_paths'] = self::$iconos[$especialidad['icono']] ?? [];

@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-31] Fix: slug de especialidades generado fuera de la propiedad estática
+
+Se corrige la causa raíz del error 500 en `app/Support/Especialidades.php`: `Str::slug()` no puede ejecutarse dentro de una propiedad estática inicializada con un array en PHP. La lista original de 27 especialidades se mantiene igual y el cálculo del `slug` se mueve a un método privado, sin cambiar los nombres ni los iconos.
+
 ## [2026-08-31] Especialidades: filas del directorio enlazan a su página individual
 
 Cada fila de `especialidades.blade.php` pasa de `<div>` a `<a href>`, apuntando a la ruta `especialidades.show` con el slug generado desde el nombre (`Str::slug`). Se agrega `text-decoration: none` a `.cb-directory-row` en `public.css` para que el navegador no subraye el texto por defecto al ser ahora un link.
