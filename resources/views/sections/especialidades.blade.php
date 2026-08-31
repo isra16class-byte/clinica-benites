@@ -105,7 +105,6 @@
             ['nombre' => 'Urología', 'icono' => 'drop'],
         ];
         $columnas = array_chunk($especialidades, (int) ceil(count($especialidades) / 3));
-        use Illuminate\Support\Str;
     @endphp
 
     <div class="relative z-10 mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
@@ -129,7 +128,7 @@
                 @foreach ($columnas as $columna)
                     <div class="cb-directory-col">
                         @foreach ($columna as $item)
-                            <a href="{{ route('especialidades.show', Str::slug($item['nombre'])) }}" class="cb-directory-row">
+                            <a href="{{ route('especialidades.show', \Illuminate\Support\Str::slug($item['nombre'])) }}" class="cb-directory-row">
                                 <span class="cb-directory-left">
                                     <svg class="cb-directory-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         @foreach ($iconos[$item['icono']] as $d)
