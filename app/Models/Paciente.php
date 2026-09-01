@@ -28,6 +28,13 @@ class Paciente extends Model
         return $this->hasMany(HistoriaClinica::class);
     }
 
+    // Expediente clínico completo (sección 8 de MEMORIA.md): alergias vive
+    // por paciente, no por consulta.
+    public function alergias(): HasMany
+    {
+        return $this->hasMany(Alergia::class);
+    }
+
     public function facturas(): HasMany
     {
         return $this->hasMany(Factura::class);

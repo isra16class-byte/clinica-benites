@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Alergia;
 use App\Models\Area;
 use App\Models\Cama;
 use App\Models\Cirugia;
@@ -59,6 +60,7 @@ class DemoHistoricoSeeder extends Seeder
 
         $medicos = $this->crearMedicos($areas, 10);
         $pacientes = $this->crearPacientes(22);
+        $this->crearAlergias($pacientes);
 
         $citas = $this->crearCitas($pacientes, $medicos, $areas, 18);
         $this->crearHistoriaClinicas($citas);
@@ -448,6 +450,39 @@ class DemoHistoricoSeeder extends Seeder
                 'estado' => 'completado',
                 'resultado_texto' => 'Resultado dentro de parámetros esperados.',
                 'resultado_archivo' => null,
+                'notas' => null,
+            ]);
+        }
+    }
+
+    /**
+     * Primer módulo del expediente clínico completo (MEMORIA.md sección 8).
+     * Solo una parte de los pacientes tiene alergias registradas (no todos
+     * las tienen en la realidad) — a propósito no es 1 por paciente.
+     */
+    private function crearAlergias($pacientes): void
+    {
+        $alergias = [
+            ['alergeno' => 'Penicilina', 'tipo' => 'medicamento', 'severidad' => 'severa', 'reaccion' => 'Anafilaxia.'],
+            ['alergeno' => 'Aspirina', 'tipo' => 'medicamento', 'severidad' => 'moderada', 'reaccion' => 'Urticaria y dificultad respiratoria leve.'],
+            ['alergeno' => 'Maní', 'tipo' => 'alimento', 'severidad' => 'severa', 'reaccion' => 'Hinchazón facial y de garganta.'],
+            ['alergeno' => 'Mariscos', 'tipo' => 'alimento', 'severidad' => 'moderada', 'reaccion' => 'Ronchas en piel.'],
+            ['alergeno' => 'Látex', 'tipo' => 'otro', 'severidad' => 'leve', 'reaccion' => 'Irritación en el contacto.'],
+            ['alergeno' => 'Sulfas', 'tipo' => 'medicamento', 'severidad' => 'moderada', 'reaccion' => 'Erupción cutánea.'],
+        ];
+
+        // Un subconjunto de pacientes (no todos) tiene alguna alergia
+        // registrada, para que el aviso destacado se vea tanto en pacientes
+        // con alergias como en los que no.
+        foreach ($pacientes->random(min(8, $pacientes->count())) as $paciente) {
+            $alergia = $alergias[array_rand($alergias)];
+
+            Alergia::create([
+                'paciente_id' => $paciente->id,
+                'alergeno' => $alergia['alergeno'],
+                'tipo' => $alergia['tipo'],
+                'severidad' => $alergia['severidad'],
+                'reaccion' => $alergia['reaccion'],
                 'notas' => null,
             ]);
         }

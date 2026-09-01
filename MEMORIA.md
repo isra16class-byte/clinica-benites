@@ -34,13 +34,15 @@ clinica-benites/
   app/
     Models/            # Area, Paciente, Medico, Cita, HistoriaClinica, Factura, User,
                         # ItemInventario, LoteInventario, MovimientoInventario,
-                        # Cama, Quirofano, Internamiento, Cirugia, OrdenEstudio, ServicioAmbulancia
+                        # Cama, Quirofano, Internamiento, Cirugia, OrdenEstudio, ServicioAmbulancia,
+                        # Alergia (expediente clínico completo, módulo 1 de 3)
     Http/Controllers/
       FacturaPdfController.php   # Exporta factura a PDF (dompdf)
     Filament/
       Concerns/
         HasBackFormAction.php    # Trait: botón "Atrás" en vez de "Cancelar" en pantallas de Editar
       Resources/                 # Un Resource completo (Form+Table+Pages) por cada modelo de arriba
+        Pacientes/RelationManagers/AlergiasRelationManager.php   # Tab de Alergias dentro de Editar Paciente
       Widgets/
         CitasDeHoyWidget.php
         IndicadoresGerencialesWidget.php   # solo admin
@@ -78,6 +80,9 @@ camas, quirofanos, internamientos, cirugias (+ pivot médicos adicionales), orde
 
 # Módulo medicamentos/insumos (24 ago 2026)
 items_inventario, lotes_inventario (FEFO, vencimiento), movimientos_inventario
+
+# Expediente clínico completo — módulo 1 de 3 (31 ago 2026)
+alergias — paciente_id, alergeno, tipo (medicamento/alimento/otro), severidad (leve/moderada/severa), reaccion, notas
 ```
 
 **Por qué `areas` es tabla propia**: la clínica tiene 27 especialidades reales (confirmado, ver `Servicios_CB_2026.pdf`) — con tabla aparte, agregar/quitar áreas no requiere tocar código.
@@ -152,7 +157,11 @@ Ya resuelto: especialidades (27, ver `Servicios_CB_2026.pdf`), no se agenda cita
 
 ## 8. Funciones futuras propuestas (investigadas, no priorizadas ni construidas)
 
-- **Expediente clínico completo — alcance confirmado por el cliente** (entrevista 25 ago 2026, Ysrael Calle): al preguntarle directamente, confirmó que "digitalizar la mayor parte del historial clínico" significa un expediente completo (antecedentes, alergias, signos vitales, resultados de exámenes, todo conectado) — no solo el `diagnostico`/`tratamiento`/`notas` en texto libre que hoy tiene `HistoriaClinica`. Resultados de exámenes con archivo adjunto **ya está cubierto** por `OrdenEstudio` (no hace falta módulo nuevo ahí). Faltan 3 módulos reales, con diseño ya pensado pero no construido: **(1) Alergias** — por paciente (no por consulta), tipo (medicamento/alimento/otro) + severidad, debe verse destacado en la ficha del paciente y en Historia Clínica; **(2) Antecedentes** — por paciente, categorizado (personal/quirúrgico/familiar/hábito) + grupo sanguíneo; **(3) Signos vitales** — por consulta (vinculado a `HistoriaClinica`): presión arterial, temperatura, frecuencia cardíaca, frecuencia respiratoria, peso, talla, saturación de oxígeno. Orden sugerido: alergias → antecedentes → signos vitales (seguridad del paciente primero; los 2 primeros son más simples al ser "por paciente" en vez de "por consulta"). Falta también: extender la matriz de permisos (sección 10) para estos 3 módulos, y confirmar si un antecedente/alergia corregido conserva historial de cambios o se edita directo.
+- **Expediente clínico completo — alcance confirmado por el cliente** (entrevista 25 ago 2026, Ysrael Calle): al preguntarle directamente, confirmó que "digitalizar la mayor parte del historial clínico" significa un expediente completo (antecedentes, alergias, signos vitales, resultados de exámenes, todo conectado) — no solo el `diagnostico`/`tratamiento`/`notas` en texto libre que hoy tiene `HistoriaClinica`. Resultados de exámenes con archivo adjunto **ya está cubierto** por `OrdenEstudio` (no hace falta módulo nuevo ahí). Orden de construcción: alergias → antecedentes → signos vitales (seguridad del paciente primero; los 2 primeros son más simples al ser "por paciente" en vez de "por consulta").
+  - **(1) Alergias — construido (31 ago 2026)**: modelo `Alergia` (paciente_id, alergeno, tipo [medicamento/alimento/otro], severidad [leve/moderada/severa], reaccion, notas). `AlergiaResource` con CRUD completo (nav propia, grupo "Atención al paciente") + `AlergiasRelationManager` como tab dentro de Editar Paciente (así queda "destacado en la ficha del paciente", no escondido en una nota) + sección destacada de solo lectura en el infolist de Historia Clínica cuando el paciente tiene alergias registradas, más un aviso en vivo (`Placeholder` reactivo a `->live()` en el Select de paciente) al crear/editar una Historia Clínica. Permisos: **se aplicó por decisión propia el mismo criterio que Historia Clínica** (admin + médico ven/editan, solo admin elimina, recepción sin acceso) — no es una decisión confirmada por el cliente, sigue pendiente extender la matriz de la sección 10 formalmente para este módulo (ver nota en `AlergiaResource`). Seeder de demo (`DemoHistoricoSeeder::crearAlergias()`) agrega alergias a un subconjunto de pacientes para poder ver la función funcionando sin cargar datos a mano.
+  - **(2) Antecedentes — pendiente**: por paciente, categorizado (personal/quirúrgico/familiar/hábito), más grupo sanguíneo.
+  - **(3) Signos vitales — pendiente**: por consulta (vinculado a `HistoriaClinica`): presión arterial, temperatura, frecuencia cardíaca, frecuencia respiratoria, peso, talla, saturación de oxígeno.
+  - Preguntas sin resolver que quedaron abiertas al construir Alergias (aplican igual a los 2 módulos que faltan): si un registro corregido debe conservar historial de cambios o editarse directo, y la matriz de permisos formal de la sección 10.
 - **Inventario multi-área** (misma entrevista): el cliente pidió que el registro de insumos cubra farmacia, quirófano, admisión y facturación (4 áreas, no solo farmacia) — el modelo ya soporta esto a nivel de dato (`area_origen`/`area_destino`), pero falta confirmar si es un inventario compartido entre las 4 o si cada una maneja el suyo (depende de la misma pregunta pendiente sobre el mecanismo real de farmacia, sección 6).
 - **Prescripciones (2027)**: sigue sin construirse. Falta confirmar si el médico prescribe solo lo que existe en `items_inventario`, o también medicamentos que el paciente compra afuera de la clínica — define si se vincula o no al inventario.
 - **Marco legal ecuatoriano aplicable** (investigación 24 ago 2026, no implica cambio de código inmediato): LOPDP clasifica los datos de salud como "dato sensible" (consentimiento explícito en general, con excepción para instituciones/profesionales de salud tratando datos de sus propios pacientes) y establece "protección de datos desde el diseño". Además, **Acuerdos Ministeriales del MSP (1190-2012, 0009-2017 y su reglamento de 2017) obligan al estándar HL7 para historia clínica electrónica, para instituciones de salud tanto públicas como privadas en Ecuador** — no es opcional a futuro, aplica directo cuando se construya el expediente clínico completo de arriba. Cumplimiento LOPDP: registro de consentimiento del paciente + auditoría de accesos a datos de salud (candidato: `spatie/laravel-activitylog`).
@@ -179,16 +188,21 @@ Detalle completo de cada propuesta en `docs/historico/MEMORIA_2026-08-23_2026-08
 | Pacientes | Todo | Todo | Ver y editar (sin eliminar) |
 | Citas | Todo | Todo | Ver y editar (sin eliminar, sin crear) |
 | Historias Clínicas | Todo | Sin acceso | Todo (eliminar solo admin) |
+| Alergias *(no confirmado con el cliente)* | Todo | Sin acceso | Todo (eliminar solo admin) |
 | Facturas | Todo | Todo | Sin acceso |
 | Usuarios | Todo (excepto autoborrado) | Sin acceso | Sin acceso |
 
-Médico ve solo "sus" registros (Citas, Historias Clínicas, Dashboard) vía `medico_id` vinculado en `users`. Si un usuario médico no tiene `medico_id` asignado, ve todo (diseño defensivo — mejor ver de más que bloquear).
+Médico ve solo "sus" registros (Citas, Historias Clínicas, Alergias, Dashboard) vía `medico_id` vinculado en `users`. Si un usuario médico no tiene `medico_id` asignado, ve todo (diseño defensivo — mejor ver de más que bloquear).
+
+**Alergias**: fila agregada al construir el módulo (31 ago 2026) usando el mismo criterio que Historias Clínicas, por analogía (dato clínico sensible) — no es una fila confirmada por el cliente todavía. Si en la entrevista formal se decide otra cosa (ej. que recepción sí necesite verlas por seguridad al agendar), ajustar `AlergiaResource::canViewAny()` y `AlergiasRelationManager::canViewForRecord()`.
 
 ## 11. Roadmap inmediato
 
 1. Confirmar en entorno real el mosaico de Servicios, el directorio de Especialidades y el nuevo scroll-reveal (`.cb-reveal` → `view()`) con las fuentes reales cargadas (el video del hero ya está confirmado, 31 ago 2026 — ver sección 7).
 2. Reemplazar placeholders de teléfono/WhatsApp antes de publicar (6 ocurrencias: nav, hero, contacto).
 3. Entrevista formal con el dueño — resolver preguntas de la sección 6 (incluida confirmar dirección exacta/horario real para la sección Contacto — el mapa ya tiene coordenadas reales, pero horario/teléfono siguen sin confirmar).
+4. Correr `sail artisan migrate` y probar el módulo de Alergias en el entorno real (este sandbox no tiene PHP ni acceso a Packagist para instalar `vendor/` ni correr migraciones — el código no se probó ejecutándose, solo se revisó a mano contra los patrones ya usados en el proyecto).
+5. Confirmar con el cliente la fila de permisos de Alergias (sección 10, hoy es una decisión propia por analogía con Historias Clínicas) y seguir con los 2 módulos restantes del expediente clínico completo: Antecedentes y Signos vitales (sección 8).
 
 ## 12. Cómo mantener este archivo (a partir de ahora)
 
