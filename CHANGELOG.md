@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-08-31] Dato: confirmación en vivo del módulo de Alergias
+
+El usuario probó en su entorno real (`sail up` + `sail artisan migrate` tras aplicar el patch): pantalla de Crear Alergia, tab "Alergias" dentro de Editar Paciente y el aviso destacado en Historia Clínica, todo funcionando como se esperaba. Sin cambios de código — solo confirmación (MEMORIA.md sección 8, módulo 1 pasa de "construido" a "construido y confirmado").
+
 ## [2026-08-31] Expediente clínico completo: módulo 1 de 3 — Alergias
 
 Primer módulo del expediente clínico completo (MEMORIA.md sección 8, alcance confirmado en la entrevista del 25 ago). Migración + modelo `Alergia` (paciente_id, alergeno, tipo, severidad, reaccion, notas). `AlergiaResource` con CRUD completo (Form/Table/Pages) en "Atención al paciente", más `AlergiasRelationManager` registrado en `PacienteResource` (tab "Alergias" dentro de Editar Paciente, para que sea visible en la ficha del paciente) y una sección destacada de solo lectura + un aviso en vivo (`Placeholder` reactivo) en `HistoriaClinicaInfolist`/`HistoriaClinicaForm` cuando el paciente tiene alergias registradas. Seeder de demo actualizado (`DemoHistoricoSeeder::crearAlergias()`). Permisos: se replicó el criterio de Historia Clínica (admin+médico, solo admin elimina) **por decisión propia, no confirmada con el cliente** — queda marcado en `AlergiaResource`, `AlergiasRelationManager` y MEMORIA.md sección 10. Sin instalar `vendor/` ni correr migraciones en este sandbox (sin red a Packagist ni PHP disponible) — código revisado a mano contra los patrones ya usados en el proyecto, pendiente de probarse en el entorno real (ver roadmap, sección 11).
