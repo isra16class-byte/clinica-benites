@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Alergia;
+use App\Models\Antecedente;
 use App\Models\Area;
 use App\Models\Cama;
 use App\Models\Cirugia;
@@ -61,6 +62,7 @@ class DemoHistoricoSeeder extends Seeder
         $medicos = $this->crearMedicos($areas, 10);
         $pacientes = $this->crearPacientes(22);
         $this->crearAlergias($pacientes);
+        $this->crearAntecedentes($pacientes);
 
         $citas = $this->crearCitas($pacientes, $medicos, $areas, 18);
         $this->crearHistoriaClinicas($citas);
@@ -114,6 +116,7 @@ class DemoHistoricoSeeder extends Seeder
         $nombres = ['Juan', 'Lucía', 'Pedro', 'Gabriela', 'Miguel', 'Daniela', 'Fernando', 'Isabel', 'Ricardo', 'Verónica', 'Esteban', 'Mónica', 'Iván', 'Karla', 'Freddy', 'Nathaly', 'Wilson', 'Priscila', 'Xavier', 'Johanna', 'Marco', 'Belén'];
         $apellidos = ['Benites', 'Zambrano', 'Vera', 'Cedeño', 'Loor', 'Alcívar', 'Solórzano', 'Delgado', 'Moreira', 'Intriago', 'Bravo', 'Pinargote', 'Zamora', 'Vélez', 'Anchundia', 'Pincay', 'Macías', 'Suárez', 'Quiroz', 'Rivadeneira', 'Pico', 'Cañarte'];
         $sexos = ['Masculino', 'Femenino'];
+        $gruposSanguineos = ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'];
 
         $pacientes = collect();
 
@@ -131,6 +134,10 @@ class DemoHistoricoSeeder extends Seeder
                 'email' => strtolower($nombre.'.'.$apellido.$i.'@example.test'),
                 'direccion' => 'Av. de prueba '.random_int(1, 999).' y calle '.random_int(1, 50),
                 'sexo' => $sexos[$i % 2],
+                // No todos tienen grupo sanguíneo confirmado (dato real:
+                // suele confirmarse recién con un examen), a propósito
+                // nullable para una parte del set de demo.
+                'grupo_sanguineo' => $i % 3 === 0 ? null : $gruposSanguineos[$i % count($gruposSanguineos)],
             ]));
         }
 
@@ -485,6 +492,44 @@ class DemoHistoricoSeeder extends Seeder
                 'reaccion' => $alergia['reaccion'],
                 'notas' => null,
             ]);
+        }
+    }
+
+    /**
+     * Segundo módulo del expediente clínico completo (MEMORIA.md sección
+     * 8). Igual que alergias, solo una parte de los pacientes tiene
+     * antecedentes registrados y algunos tienen más de uno (categorías
+     * distintas), para que la tabla/tab se vea con contenido real y
+     * variado.
+     */
+    private function crearAntecedentes($pacientes): void
+    {
+        $antecedentes = [
+            ['categoria' => 'personal', 'descripcion' => 'Diabetes tipo 2', 'notas' => null],
+            ['categoria' => 'personal', 'descripcion' => 'Hipertensión arterial', 'notas' => null],
+            ['categoria' => 'personal', 'descripcion' => 'Asma', 'notas' => 'Diagnosticada en la infancia.'],
+            ['categoria' => 'quirurgico', 'descripcion' => 'Apendicectomía (2015)', 'notas' => null],
+            ['categoria' => 'quirurgico', 'descripcion' => 'Cesárea (2019)', 'notas' => null],
+            ['categoria' => 'familiar', 'descripcion' => 'Madre con hipertensión', 'notas' => null],
+            ['categoria' => 'familiar', 'descripcion' => 'Padre con diabetes tipo 2', 'notas' => null],
+            ['categoria' => 'habito', 'descripcion' => 'Fuma 10 cigarrillos/día', 'notas' => null],
+            ['categoria' => 'habito', 'descripcion' => 'Consumo ocasional de alcohol', 'notas' => null],
+        ];
+
+        // Un subconjunto de pacientes (no todos) tiene antecedentes
+        // registrados, y algunos tienen más de uno.
+        foreach ($pacientes->random(min(10, $pacientes->count())) as $paciente) {
+            $cantidad = random_int(1, 3);
+            $seleccion = collect($antecedentes)->random(min($cantidad, count($antecedentes)));
+
+            foreach ($seleccion as $antecedente) {
+                Antecedente::create([
+                    'paciente_id' => $paciente->id,
+                    'categoria' => $antecedente['categoria'],
+                    'descripcion' => $antecedente['descripcion'],
+                    'notas' => $antecedente['notas'],
+                ]);
+            }
         }
     }
 

@@ -16,6 +16,7 @@ class Paciente extends Model
         'email',
         'direccion',
         'sexo',
+        'grupo_sanguineo',
     ];
 
     public function citas(): HasMany
@@ -33,6 +34,14 @@ class Paciente extends Model
     public function alergias(): HasMany
     {
         return $this->hasMany(Alergia::class);
+    }
+
+    // Módulo 2 del expediente clínico completo (sección 8 de MEMORIA.md):
+    // igual que alergias, vive por paciente. `grupo_sanguineo` (dato único,
+    // no una lista) es una columna directa de esta tabla, ver migración.
+    public function antecedentes(): HasMany
+    {
+        return $this->hasMany(Antecedente::class);
     }
 
     public function facturas(): HasMany

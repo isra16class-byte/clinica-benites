@@ -35,6 +35,10 @@ class PacientesTable
                     ->searchable(),
                 TextColumn::make('sexo')
                     ->searchable(),
+                TextColumn::make('grupo_sanguineo')
+                    ->label('Grupo sanguíneo')
+                    ->placeholder('-')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
