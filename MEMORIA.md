@@ -111,12 +111,13 @@ Ya resuelto: especialidades (27, ver `Servicios_CB_2026.pdf`), no se agenda cita
 **Sistema interno (Filament) — funcional de punta a punta:**
 - CRUD completo de los 6 modelos core + roles/permisos (matriz completa en sección 10).
 - Módulo de infraestructura física y de inventario (medicamentos/insumos), completos.
-- Dashboard gerencial (KPIs, gráficos, alertas operativas) — solo admin.
+- **Dashboard gerencial** (solo admin): 4 indicadores clave (ingresos del mes vs. mes anterior, por cobrar, citas atendidas hoy, ocupación de camas) como tarjetas presionables — al hacer clic abren un popover flotante (`x-anchor`/Floating UI, sin JS propio más allá de Alpine core) con el detalle real (montos, desgloses por área/tipo), cada línea con un marcador de diamante del mismo color semántico de la tarjeta (`IndicadoresGerencialesWidget.php`, `atributosPopover()`/`valorConPopover()`, `theme.css`). Más 2 gráficos (ingresos por mes, facturación por área, con selectores de rango/métrica) y el widget de alertas operativas (lotes por vencer, facturas vencidas, camas ocupadas hace mucho). Todo confirmado funcionando en el entorno real.
+- **Topbar del panel rediseñado**: fondo navy sólido (en vez del blanco/gris default de Filament), logo intercambiado a la variante blanca por CSS (`content: url(...)`, sin tocar el logo navy que sigue usándose en el drawer móvil/login), buscador global con placeholder específico ("Buscar pacientes, citas, médicos..."), y menú de usuario con nombre + rol + "Editar perfil" + "Cerrar sesión" (`->userMenuItems()` en `AdminPanelProvider.php`). Página propia `/admin/profile` (`App\Filament\Pages\EditProfile extends Filament\Auth\Pages\EditProfile`) con el campo Rol de solo lectura agregado. Confirmado funcionando en el entorno real.
 - Gestión de usuarios desde `/admin/users` (solo admin, con protección de autoborrado).
 - Exportar Factura a PDF.
 - Filtro "mis pacientes" para rol médico (vía `medico_id` en `users`) — `medico_id` ya asignado a los usuarios médico existentes desde `/admin/users`, **confirmado funcionando en el entorno real** (31 ago 2026).
-- Branding aplicado: logo real de la clínica, color primario Teal, favicon.
-- UX pulida: botón "Atrás" en Editar, sidebar agrupado por categorías, buscador global en los 6 Resources, filtros rápidos en Citas, cambio de estado con un clic, theme propio (`theme.css`) para encabezado de tablas.
+- Branding aplicado: logo real de la clínica, color primario navy `#0C447C` (cambiado de `Color::Teal`, 25 ago 2026), favicon.
+- UX pulida: botón "Atrás" en Editar, sidebar agrupado por categorías (con ítem activo en fondo navy sólido), buscador global en los 6 Resources, filtros rápidos en Citas, cambio de estado con un clic, theme propio (`theme.css`) para encabezado de tablas, fondo de página gris-azulado y sombra sutil en tarjetas/secciones para separar visualmente del contenido.
 
 **Sitio público — las 5 secciones completas, rediseño del 28 ago 2026 cerrado:**
 - Paleta: navy `#0C447C` + verde azulado `#0F6E56` (mismos colores del panel) + acento dorado/champán, exclusivo del sitio público.
