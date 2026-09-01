@@ -35,14 +35,17 @@ clinica-benites/
     Models/            # Area, Paciente, Medico, Cita, HistoriaClinica, Factura, User,
                         # ItemInventario, LoteInventario, MovimientoInventario,
                         # Cama, Quirofano, Internamiento, Cirugia, OrdenEstudio, ServicioAmbulancia,
-                        # Alergia (expediente clínico completo, módulo 1 de 3)
+                        # Alergia, Antecedente, SignosVitales (expediente clínico completo, 3/3 — sección 8)
     Http/Controllers/
       FacturaPdfController.php   # Exporta factura a PDF (dompdf)
     Filament/
       Concerns/
         HasBackFormAction.php    # Trait: botón "Atrás" en vez de "Cancelar" en pantallas de Editar
-      Resources/                 # Un Resource completo (Form+Table+Pages) por cada modelo de arriba
-        Pacientes/RelationManagers/AlergiasRelationManager.php   # Tab de Alergias dentro de Editar Paciente
+      Resources/                 # Un Resource completo (Form+Table+Pages) por cada modelo de arriba,
+                                  # excepto SignosVitales (embebido en HistoriaClinicaForm/Infolist, sin nav propia)
+        Pacientes/RelationManagers/
+          AlergiasRelationManager.php       # Tab "Alergias" dentro de Editar Paciente
+          AntecedentesRelationManager.php   # Tab "Antecedentes" dentro de Editar Paciente
       Widgets/
         CitasDeHoyWidget.php
         IndicadoresGerencialesWidget.php   # solo admin
@@ -55,9 +58,17 @@ clinica-benites/
       filament/admin/theme.css            # theme propio del panel (encabezado de tablas, etc.)
     views/
       components/layouts/public.blade.php
-      partials/nav.blade.php
-      sections/hero.blade.php             # única sección del sitio público construida hasta ahora
-      home.blade.php                      # compone layout+nav+secciones
+      partials/
+        nav.blade.php
+        footer.blade.php
+      sections/                           # las 5 secciones del sitio público, completas (28 ago 2026)
+        hero.blade.php
+        especialidades.blade.php          # directorio de las 27 especialidades reales
+        servicios.blade.php               # mosaico (bento grid) con las 5 fotos reales
+        sobre.blade.php                   # "Sobre nosotros" (#nosotros)
+        contacto.blade.php                # sin formulario, con mapa embebido
+      especialidad.blade.php              # página individual /especialidades/{slug} (contenido genérico Unsplash, pendiente entrevista)
+      home.blade.php                      # compone layout+nav+5 secciones+footer
       pdf/factura.blade.php
   public/images/                          # logo real de la clínica, hero-quirofano.jpg, hero video
   docs/
