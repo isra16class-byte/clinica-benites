@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Facturas;
 use App\Filament\Resources\Facturas\Pages\CreateFactura;
 use App\Filament\Resources\Facturas\Pages\EditFactura;
 use App\Filament\Resources\Facturas\Pages\ListFacturas;
+use App\Filament\Resources\Facturas\RelationManagers\LineasFacturaRelationManager;
 use App\Filament\Resources\Facturas\Schemas\FacturaForm;
 use App\Filament\Resources\Facturas\Tables\FacturasTable;
 use App\Models\Factura;
@@ -76,7 +77,6 @@ class FacturaResource extends Resource
             'paciente.apellidos',
             'paciente.cedula',
             'estado_pago',
-            'metodo_pago',
         ];
     }
 
@@ -90,7 +90,7 @@ class FacturaResource extends Resource
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
-            'Monto' => '$'.number_format((float) $record->monto, 2),
+            'Total' => '$'.number_format((float) $record->total, 2),
             'Estado de pago' => ucfirst($record->estado_pago),
             'Fecha' => Carbon::parse($record->fecha)->format('d/m/Y'),
         ];
@@ -104,7 +104,10 @@ class FacturaResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            // Detalle de la factura (MEMORIA.md sección 6) — sin esto no
+            // se puede emitir electrónicamente al SRI (exige líneas, no un
+            // monto suelto). Ver LineasFacturaRelationManager.
+            LineasFacturaRelationManager::class,
         ];
     }
 

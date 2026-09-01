@@ -145,7 +145,7 @@ class FacturacionPorAreaChartWidget extends ChartWidget
             ->map(fn (Area $area) => (float) Factura::query()
                 ->whereHas('cita', fn ($query) => $query->where('area_id', $area->id))
                 ->whereBetween('fecha', [$inicio, $fin])
-                ->sum('monto'))
+                ->sum('total'))
             ->all();
     }
 }

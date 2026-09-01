@@ -10,6 +10,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,11 +24,15 @@ class FacturasTable
                     ->label('Paciente')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('numeroComprobante')
+                    ->label('N.° comprobante')
+                    ->state(fn (Factura $record): string => $record->numeroComprobante() ?? '-')
+                    ->toggleable(),
                 TextColumn::make('cita.fecha')
                     ->label('Fecha de cita')
                     ->date()
                     ->sortable(),
-                TextColumn::make('monto')
+                TextColumn::make('total')
                     ->money('USD')
                     ->sortable(),
                 TextColumn::make('estado_pago')
@@ -39,8 +44,24 @@ class FacturasTable
                         default => 'gray',
                     })
                     ->searchable(),
-                TextColumn::make('metodo_pago')
-                    ->searchable(),
+                TextColumn::make('forma_pago')
+                    ->label('Forma de pago')
+                    ->formatStateUsing(fn (?string $state): string => Factura::FORMAS_PAGO[$state] ?? ($state ?? '-')),
+                // Facturación electrónica SRI (MEMORIA.md sección 6): todas
+                // las facturas nacen 'no_emitida' mientras el cliente no
+                // tenga RUC/establecimiento/punto de emisión/certificado
+                // .p12 — ver App\Services\Sri\FacturaSriService (sin probar
+                // en este sandbox).
+                TextColumn::make('estado_sri')
+                    ->label('Estado SRI')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'autorizada' => 'success',
+                        'pendiente' => 'warning',
+                        'rechazada', 'error' => 'danger',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => Factura::ESTADOS_SRI[$state] ?? $state),
                 TextColumn::make('fecha')
                     ->date()
                     ->sortable(),
@@ -54,7 +75,9 @@ class FacturasTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('estado_sri')
+                    ->label('Estado SRI')
+                    ->options(Factura::ESTADOS_SRI),
             ])
             ->recordActions([
                 Action::make('exportarPdf')

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Pacientes\Schemas;
 
+use App\Models\Paciente;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -18,8 +19,21 @@ class PacienteForm
                 TextInput::make('apellidos')
                     ->required(),
                 TextInput::make('cedula')
+                    ->label('Cédula / RUC')
                     ->required()
                     ->unique(table: 'pacientes', column: 'cedula', ignoreRecord: true),
+                // Facturación electrónica SRI (MEMORIA.md sección 6): el
+                // comprobante exige declarar el tipo de identificación con
+                // uno de los códigos fijos del SRI. Se guarda por separado
+                // del número (columna `cedula`, sin renombrar — ver
+                // migración) para no romper todo lo que ya depende de ese
+                // nombre de columna en el resto del proyecto.
+                Select::make('tipo_identificacion')
+                    ->label('Tipo de identificación')
+                    ->options(array_map(fn (array $tipo): string => $tipo['label'], Paciente::TIPOS_IDENTIFICACION))
+                    ->native(false)
+                    ->required()
+                    ->default('cedula'),
                 DatePicker::make('fecha_nacimiento'),
                 TextInput::make('telefono')
                     ->tel(),

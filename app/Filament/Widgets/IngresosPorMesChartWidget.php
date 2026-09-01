@@ -93,12 +93,12 @@ class IngresosPorMesChartWidget extends ChartWidget
 
             $facturado[] = (float) Factura::query()
                 ->whereBetween('fecha', [$inicioMes, $finMes])
-                ->sum('monto');
+                ->sum('total');
 
             $cobrado[] = (float) Factura::query()
                 ->where('estado_pago', 'pagado')
                 ->whereBetween('fecha', [$inicioMes, $finMes])
-                ->sum('monto');
+                ->sum('total');
 
             $mes->addMonthNoOverflow();
         }

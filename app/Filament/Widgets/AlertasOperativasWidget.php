@@ -103,7 +103,7 @@ class AlertasOperativasWidget extends Widget
 
         return [
             'total' => $facturas->count(),
-            'monto_total' => (float) $facturas->sum('monto'),
+            'monto_total' => (float) $facturas->sum('total'),
             'items' => $facturas->take(5),
             'url' => FacturaResource::getUrl('index'),
         ];

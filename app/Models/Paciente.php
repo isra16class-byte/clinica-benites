@@ -7,10 +7,26 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Paciente extends Model
 {
+    /**
+     * Tipo de identificación para facturación electrónica SRI (MEMORIA.md
+     * sección 6). Clave interna => [código SRI, etiqueta]. El código SRI
+     * es el que exige dazza-dev/sri-xml-generator en `Customer` (verificado
+     * contra `identification-types.json` del paquete real). No se ofrece
+     * "identificación del exterior" (código 08 SRI): caso de borde no
+     * relevante para pacientes de la clínica.
+     */
+    public const TIPOS_IDENTIFICACION = [
+        'cedula' => ['sri' => '05', 'label' => 'Cédula'],
+        'ruc' => ['sri' => '04', 'label' => 'RUC'],
+        'pasaporte' => ['sri' => '06', 'label' => 'Pasaporte'],
+        'consumidor_final' => ['sri' => '07', 'label' => 'Consumidor final'],
+    ];
+
     protected $fillable = [
         'nombres',
         'apellidos',
         'cedula',
+        'tipo_identificacion',
         'fecha_nacimiento',
         'telefono',
         'email',

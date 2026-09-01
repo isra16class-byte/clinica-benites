@@ -20,7 +20,7 @@ class FacturaPdfController extends Controller
     {
         abort_unless(FacturaResource::canViewAny(), 403);
 
-        $factura->load(['paciente', 'cita.medico', 'cita.area']);
+        $factura->load(['paciente', 'cita.medico', 'cita.area', 'lineas']);
 
         return Pdf::loadView('pdf.factura', ['factura' => $factura])
             ->download("factura-{$factura->id}.pdf");

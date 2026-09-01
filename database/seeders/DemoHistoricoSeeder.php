@@ -139,6 +139,10 @@ class DemoHistoricoSeeder extends Seeder
                 // suele confirmarse recién con un examen), a propósito
                 // nullable para una parte del set de demo.
                 'grupo_sanguineo' => $i % 3 === 0 ? null : $gruposSanguineos[$i % count($gruposSanguineos)],
+                // Facturación electrónica SRI (MEMORIA.md sección 6): la
+                // mayoría paga con cédula (persona natural), 1 de cada 10
+                // queda como 'ruc' para poder probar ese caso en demo.
+                'tipo_identificacion' => $i % 10 === 0 ? 'ruc' : 'cedula',
             ]));
         }
 
@@ -244,7 +248,20 @@ class DemoHistoricoSeeder extends Seeder
      */
     private function crearFacturas($pacientes, $citas, int $cantidad): void
     {
-        $metodos = ['Efectivo', 'Tarjeta', 'Transferencia'];
+        // Formas de pago del catálogo oficial del SRI (Factura::FORMAS_PAGO)
+        // — reemplaza el texto libre que tenía antes este seeder.
+        $formasPago = ['01', '16', '19']; // Efectivo, Tarjeta de débito, Tarjeta de crédito
+
+        // Conceptos de ejemplo para las líneas de detalle (MEMORIA.md
+        // sección 6: el SRI exige detalle, no un monto suelto). Genéricos a
+        // propósito, no ligados a items_inventario (ver nota en la
+        // migración de lineas_factura).
+        $conceptos = [
+            ['descripcion' => 'Consulta médica general', 'precio' => [25, 45]],
+            ['descripcion' => 'Consulta especializada', 'precio' => [40, 80]],
+            ['descripcion' => 'Examen de laboratorio', 'precio' => [15, 60]],
+            ['descripcion' => 'Procedimiento ambulatorio', 'precio' => [50, 200]],
+        ];
 
         for ($i = 0; $i < $cantidad; $i++) {
             $offsetDias = random_int(5, 365);
@@ -261,14 +278,36 @@ class DemoHistoricoSeeder extends Seeder
 
             $cita = $citas->random();
 
-            Factura::create([
+            $factura = Factura::create([
                 'paciente_id' => $pacientes->random()->id,
                 'cita_id' => random_int(0, 4) > 0 ? $cita->id : null, // la mayoría enlaza a una cita
-                'monto' => random_int(20, 450) + (random_int(0, 99) / 100),
                 'estado_pago' => $estado,
-                'metodo_pago' => $estado === 'pagado' ? $metodos[array_rand($metodos)] : null,
+                'forma_pago' => $estado === 'pagado' ? $formasPago[array_rand($formasPago)] : null,
                 'fecha' => $fecha->format('Y-m-d'),
+                // Ninguna factura demo se emite realmente al SRI (no hay
+                // certificado/RUC todavía, ver MEMORIA.md sección 6) — todas
+                // quedan en el estado por defecto 'no_emitida'.
             ]);
+
+            // 1 a 3 líneas por factura; cada guardado recalcula el total de
+            // la factura dueña (LineaFactura::booted()).
+            $cantidadLineas = random_int(1, 3);
+            for ($l = 0; $l < $cantidadLineas; $l++) {
+                $concepto = $conceptos[array_rand($conceptos)];
+                $precio = random_int($concepto['precio'][0], $concepto['precio'][1]) + (random_int(0, 99) / 100);
+
+                $factura->lineas()->create([
+                    'descripcion' => $concepto['descripcion'],
+                    'cantidad' => 1,
+                    'precio_unitario' => $precio,
+                    'descuento' => 0,
+                    // La mayoría de servicios de salud van a tarifa 0% de
+                    // IVA (LRTI art. 55-56, ver nota en la migración) — 1 de
+                    // cada 6 líneas queda en 15% para poder ver ambos casos
+                    // en la demo (ej. un cobro que no califica como salud).
+                    'codigo_iva' => $l % 6 === 0 ? '4' : '0',
+                ]);
+            }
         }
     }
 

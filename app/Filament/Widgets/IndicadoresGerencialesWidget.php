@@ -310,7 +310,7 @@ class IndicadoresGerencialesWidget extends BaseWidget
     }
 
     /**
-     * Ingresos del mes: suma de facturas.monto pagadas dentro del mes
+     * Ingresos del mes: suma de facturas.total pagadas dentro del mes
      * actual, con comparación (%) contra el total pagado el mes anterior.
      */
     private function statIngresosDelMes(): Stat
@@ -323,12 +323,12 @@ class IndicadoresGerencialesWidget extends BaseWidget
         $ingresosMesActual = (float) Factura::query()
             ->where('estado_pago', 'pagado')
             ->whereBetween('fecha', [$inicioMesActual, $finMesActual])
-            ->sum('monto');
+            ->sum('total');
 
         $ingresosMesAnterior = (float) Factura::query()
             ->where('estado_pago', 'pagado')
             ->whereBetween('fecha', [$inicioMesAnterior, $finMesAnterior])
-            ->sum('monto');
+            ->sum('total');
 
         if ($ingresosMesAnterior > 0) {
             $variacion = (($ingresosMesActual - $ingresosMesAnterior) / $ingresosMesAnterior) * 100;
@@ -382,7 +382,7 @@ class IndicadoresGerencialesWidget extends BaseWidget
     {
         $porCobrar = (float) Factura::query()
             ->where('estado_pago', 'pendiente')
-            ->sum('monto');
+            ->sum('total');
 
         $color = $porCobrar > 0 ? 'warning' : 'success';
         $clases = $porCobrar > 0 ? "cb-stat-accent-{$color} cb-stat-destacado" : "cb-stat-accent-{$color}";

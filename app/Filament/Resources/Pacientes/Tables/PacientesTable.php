@@ -22,7 +22,12 @@ class PacientesTable
                 TextColumn::make('apellidos')
                     ->searchable(),
                 TextColumn::make('cedula')
+                    ->label('Cédula / RUC')
                     ->searchable(),
+                TextColumn::make('tipo_identificacion')
+                    ->label('Tipo ident.')
+                    ->formatStateUsing(fn (?string $state): string => \App\Models\Paciente::TIPOS_IDENTIFICACION[$state]['label'] ?? ($state ?? '-'))
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('fecha_nacimiento')
                     ->date()
                     ->sortable(),

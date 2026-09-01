@@ -79,7 +79,7 @@
                                     {{ $factura->paciente?->nombres ?? 'Paciente eliminado' }}
                                 </span>
                                 <span class="text-gray-500 dark:text-gray-400">
-                                    — ${{ number_format($factura->monto, 2) }},
+                                    — ${{ number_format($factura->total, 2) }},
                                     emitida {{ \Illuminate\Support\Carbon::parse($factura->fecha)->translatedFormat('d M Y') }}
                                     ({{ (int) round(now()->diffInDays(\Illuminate\Support\Carbon::parse($factura->fecha), true)) }} días)
                                 </span>
