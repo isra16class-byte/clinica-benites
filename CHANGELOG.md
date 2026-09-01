@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-09-01] Dato: confirmación en vivo del módulo de Antecedentes
+
+El usuario probó en su entorno real (`sail up` + `sail artisan migrate` tras aplicar el patch): pantalla de Crear Antecedente, tab "Antecedentes" dentro de Editar Paciente, campo "Grupo sanguíneo" en la ficha del paciente, y permisos por rol (recepción sin acceso, médico ve solo sus pacientes, eliminar solo admin), todo funcionando como se esperaba. Sin cambios de código — solo confirmación (MEMORIA.md sección 8, módulo 2 pasa de "construido" a "construido y confirmado").
+
 ## [2026-08-31] Expediente clínico completo: módulo 2 de 3 — Antecedentes
 
 Segundo módulo del expediente clínico completo (MEMORIA.md sección 8), mismo patrón que Alergias. Migración + modelo `Antecedente` (paciente_id, categoria [personal/quirurgico/familiar/habito], descripcion, notas). `AntecedenteResource` con CRUD completo en "Atención al paciente" + `AntecedentesRelationManager` como tab "Antecedentes" en Editar Paciente. `grupo_sanguineo` se agregó como columna nueva en `pacientes` (no en `antecedentes`, por ser un dato único no categorizado) y como campo `Select` en `PacienteForm` + columna oculta por defecto en `PacientesTable`. Seeder actualizado (`crearAntecedentes()` + `grupo_sanguineo` en `crearPacientes()`). Permisos: mismo criterio que Alergias por analogía, **no confirmado con el cliente** (MEMORIA.md sección 10). Sin instalar `vendor/` ni correr migraciones en este sandbox (mismo motivo que Alergias) — pendiente de probarse en el entorno real.
