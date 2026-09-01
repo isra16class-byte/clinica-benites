@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class HistoriaClinica extends Model
 {
@@ -30,5 +31,13 @@ class HistoriaClinica extends Model
     public function cita(): BelongsTo
     {
         return $this->belongsTo(Cita::class);
+    }
+
+    // Módulo 3 del expediente clínico completo (sección 8 de MEMORIA.md):
+    // a diferencia de alergias/antecedentes (por paciente), signos vitales
+    // va por consulta — 1 a 1 con esta historia clínica.
+    public function signosVitales(): HasOne
+    {
+        return $this->hasOne(SignosVitales::class);
     }
 }

@@ -4,8 +4,10 @@ namespace App\Filament\Resources\HistoriaClinicas\Schemas;
 
 use App\Models\Paciente;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
@@ -65,6 +67,53 @@ class HistoriaClinicaForm
                     ->columnSpanFull(),
                 Textarea::make('notas')
                     ->columnSpanFull(),
+                // Módulo 3 del expediente clínico completo (MEMORIA.md
+                // sección 8): va por consulta, no por paciente, así que se
+                // integra directo acá (relación 1 a 1) en vez de tener su
+                // propio Resource/nav como Alergias y Antecedentes.
+                // ->relationship('signosVitales') hace que Filament
+                // cargue/guarde estos campos contra el registro
+                // relacionado automáticamente (crea la fila la primera vez
+                // que se guarda algo acá).
+                Section::make('Signos vitales')
+                    ->description('Opcional — dejar en blanco lo que no se haya medido en esta consulta.')
+                    ->relationship('signosVitales')
+                    ->columnSpanFull()
+                    ->columns(4)
+                    ->schema([
+                        TextInput::make('presion_arterial')
+                            ->label('Presión arterial')
+                            ->placeholder('120/80'),
+                        TextInput::make('temperatura')
+                            ->numeric()
+                            ->step(0.1)
+                            ->suffix('°C'),
+                        TextInput::make('frecuencia_cardiaca')
+                            ->label('Frec. cardíaca')
+                            ->numeric()
+                            ->suffix('lpm'),
+                        TextInput::make('frecuencia_respiratoria')
+                            ->label('Frec. respiratoria')
+                            ->numeric()
+                            ->suffix('rpm'),
+                        TextInput::make('peso')
+                            ->numeric()
+                            ->step(0.01)
+                            ->suffix('kg'),
+                        TextInput::make('talla')
+                            ->numeric()
+                            ->step(0.01)
+                            ->suffix('cm'),
+                        TextInput::make('saturacion_oxigeno')
+                            ->label('Saturación de O₂')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->suffix('%'),
+                        Textarea::make('notas')
+                            ->label('Notas de signos vitales')
+                            ->columnSpan(4),
+                    ]),
             ]);
     }
 }

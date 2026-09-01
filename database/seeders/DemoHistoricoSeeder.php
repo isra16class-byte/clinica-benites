@@ -19,6 +19,7 @@ use App\Models\OrdenEstudio;
 use App\Models\Paciente;
 use App\Models\Quirofano;
 use App\Models\ServicioAmbulancia;
+use App\Models\SignosVitales;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -192,7 +193,7 @@ class DemoHistoricoSeeder extends Seeder
         $diagnosticos = ['Sin hallazgos relevantes', 'Cuadro viral leve', 'Hipertensión controlada', 'Gastritis', 'Evolución favorable', 'Requiere estudios adicionales'];
 
         foreach ($citas->where('estado', 'atendida') as $cita) {
-            HistoriaClinica::create([
+            $historiaClinica = HistoriaClinica::create([
                 'paciente_id' => $cita->paciente_id,
                 'medico_id' => $cita->medico_id,
                 'cita_id' => $cita->id,
@@ -201,7 +202,38 @@ class DemoHistoricoSeeder extends Seeder
                 'tratamiento' => 'Indicaciones entregadas al paciente.',
                 'notas' => null,
             ]);
+
+            $this->crearSignosVitales($historiaClinica);
         }
+    }
+
+    /**
+     * Tercer módulo del expediente clínico completo (MEMORIA.md sección
+     * 8). Va por consulta (1 a 1 con HistoriaClinica) — a propósito no
+     * todas las historias clínicas de demo tienen signos vitales
+     * registrados, para que se vea tanto el caso con datos como la
+     * sección oculta cuando no hay nada cargado.
+     */
+    private function crearSignosVitales(HistoriaClinica $historiaClinica): void
+    {
+        // Sin signos vitales en 1 de cada 4 consultas (ej. una consulta
+        // por resultados de laboratorio puede no requerir tomarlos de
+        // nuevo).
+        if (random_int(1, 4) === 1) {
+            return;
+        }
+
+        SignosVitales::create([
+            'historia_clinica_id' => $historiaClinica->id,
+            'presion_arterial' => random_int(100, 140).'/'.random_int(60, 90),
+            'temperatura' => round(random_int(360, 375) / 10, 1),
+            'frecuencia_cardiaca' => random_int(60, 100),
+            'frecuencia_respiratoria' => random_int(12, 20),
+            'peso' => random_int(500, 950) / 10,
+            'talla' => random_int(1500, 1900) / 10,
+            'saturacion_oxigeno' => random_int(94, 100),
+            'notas' => null,
+        ]);
     }
 
     /**

@@ -4,6 +4,10 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-09-01] Expediente clínico completo: módulo 3 de 3 — Signos vitales
+
+Tercer y último módulo del expediente clínico completo (MEMORIA.md sección 8). A diferencia de Alergias y Antecedentes, va por consulta (1 a 1 con `HistoriaClinica`), no por paciente — así que se integró directo en el formulario/infolist de Historia Clínica en vez de tener Resource/nav propia. Migración + modelo `SignosVitales` (historia_clinica_id único, presion_arterial, temperatura, frecuencia_cardiaca, frecuencia_respiratoria, peso, talla, saturacion_oxigeno, notas, todos nullable). `HistoriaClinicaForm` gana una `Section` "Signos vitales" con `->relationship('signosVitales')` (Filament carga/guarda contra el registro relacionado); `HistoriaClinicaInfolist` gana la sección de solo lectura equivalente, oculta si no hay datos cargados. Sin Resource propio: hereda los permisos de `HistoriaClinicaResource`. Seeder actualizado (`crearSignosVitales()`, 3 de cada 4 historias clínicas de demo). Sin instalar `vendor/` ni correr migraciones en este sandbox (mismo motivo que los módulos anteriores) — el patrón `->relationship()` sobre una relación 1 a 1 es nuevo en el proyecto (los módulos anteriores usan RelationManagers, ya probado), así que pide especial atención al confirmarlo en el entorno real (ver nota en MEMORIA.md sección 8).
+
 ## [2026-09-01] Dato: confirmación en vivo del módulo de Antecedentes
 
 El usuario probó en su entorno real (`sail up` + `sail artisan migrate` tras aplicar el patch): pantalla de Crear Antecedente, tab "Antecedentes" dentro de Editar Paciente, campo "Grupo sanguíneo" en la ficha del paciente, y permisos por rol (recepción sin acceso, médico ve solo sus pacientes, eliminar solo admin), todo funcionando como se esperaba. Sin cambios de código — solo confirmación (MEMORIA.md sección 8, módulo 2 pasa de "construido" a "construido y confirmado").

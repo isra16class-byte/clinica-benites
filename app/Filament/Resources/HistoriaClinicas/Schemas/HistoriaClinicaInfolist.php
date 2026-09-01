@@ -59,6 +59,44 @@ class HistoriaClinicaInfolist
                 TextEntry::make('notas')
                     ->placeholder('-')
                     ->columnSpanFull(),
+                // Módulo 3 del expediente clínico completo (MEMORIA.md
+                // sección 8): solo se muestra si se cargó al menos un
+                // signo vital en esta consulta (relación 1 a 1 puede no
+                // existir todavía).
+                Section::make('Signos vitales')
+                    ->visible(fn ($record): bool => $record->signosVitales !== null)
+                    ->columns(4)
+                    ->schema([
+                        TextEntry::make('signosVitales.presion_arterial')
+                            ->label('Presión arterial')
+                            ->placeholder('-'),
+                        TextEntry::make('signosVitales.temperatura')
+                            ->label('Temperatura')
+                            ->suffix(' °C')
+                            ->placeholder('-'),
+                        TextEntry::make('signosVitales.frecuencia_cardiaca')
+                            ->label('Frec. cardíaca')
+                            ->suffix(' lpm')
+                            ->placeholder('-'),
+                        TextEntry::make('signosVitales.frecuencia_respiratoria')
+                            ->label('Frec. respiratoria')
+                            ->suffix(' rpm')
+                            ->placeholder('-'),
+                        TextEntry::make('signosVitales.peso')
+                            ->suffix(' kg')
+                            ->placeholder('-'),
+                        TextEntry::make('signosVitales.talla')
+                            ->suffix(' cm')
+                            ->placeholder('-'),
+                        TextEntry::make('signosVitales.saturacion_oxigeno')
+                            ->label('Saturación de O₂')
+                            ->suffix('%')
+                            ->placeholder('-'),
+                        TextEntry::make('signosVitales.notas')
+                            ->label('Notas')
+                            ->placeholder('-')
+                            ->columnSpan(4),
+                    ]),
                 TextEntry::make('created_at')
                     ->dateTime()
                     ->placeholder('-'),
