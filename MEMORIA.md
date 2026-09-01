@@ -114,7 +114,7 @@ Ya resuelto: especialidades (27, ver `Servicios_CB_2026.pdf`), no se agenda cita
 - Dashboard gerencial (KPIs, gráficos, alertas operativas) — solo admin.
 - Gestión de usuarios desde `/admin/users` (solo admin, con protección de autoborrado).
 - Exportar Factura a PDF.
-- Filtro "mis pacientes" para rol médico (vía `medico_id` en `users`) — **pendiente**: asignar `medico_id` a los usuarios médico existentes desde `/admin/users`.
+- Filtro "mis pacientes" para rol médico (vía `medico_id` en `users`) — `medico_id` ya asignado a los usuarios médico existentes desde `/admin/users`, **confirmado funcionando en el entorno real** (31 ago 2026).
 - Branding aplicado: logo real de la clínica, color primario Teal, favicon.
 - UX pulida: botón "Atrás" en Editar, sidebar agrupado por categorías, buscador global en los 6 Resources, filtros rápidos en Citas, cambio de estado con un clic, theme propio (`theme.css`) para encabezado de tablas.
 
@@ -184,8 +184,7 @@ Médico ve solo "sus" registros (Citas, Historias Clínicas, Dashboard) vía `me
 
 1. Confirmar en entorno real el sitio público completo (las 5 secciones), en particular el video del hero, el mosaico de Servicios y el nuevo scroll-reveal (`.cb-reveal` → `view()`) con las fuentes reales cargadas.
 2. Reemplazar placeholders de teléfono/WhatsApp antes de publicar (6 ocurrencias: nav, hero, contacto).
-3. Asignar `medico_id` a usuarios médico existentes.
-4. Entrevista formal con el dueño — resolver preguntas de la sección 6 (incluida confirmar dirección exacta/horario real para la sección Contacto — el mapa ya tiene coordenadas reales, pero horario/teléfono siguen sin confirmar).
+3. Entrevista formal con el dueño — resolver preguntas de la sección 6 (incluida confirmar dirección exacta/horario real para la sección Contacto — el mapa ya tiene coordenadas reales, pero horario/teléfono siguen sin confirmar).
 
 ## 12. Cómo mantener este archivo (a partir de ahora)
 
