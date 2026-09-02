@@ -5,6 +5,16 @@
     "description": "The skeleton application for the Laravel framework.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
+    "repositories": [
+        {
+            "//": "Patch temporal de compatibilidad Laravel 13 — ver packages/dazza-dev/laravel-sri-ec/PATCH_LOCAL.md. Quitar cuando el paquete publique soporte oficial para ^13.0 en Packagist.",
+            "type": "path",
+            "url": "packages/dazza-dev/laravel-sri-ec",
+            "options": {
+                "symlink": false
+            }
+        }
+    ],
     "require": {
         "php": "^8.3",
         "barryvdh/laravel-dompdf": "^3.1",

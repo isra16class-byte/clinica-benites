@@ -4,6 +4,44 @@ Este documento es para que la **próxima sesión de Claude** retome exactamente
 donde quedó esta. Leer esto antes de seguir con el tema. MEMORIA.md sección 8
 tiene un resumen corto que apunta acá; este archivo es el detalle completo.
 
+## Bloqueo real encontrado al probar en el entorno (01 sep 2026, sesión siguiente) — LEER PRIMERO
+
+El usuario corrió `./vendor/bin/sail composer install` y luego
+`composer update dazza-dev/laravel-sri-ec --with-all-dependencies` en su
+entorno real (Sail) y Composer rechazó la instalación:
+`dazza-dev/laravel-sri-ec` v1.0.0 (única versión publicada, y también su
+fork `clonixdev/laravel-sri-ec`, mismo autor) declara
+`"laravel/framework": "^8.0|^9.0|^10.0|^11.0|^12.0"` — **no incluye
+Laravel 13**, que es lo que usa este proyecto (`^13.17`). Se confirmó
+además (clonando de nuevo el repo) que ni siquiera la rama `main` sin
+tagear en GitHub actualizó ese constraint, y que el repo no tiene ningún
+issue abierto reportando esto.
+
+**Solución aplicada**: se vendorizó una copia local del código fuente
+real del paquete en `packages/dazza-dev/laravel-sri-ec/` (descargado tal
+cual de GitHub, solo se tocó una línea de su `composer.json` para agregar
+`|^13.0` al constraint de `laravel/framework`), y se registró como un
+Composer "path repository" en el `composer.json` raíz — así Composer usa
+esa copia local en vez de bajar del Packagist real. Se revisó
+`LaravelSriEcServiceProvider.php` a fondo: solo usa APIs estables de
+Laravel (`ServiceProvider`, `singleton()`, `publishes()`,
+`loadTranslationsFrom()`, `commands()`) sin nada específico de una
+versión — el bloqueo es casi con certeza solo metadata desactualizada del
+autor, no una incompatibilidad real, pero **esto no se pudo probar**
+corriendo el código (seguimos sin PHP/Composer en el sandbox donde se
+armó el patch). Detalle completo de la decisión, qué se tocó exactamente,
+y cuándo dejar de usar este patch: `packages/dazza-dev/laravel-sri-ec/PATCH_LOCAL.md`.
+
+**Siguiente paso inmediato**: correr en el entorno real (Sail)
+`./vendor/bin/sail composer update dazza-dev/laravel-sri-ec --with-all-dependencies`
+de nuevo — ahora debería resolver usando la copia local en vez de
+Packagist, y regenerar el `composer.lock` correctamente. Si vuelve a
+fallar (por ejemplo, si alguna de las dependencias transitivas —
+`dazza-dev/sri-ec`, `sri-xml-generator`, `sri-signer`, `sri-sender` — *sí*
+tiene algún problema real de compatibilidad con Laravel 13 o con alguna
+extensión PHP puntual), avisar con el error completo para revisarlo antes
+de seguir.
+
 ## Contexto de negocio (confirmado con el cliente, 01 sep 2026)
 
 - El cliente confirmó que la clínica **sí necesita** facturación electrónica
