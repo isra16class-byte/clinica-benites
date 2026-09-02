@@ -4,10 +4,12 @@ namespace App\Filament\Resources\Facturas\Tables;
 
 use App\Filament\Resources\Facturas\FacturaResource;
 use App\Models\Factura;
+use App\Services\Sri\FacturaSriService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -86,6 +88,48 @@ class FacturasTable
                     ->color('gray')
                     ->url(fn (Factura $record): string => route('facturas.pdf', $record))
                     ->openUrlInNewTab(),
+                // Facturación electrónica SRI (MEMORIA.md sección 6): no
+                // se puede probar todavía (falta certificado .p12 y RUC/
+                // establecimiento/punto de emisión del cliente) — la
+                // acción existe y valida sus propios bloqueos vía
+                // FacturaSriService::motivosBloqueoEmision(), pero hasta
+                // que esos datos existan siempre va a mostrar el aviso de
+                // "no se puede emitir" en vez de intentar la llamada real.
+                Action::make('emitirSri')
+                    ->label('Emitir al SRI')
+                    ->icon(Heroicon::OutlinedPaperAirplane)
+                    ->color('success')
+                    ->visible(fn (): bool => Auth::user()?->isAdmin() ?? false)
+                    ->requiresConfirmation()
+                    ->action(function (Factura $record): void {
+                        $servicio = app(FacturaSriService::class);
+                        $motivos = $servicio->motivosBloqueoEmision($record);
+
+                        if ($motivos !== []) {
+                            Notification::make()
+                                ->title('No se puede emitir todavía')
+                                ->body(implode("\n", $motivos))
+                                ->warning()
+                                ->send();
+
+                            return;
+                        }
+
+                        try {
+                            $servicio->emitir($record);
+
+                            Notification::make()
+                                ->title('Factura autorizada por el SRI')
+                                ->success()
+                                ->send();
+                        } catch (\Throwable $excepcion) {
+                            Notification::make()
+                                ->title('El SRI rechazó la factura')
+                                ->body($excepcion->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
                 EditAction::make()
                     ->visible(fn (Factura $record): bool => FacturaResource::canEdit($record)),
             ])

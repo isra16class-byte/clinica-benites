@@ -118,7 +118,6 @@ signos_vitales — historia_clinica_id (unique, 1 a 1), presion_arterial, temper
 
 - [ ] ¿El paciente ve precios/servicios en la web o se maneja solo internamente?
 - [ ] ¿La cita se confirma automática o la aprueba recepción?
-- [ ] ¿Facturación electrónica con el SRI? ¿Seguros médicos/reembolsos, con cuáles aseguradoras?
 - [ ] ¿Cuántos médicos/usuarios usarán el sistema?
 - [ ] ¿Acceso remoto o solo desde la clínica?
 - [ ] ¿Presupuesto y plazo de entrega?
@@ -127,7 +126,9 @@ signos_vitales — historia_clinica_id (unique, 1 a 1), presion_arterial, temper
 - [ ] ¿Los 3 roles (admin/recepción/médico) alcanzan, o falta un 4º rol de farmacia/bodega? La clínica sí tiene personal dedicado en farmacia, pero no se sabe el mecanismo real de descuento de stock (¿lo registra el médico en el momento, avisa después, o farmacia prepara antes?).
 - [ ] Historias clínicas digitales: es objetivo confirmado del proyecto, pero el alcance real es gradual/por fases — falta definir qué se digitaliza primero.
 
-Ya resuelto: especialidades (27, ver `Servicios_CB_2026.pdf`), no se agenda cita desde la web, logo/branding real recibido y aplicado.
+Ya resuelto: especialidades (27, ver `Servicios_CB_2026.pdf`), no se agenda cita desde la web, logo/branding real recibido y aplicado. Facturación electrónica SRI: confirmado que sí hace falta (código en curso, ver sección 8 y `docs/FACTURACION_ELECTRONICA_SRI.md`; falta certificado .p12 y RUC/establecimiento/punto de emisión, esos sí siguen pendientes del lado del cliente).
+
+Nueva: ¿seguros médicos/reembolsos, con cuáles aseguradoras?
 
 ## 7. Estado por módulo
 
@@ -184,7 +185,7 @@ Ya resuelto: especialidades (27, ver `Servicios_CB_2026.pdf`), no se agenda cita
   - Preguntas sin resolver que quedaron abiertas al construir Alergias (aplican a los 3 módulos): si un registro corregido debe conservar historial de cambios o editarse directo, y la matriz de permisos formal de la sección 10.
 - **Inventario multi-área** (misma entrevista): el cliente pidió que el registro de insumos cubra farmacia, quirófano, admisión y facturación (4 áreas, no solo farmacia) — el modelo ya soporta esto a nivel de dato (`area_origen`/`area_destino`), pero falta confirmar si es un inventario compartido entre las 4 o si cada una maneja el suyo (depende de la misma pregunta pendiente sobre el mecanismo real de farmacia, sección 6).
 - **Prescripciones (2027)**: sigue sin construirse. Falta confirmar si el médico prescribe solo lo que existe en `items_inventario`, o también medicamentos que el paciente compra afuera de la clínica — define si se vincula o no al inventario.
-- **Facturación electrónica SRI — EN CURSO (01 sep 2026), confirmado que sí hace falta**: el cliente confirmó que la clínica necesita emitir facturas electrónicas al SRI. Dos bloqueos de datos confirmados con el cliente: **no tiene certificado digital .p12 todavía** (hay que tramitarlo con una entidad certificadora — Security Data, BCE, Uanataca, etc., trámite con costo propio) y **no tiene RUC/establecimiento/punto de emisión asignados** (los asigna el SRI al registrar el punto de venta). Con esos dos bloqueos, se decidió construir la Parte 1 (estructura interna, sin depender de nada externo) **ya, completa**, y dejar la Parte 2 (integración real con el paquete SRI) armada con datos de ejemplo pero **sin poder probarla**. Detalle completo, decisiones de diseño y lo que falta: `docs/FACTURACION_ELECTRONICA_SRI.md` (documento de continuación para la próxima sesión — leer antes de seguir con este tema).
+- **Facturación electrónica SRI — Parte 1 y 2 escritas (01 sep 2026), sin poder probarse todavía**: el cliente confirmó que la clínica necesita emitir facturas electrónicas al SRI. Dos bloqueos de datos confirmados con el cliente: **no tiene certificado digital .p12 todavía** (hay que tramitarlo con una entidad certificadora — Security Data, BCE, Uanataca, etc., trámite con costo propio) y **no tiene RUC/establecimiento/punto de emisión asignados** (los asigna el SRI al registrar el punto de venta). Con esos dos bloqueos, se construyó completa la Parte 1 (estructura interna: líneas de factura, catálogos SRI de forma de pago/tipo de identificación/tarifa de IVA, PDF con detalle) **y también la Parte 2** (mapper + servicio que arman el documento y llaman a `dazza-dev/laravel-sri-ec`, acción "Emitir al SRI" en el panel) — ambas sin poder probarse en este sandbox (sin PHP/Composer). Detalle completo, decisiones de diseño y pasos pendientes (certificado, RUC, `composer install`, probar en ambiente de pruebas del SRI): `docs/FACTURACION_ELECTRONICA_SRI.md`.
 - **Marco legal ecuatoriano aplicable** (investigación 24 ago 2026, no implica cambio de código inmediato): LOPDP clasifica los datos de salud como "dato sensible" (consentimiento explícito en general, con excepción para instituciones/profesionales de salud tratando datos de sus propios pacientes) y establece "protección de datos desde el diseño". Además, **Acuerdos Ministeriales del MSP (1190-2012, 0009-2017 y su reglamento de 2017) obligan al estándar HL7 para historia clínica electrónica, para instituciones de salud tanto públicas como privadas en Ecuador** — no es opcional a futuro, aplica directo cuando se construya el expediente clínico completo de arriba. Cumplimiento LOPDP: registro de consentimiento del paciente + auditoría de accesos a datos de salud (candidato: `spatie/laravel-activitylog`).
 - Recordatorios de cita por WhatsApp/SMS, portal de autoagendamiento — **descartados explícitamente por ahora**, fase futura.
 - Reportes/KPIs adicionales, lista de espera automática al cancelar cita, recall/control preventivo, encuesta de satisfacción post-visita, ficha de "paciente frecuente", turno virtual sin cita, panel ejecutivo ampliado.
@@ -226,6 +227,7 @@ Médico ve solo "sus" registros (Citas, Historias Clínicas, Alergias, Anteceden
 2. Reemplazar placeholders de teléfono/WhatsApp antes de publicar (6 ocurrencias: nav, hero, contacto).
 3. Entrevista formal con el dueño — resolver preguntas de la sección 6 (incluida confirmar dirección exacta/horario real para la sección Contacto — el mapa ya tiene coordenadas reales, pero horario/teléfono siguen sin confirmar).
 4. Confirmar con el cliente la matriz de permisos de Alergias, Antecedentes y Signos vitales (sección 10, hoy es una decisión propia por analogía con Historias Clínicas). Con los 3 módulos del expediente clínico completo construidos y confirmados en el entorno real, no queda ningún módulo nuevo pendiente de diseño ni de probar — el resto son confirmaciones con el cliente.
+5. Facturación electrónica SRI: probar Parte 1 en el entorno real (`sail artisan migrate` + `db:seed`, revisar el tab "Líneas" en Editar Factura y el PDF). Del lado del cliente: tramitar el certificado .p12 y confirmar RUC/establecimiento/punto de emisión — recién con eso se puede probar la Parte 2 (`composer install` + publicar migraciones del paquete + probar "Emitir al SRI" en ambiente de pruebas del SRI). Detalle completo: `docs/FACTURACION_ELECTRONICA_SRI.md`.
 
 ## 12. Cómo mantener este archivo (a partir de ahora)
 

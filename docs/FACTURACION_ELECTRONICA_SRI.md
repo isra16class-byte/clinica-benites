@@ -167,67 +167,110 @@ falta probarlo en el entorno real, igual que los módulos anteriores.
   `sum('total')` — se habrían roto en el entorno real si no se corregían
   junto con el rename de columna.
 
-## Lo que FALTA (Parte 2 — integración real, no empezada)
+## Lo que YA está construido (Parte 2 — integración real, escrita el 01 sep 2026, SIN PROBAR)
 
-No se escribió ni una línea de esto todavía. Es lo que sigue:
+Escrito en la misma sesión que retomó este documento. Sigue sin poder
+probarse (sin PHP/Composer en el sandbox) — **antes de usar esto en el
+entorno real, correr `composer install` y probar contra el ambiente de
+pruebas del SRI, no producción, la primera vez.**
 
-1. **`config/clinica.php`** (nuevo) — datos tributarios de la empresa (RUC,
-   razón social, nombre comercial, dirección matriz, código de
-   establecimiento/punto de emisión por defecto), todos vía `env()`, con
-   placeholders explícitos hasta que el cliente confirme los datos reales
-   (sección 6 de MEMORIA.md, pregunta pendiente).
-2. **`.env.example`** — agregar bloque con las variables de arriba +
-   `SRI_TEST`, `SRI_CERTIFICATE_PATH`, `SRI_CERTIFICATE_PASSWORD`,
-   `SRI_PATH` (las que pide `laravel-sri-ec/config/laravel-sri-ec.php`).
-3. **`composer.json`** — agregar `"dazza-dev/laravel-sri-ec": "^1.0"` a
-   `require`. Sigue siendo código muerto hasta que el usuario corra
-   `composer install` en su entorno real.
-4. **`app/Services/Sri/FacturaSriMapper.php`** (nuevo) — clase que arma el
-   array `$documentData` (estructura verificada arriba) a partir de un
-   `Factura` con sus `lineas` cargadas + los datos de `config/clinica.php`
-   + el `Paciente` relacionado. Punto de mayor riesgo de bugs de mapeo:
-   revisar con cuidado que cada `codigo_iva` de `LineaFactura` se traduzca
-   bien a `taxes[].percentage_code`, y que `unit` tenga un valor por
-   defecto razonable (el paquete lo exige, el proyecto no tiene ese
-   concepto todavía — usar `'UNI'` fijo es razonable para servicios).
-5. **`app/Services/Sri/FacturaSriService.php`** (nuevo) — llama a
-   `LaravelSriEc::getClient()->setDocumentType('invoice')->
-   setDocumentData($mapper->toArray($factura))->sendDocument()`, envuelto
-   en `try/catch` sobre `DazzaDev\SriEc\Exceptions\DocumentException`, y
-   guarda el resultado en la factura (`estado_sri`, `clave_acceso`,
-   `numero_autorizacion`, `mensaje_sri`, `fecha_autorizacion`,
-   `secuencial` asignado en este momento, no antes — ver comentario en la
-   migración de `facturas`). Debe chequear
-   `class_exists(\DazzaDev\LaravelSriEc\Facades\LaravelSriEc::class)`
-   primero y devolver un error claro si el paquete todavía no está
-   instalado (composer install pendiente).
-6. **Action "Emitir al SRI"** en `FacturasTable`/`EditFactura` — visible
-   solo para admin, llama al servicio de arriba, muestra notificación de
-   éxito/error. Debe avisar explícitamente si falta certificado/RUC en
-   config (no intentar silenciosamente).
-7. **Publicar migraciones del paquete** (`sri_certificates`,
-   `sri_listings`, `sri_documents`) — documentar en este archivo el
-   comando (`php artisan vendor:publish --tag="laravel-sri-ec-migrations"`)
-   para que el usuario lo corra en su entorno.
-8. Actualizar MEMORIA.md sección 10 (permisos) y sección 11 (roadmap) una
-   vez que la Parte 2 esté escrita: agregar los pasos pendientes del lado
-   del cliente (tramitar certificado .p12, tramitar RUC/establecimiento/
-   punto de emisión, cargar esos datos en `.env`, correr
-   `composer require dazza-dev/laravel-sri-ec` + publicar migraciones +
-   migrar, y recién ahí probar "Emitir al SRI" en ambiente de pruebas del
-   SRI antes de producción).
+- **`config/clinica.php`** (nuevo) — datos tributarios de la empresa (RUC,
+  razón social, nombre comercial, dirección matriz, establecimiento/punto
+  de emisión por defecto, certificado .p12), todos vía `env()`. Ningún
+  valor real cargado — placeholders hasta que el cliente confirme.
+- **`.env.example`** — bloque nuevo con `CLINICA_RUC`,
+  `CLINICA_RAZON_SOCIAL`, `CLINICA_NOMBRE_COMERCIAL`,
+  `CLINICA_DIRECCION_MATRIZ`, `CLINICA_CONTRIBUYENTE_ESPECIAL`,
+  `CLINICA_OBLIGADO_CONTABILIDAD`, `CLINICA_AGENTE_RETENCION`,
+  `CLINICA_ESTABLECIMIENTO_CODE/NAME`, `CLINICA_PUNTO_EMISION_CODE/NAME`,
+  `SRI_AMBIENTE` (default `pruebas`), `SRI_CERTIFICATE_PATH`,
+  `SRI_CERTIFICATE_PASSWORD`.
+- **`composer.json`** — agregado `"dazza-dev/laravel-sri-ec": "^1.0"` a
+  `require`. Sigue siendo código muerto hasta correr `composer install`;
+  `composer.lock` no se regeneró (no hay Composer en el sandbox) — correr
+  `composer update dazza-dev/laravel-sri-ec` la primera vez en el entorno
+  real.
+- **`app/Services/Sri/FacturaSriMapper.php`** (nuevo) — arma el array
+  `$documentData` exacto (estructura verificada arriba) a partir de una
+  `Factura` con `lineas`/`paciente` cargados. Lanza `InvalidArgumentException`
+  explícita si falta algo (paciente, líneas, forma de pago, RUC/dirección
+  de la empresa) en vez de mandar un XML incompleto. Agrupa las líneas por
+  `codigo_iva` para armar `totals.taxes` (el SRI exige un renglón de
+  impuesto por cada tarifa distinta usada, no un total único).
+- **`app/Services/Sri/FacturaSriService.php`** (nuevo) —
+  `motivosBloqueoEmision(Factura)` chequea todo lo verificable sin red
+  (paquete instalado, RUC/certificado configurados, factura con
+  líneas/forma de pago, no ya autorizada) y devuelve la lista de motivos
+  en español; `puedeEmitir()` es el booleano corto. `emitir(Factura)`
+  asigna el `secuencial` recién en este momento (no al crear la factura),
+  llama a `LaravelSriEc::getClient()->setCertificate()->setDocumentType('invoice')
+  ->setDocumentData()->sendDocument()`, y guarda `estado_sri`,
+  `clave_acceso`, `numero_autorizacion`, `fecha_autorizacion`,
+  `mensaje_sri` según el resultado. **Nota de concurrencia**: el cálculo
+  del siguiente secuencial (`siguienteSecuencial()`) no usa
+  `lockForUpdate()` — si en algún momento hay más de una caja emitiendo al
+  mismo tiempo, hace falta agregarlo para no repetir secuencial (no se
+  agregó para no complicar código que no se pudo probar).
+- **Action "Emitir al SRI"** en `FacturasTable` — visible solo para admin,
+  llama a `motivosBloqueoEmision()` primero y muestra una notificación de
+  advertencia con la lista en español si no se puede emitir todavía (sin
+  intentar la llamada real), o el resultado de éxito/error de `emitir()`.
 
-## Cómo seguir
+Investigación adicional hecha para escribir esto (no repetir): se clonó
+también `github.com/dazza-dev/sri-sender` para confirmar la forma exacta
+de la respuesta de `Client::sendDocument()` — devuelve
+`$send['authorization']` con `status`, `authorized_document` (`access_key`
+= número de autorización del SRI — el nombre del campo es confuso, no es
+la clave de acceso de 49 dígitos —, `xml`, `date`), `messages`,
+`attempts`. Confirmado en `AuthorizationClient::getAuthorizationNumber()`
+que navega `RespuestaAutorizacionComprobante->autorizaciones->autorizacion->numeroAutorizacion`.
+Si el SRI rechaza, `Client::sendDocument()` lanza
+`DazzaDev\SriEc\Exceptions\DocumentException` con el mensaje de error —
+el servicio lo captura como `Throwable` genérico y guarda
+`estado_sri = 'error'` + el mensaje en `mensaje_sri`.
 
-1. Leer este archivo completo.
-2. Empezar por el punto 1 de "Lo que FALTA" (`config/clinica.php`) y seguir
-   el orden — cada punto depende un poco del anterior.
-3. Mismo flujo de trabajo de siempre: sin PHP/Composer en el sandbox,
-   escribir el código a mano verificando contra el código fuente real de
-   los paquetes (ya clonados una vez en esta sesión — si hace falta
-   reconsultarlos, volver a clonar con `git clone --depth 1
-   https://github.com/dazza-dev/<paquete>.git`, la red del sandbox lo
-   permite).
-4. Al terminar, actualizar este mismo archivo (o borrarlo y dejar el
-   resumen final directo en MEMORIA.md/CHANGELOG.md, si para ese momento
-   ya no hace falta un documento de continuación aparte).
+## Lo que FALTA (para poder usar esto de verdad)
+
+Todo esto depende de datos/trámites que **no son código** — nada más para
+escribir hasta que el cliente los tenga:
+
+1. Tramitar el certificado digital .p12 (entidad certificadora autorizada
+   en Ecuador — Security Data, BCE, Uanataca, etc.).
+2. Tramitar/confirmar RUC, código de establecimiento y punto de emisión
+   ante el SRI.
+3. Cargar esos datos reales en `.env` (nunca commitear el `.env` con
+   datos reales ni el archivo `.p12` al repo).
+4. Correr `composer require dazza-dev/laravel-sri-ec` (o `composer
+   update` si ya está en `composer.json`, como ahora) en el entorno real.
+5. Publicar las migraciones propias del paquete
+   (`php artisan vendor:publish --tag="laravel-sri-ec-migrations"` —
+   crean `sri_certificates`, `sri_listings`, `sri_documents`) y correr
+   `php artisan migrate`.
+6. Probar `FacturaSriService::emitir()` con `SRI_AMBIENTE=pruebas` contra
+   el ambiente de certificación del SRI, con una factura real de prueba,
+   **antes** de cambiar a `produccion` — un comprobante autorizado en
+   producción es fiscalmente real y no se puede simplemente borrar si
+   algo salió mal en el mapeo.
+7. Confirmar con un contador si el default de `codigo_iva = '0'` (0%) en
+   `LineaFactura` es correcto para todos los servicios que factura la
+   clínica, o si alguno debería ir a 15% (ver nota en la migración de
+   `lineas_factura` — verificado por búsqueda web que los servicios de
+   salud están en tarifa 0% por LRTI art. 55-56, pero no confirmado caso
+   por caso con un profesional).
+8. Una vez validado el flujo completo en producción, actualizar
+   MEMORIA.md sección 6 (marcar la pregunta como resuelta) y sección 11
+   (roadmap), y considerar borrar o resumir este archivo si ya no hace
+   falta como documento de continuación aparte.
+
+## Cómo seguir si hace falta retomar el código (no los trámites)
+
+1. Leer este archivo completo, en particular la sección de arriba con lo
+   ya construido — no reescribir el mapper/servicio desde cero.
+2. Si hace falta reconsultar el código fuente de los paquetes, volver a
+   clonarlos (la red del sandbox permite `github.com`):
+   `git clone --depth 1 https://github.com/dazza-dev/<paquete>.git`
+   (`sri-xml-generator`, `sri-ec`, `sri-sender`, `laravel-sri-ec`).
+3. Revisar con cuidado, apenas se pueda correr Composer en un entorno
+   real, que el mapeo de `FacturaSriMapper` compile y que
+   `LaravelSriEc::getClient()` exista con esa firma exacta — esto nunca
+   se ejecutó, solo se verificó leyendo el código fuente.
