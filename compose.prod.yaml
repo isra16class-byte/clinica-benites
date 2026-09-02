@@ -1,0 +1,57 @@
+# Compose de PRODUCCIÓN. No confundir con compose.yaml (ese es de Sail,
+# para desarrollo local con Mailpit/Selenium/Meilisearch que acá no hacen
+# falta — sesión/cola/caché ya usan el driver 'database', sin Redis).
+#
+# Uso:
+#   cp .env.example .env   # completar valores reales de producción
+#   docker compose -f compose.prod.yaml up -d --build
+#
+# La imagen 'app' corre las migraciones automáticamente al arrancar
+# (docker/entrypoint.sh) — no hace falta correrlas a mano la primera vez.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+    ports:
+      - '${APP_PORT:-80}:80'
+    volumes:
+      - storage-data:/var/www/html/storage/app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - clinica
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-p${DB_PASSWORD}']
+      retries: 5
+      interval: 5s
+      timeout: 5s
+    networks:
+      - clinica
+
+networks:
+  clinica:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  storage-data:
