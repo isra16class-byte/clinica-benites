@@ -4,6 +4,14 @@ Historial completo previo al 28 de agosto de 2026 (23-28 ago): ver `docs/histori
 
 Formato de entrada a partir de ahora: corta y al grano — qué cambió, en qué archivo(s), 2-4 líneas. El detalle de investigación/depuración vale más en el mensaje de commit que acá.
 
+## [2026-09-02] Decisión de hosting: evaluando Oracle Cloud "Always Free" en vez de VPS pago
+
+Comparación en pantalla con el usuario: la línea barata de Hetzner no está disponible en su cuenta, y la que sí está disponible sale más cara que DigitalOcean en specs equivalentes; con el crédito de GitHub Student Developer Pack, DigitalOcean cubriría 11-33 meses gratis. En paralelo se está evaluando Oracle Cloud "Always Free" (2 OCPU ARM + 12GB RAM, gratis permanente, no un crédito que se agota) — de sobra para el uso real estimado del proyecto. Cuenta ya creada (tenancy `isra16`, región Bogotá); falta crear la VM (forma `VM.Standard.A1.Flex`) y armar un `Dockerfile`/compose de producción (hoy solo existe el de Sail, para desarrollo). Decisión sin cerrar todavía. Sin cambios de código. Detalle completo: `docs/SESION_2026-09-02_hosting_y_fix_facturacion.md`.
+
+## [2026-09-02] Gotcha: `composer.lock` desincronizado entre patches de Claude y cambios locales del usuario
+
+Un patch de Claude falló al aplicar (`git am`) porque el usuario había corrido `composer update dazza-dev/laravel-sri-ec --with-all-dependencies` localmente sin commitear/pushear el `composer.lock` resultante — solo `composer.json` llegaba vía patch. Ya sincronizado en GitHub. Lección para adelante: verificar que `composer.lock` quede commiteado tras cualquier cambio de dependencias hecho del lado del usuario, no asumir que viene incluido en los patches de Claude.
+
 ## [2026-09-02] Dato: confirmación en vivo de Facturación electrónica SRI Parte 1 — seeder, listado y bloqueo de emisión funcionando
 
 El usuario probó en su entorno real (tras aplicar el fix de `facturas.total`): `db:seed --class=DemoHistoricoSeeder` corrió completo sin errores (facturas con líneas de detalle, totales calculados correctamente vía `recalcularTotales()`), el listado `/admin/facturas` muestra los totales reales por factura, y el botón "Emitir al SRI" (`motivosBloqueoEmision()`) bloqueó la emisión con el mensaje esperado en español: falta RUC/dirección matriz en `config/clinica.php`/`.env`, falta el certificado .p12, y la factura de prueba (estado `pendiente`) no tiene forma de pago asignada (correcto, solo las `pagado` la tienen). **Con esto, la Parte 1 de facturación SRI queda construida y confirmada funcionando de punta a punta en el entorno real** — sigue bloqueada para emitir de verdad solo por los dos trámites pendientes del lado del cliente (certificado .p12, RUC/establecimiento/punto de emisión), no por código. Sin cambios de código — solo confirmación.
